@@ -10,12 +10,14 @@ class MenuButtonCard extends StatelessWidget {
     this.onHover,
     this.backgroundColor,
     this.menuCardRadius,
+    this.hasIcon = true,
     super.key,
   });
   String title;
   Function? onTap;
   Function? onHover;
   IconData icon;
+  bool hasIcon;
   BorderRadius? menuCardRadius;
   Color? backgroundColor;
   @override
@@ -53,10 +55,12 @@ class MenuButtonCard extends StatelessWidget {
               const SizedBox(
                 width: 20,
               ),
-              Icon(
-                icon,
-                size: 25,
-              ),
+              hasIcon
+                  ? Icon(
+                      icon,
+                      size: 25,
+                    )
+                  : const SizedBox()
             ]),
           ],
         ),

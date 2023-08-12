@@ -13,100 +13,78 @@ class RealEstatesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> realEstates = [
+      'عمارة رقم ۱',
+      'عمارة رقم ۲',
+      'عمارة رقم ۳',
+      'عمارة رقم ٤',
+      'عمارة رقم ٥',
+      'عمارة رقم ٦',
+      'عمارة رقم ۷'
+    ];
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return ListView(
       shrinkWrap: true,
       children: [
-        GridView(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: width > 1250 ? 3 : 2,
-              childAspectRatio: 1.3,
-              crossAxisSpacing: 20),
-          children: [
-            /* *SECTION - RealEstate 3 */
-            RealEstateActionsWidget(
-              onAddingNewApartementButtonTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => FluidDialog(
-                    // Set the first page of the dialog.
-                    rootPage: FluidDialogPage(
-                        alignment: Alignment
-                            .center, //Aligns the dialog to the bottom left.
-                        builder: (context) {
-                          return AddRealEstate();
-                        }),
-                  ),
-                );
-              },
-              onShowAllApartementsInRealEstateButtonTap: () {},
-              onShowAllOwnersInRealEstateButtonTap: () {},
-              width: width,
-              realEstateName: 'عمارة رقم ۳',
-            ),
-            /* *!SECTION */
-
-            /* *SECTION - RealEstate 2 */
-            RealEstateActionsWidget(
-              onAddingNewApartementButtonTap: () {},
-              onShowAllApartementsInRealEstateButtonTap: () {},
-              onShowAllOwnersInRealEstateButtonTap: () {},
-              width: width,
-              realEstateName: 'عمارة رقم ۲',
-            ),
-            /* *!SECTION */
-
-            /* *SECTION - RealEstate 1 */
-            RealEstateActionsWidget(
-              onAddingNewApartementButtonTap: () {},
-              onShowAllApartementsInRealEstateButtonTap: () {},
-              onShowAllOwnersInRealEstateButtonTap: () {},
-              width: width,
-              realEstateName: 'عمارة رقم ۱',
-            ),
-            /* *!SECTION */
-            /* *SECTION - RealEstate 6 */
-            RealEstateActionsWidget(
-              onAddingNewApartementButtonTap: () {},
-              onShowAllApartementsInRealEstateButtonTap: () {},
-              onShowAllOwnersInRealEstateButtonTap: () {},
-              width: width,
-              realEstateName: 'عمارة رقم ٦',
-            ),
-            /* *!SECTION */
-
-            /* *SECTION - RealEstate 5 */
-            RealEstateActionsWidget(
-              onAddingNewApartementButtonTap: () {},
-              onShowAllApartementsInRealEstateButtonTap: () {},
-              onShowAllOwnersInRealEstateButtonTap: () {},
-              width: width,
-              realEstateName: 'عمارة رقم ٥',
-            ),
-            /* *!SECTION */
-
-            /* *SECTION - RealEstate 4 */
-            RealEstateActionsWidget(
-              onAddingNewApartementButtonTap: () {},
-              onShowAllApartementsInRealEstateButtonTap: () {},
-              onShowAllOwnersInRealEstateButtonTap: () {},
-              width: width,
-              realEstateName: 'عمارة رقم ٤',
-            ),
-            /* *!SECTION */
-          ],
-        ),
+        GridView.builder(
+            shrinkWrap: true,
+            itemCount: realEstates.length - 1,
+            reverse: false,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: width > 1250 ? 3 : 2,
+                childAspectRatio: 1.3,
+                crossAxisSpacing: 20),
+            itemBuilder: (context, index) {
+              /* *SECTION - RealEstate 3 */
+              return RealEstateActionsWidget(
+                onAddingNewApartementButtonTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => FluidDialog(
+                      // Set the first page of the dialog.
+                      rootPage: FluidDialogPage(
+                          alignment: Alignment
+                              .center, //Aligns the dialog to the bottom left.
+                          builder: (context) {
+                            return AddRealEstate(
+                              buildingNumber: index,
+                            );
+                          }),
+                    ),
+                  );
+                },
+                onShowAllApartementsInRealEstateButtonTap: () {},
+                onShowAllOwnersInRealEstateButtonTap: () {},
+                width: width,
+                realEstateName: realEstates[index],
+              );
+              /* *!SECTION */
+            }),
         /* *SECTION - RealEstate 7 */
         Center(
           child: RealEstateActionsWidget(
-            onAddingNewApartementButtonTap: () {},
+            onAddingNewApartementButtonTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => FluidDialog(
+                  // Set the first page of the dialog.
+                  rootPage: FluidDialogPage(
+                      alignment: Alignment
+                          .center, //Aligns the dialog to the bottom left.
+                      builder: (context) {
+                        return const AddRealEstate(
+                          buildingNumber: 6,
+                        );
+                      }),
+                ),
+              );
+            },
             onShowAllApartementsInRealEstateButtonTap: () {},
             onShowAllOwnersInRealEstateButtonTap: () {},
             width: width,
-            realEstateName: 'عمارة رقم ۷',
+            realEstateName: realEstates.last,
           ),
         ),
         /* *!SECTION */
@@ -179,7 +157,7 @@ class RealEstateActionsWidget extends StatelessWidget {
                         onAddingNewApartementButtonHoverValueNotifier,
                     builder: (context, value, _) {
                       return MenuButtonCard(
-                        icon: Icons.add_card,
+                        icon: Icons.add_home_outlined,
                         title: 'اضف وحدة جديدة',
                         onHover: (isHovering) {
                           onAddingNewApartementButtonHoverValueNotifier
