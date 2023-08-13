@@ -27,41 +27,48 @@ class RealEstatesPage extends StatelessWidget {
     return ListView(
       shrinkWrap: true,
       children: [
-        GridView.builder(
-            shrinkWrap: true,
-            itemCount: realEstates.length - 1,
-            reverse: false,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: width > 1250 ? 3 : 2,
-                childAspectRatio: 1.3,
-                crossAxisSpacing: 20),
-            itemBuilder: (context, index) {
-              /* *SECTION - RealEstate 3 */
-              return RealEstateActionsWidget(
-                onAddingNewApartementButtonTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => FluidDialog(
-                      // Set the first page of the dialog.
-                      rootPage: FluidDialogPage(
-                          alignment: Alignment
-                              .center, //Aligns the dialog to the bottom left.
-                          builder: (context) {
-                            return AddRealEstate(
-                              buildingNumber: index,
-                            );
-                          }),
-                    ),
-                  );
-                },
-                onShowAllApartementsInRealEstateButtonTap: () {},
-                onShowAllOwnersInRealEstateButtonTap: () {},
-                width: width,
-                realEstateName: realEstates[index],
-              );
-              /* *!SECTION */
-            }),
+        Directionality(
+          textDirection: TextDirection.rtl,
+          child: GridView.builder(
+              shrinkWrap: true,
+              itemCount: realEstates.length - 1,
+              reverse: false,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: width > 1250 ? 3 : 2,
+                  childAspectRatio: 1.3,
+                  crossAxisSpacing: 20),
+              itemBuilder: (context, index) {
+                /* *SECTION - RealEstate 3 */
+                return Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: RealEstateActionsWidget(
+                    onAddingNewApartementButtonTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => FluidDialog(
+                          // Set the first page of the dialog.
+                          rootPage: FluidDialogPage(
+                              alignment: Alignment
+                                  .center, //Aligns the dialog to the bottom left.
+                              builder: (context) {
+                                return AddRealEstate(
+                                  windowState: 'AddOwner',
+                                  buildingNumber: index + 1,
+                                );
+                              }),
+                        ),
+                      );
+                    },
+                    onShowAllApartementsInRealEstateButtonTap: () {},
+                    onShowAllOwnersInRealEstateButtonTap: () {},
+                    width: width,
+                    realEstateName: realEstates[index],
+                  ),
+                );
+                /* *!SECTION */
+              }),
+        ),
         /* *SECTION - RealEstate 7 */
         Center(
           child: RealEstateActionsWidget(
@@ -75,7 +82,8 @@ class RealEstatesPage extends StatelessWidget {
                           .center, //Aligns the dialog to the bottom left.
                       builder: (context) {
                         return const AddRealEstate(
-                          buildingNumber: 6,
+                          buildingNumber: 7,
+                          windowState: 'AddOwner',
                         );
                       }),
                 ),
