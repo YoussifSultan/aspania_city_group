@@ -1,10 +1,13 @@
+import 'dart:math';
+
 import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
 import 'package:aspania_city_group/class/buidlingproperties.dart';
+import 'package:aspania_city_group/class/validators.dart';
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
+import "package:get/get.dart";
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Dashboard/value_notifiers.dart';
 import '../class/role.dart';
 
 class AddRealEstate extends StatefulWidget {
@@ -29,6 +32,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
   TextEditingController apartementNumberTextController =
       TextEditingController();
   TextEditingController ownerNameTextController = TextEditingController();
+  bool ownerNameTextControllerIsErrorText = false;
   TextEditingController apartementLinkTextController = TextEditingController();
   TextEditingController ownerEmailTextController = TextEditingController();
   TextEditingController ownerPhoneNumberTextController =
@@ -38,12 +42,9 @@ class _AddRealEstateState extends State<AddRealEstate> {
   TextEditingController confirmPasswordTextController = TextEditingController();
   /* *!SECTION */
   /* *SECTION - ValueNotfiers */
-  OnHoverOnButtonValueNotifier onSaveButtonHoverValueNotifier =
-      OnHoverOnButtonValueNotifier(false);
-  OnHoverOnButtonValueNotifier onCancelButtonHoverValueNotifier =
-      OnHoverOnButtonValueNotifier(false);
-  OnHoverOnButtonValueNotifier onEditButtonHoverValueNotifier =
-      OnHoverOnButtonValueNotifier(false);
+  RxBool onSaveButtonHover = false.obs;
+  RxBool onCancelButtonHover = false.obs;
+  RxBool onEditButtonHover = false.obs;
   /* *!SECTION */
   /* *SECTION - Important Lists */
   final List<Building> realEstates = [
@@ -77,7 +78,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
         id: 2, ownerRole: 'Owner', roles: ['ssss', 'sss', 'sscsmahbchs']),
   ];
   /* *!SECTION */
-  /* *SECTION -  */
+  /* *SECTION -  initstate*/
   @override
   void initState() {
     if (widget.windowState == 'EditOwner') {}
@@ -94,6 +95,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    int noOfErrorsInTextController = 0;
     /* *SECTION - Dialog */
     return Container(
       width: width > 1350
@@ -101,7 +103,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
           : width > 1000
               ? width * 0.8
               : width * 0.9,
-      height: height * 0.8,
+      height: height * 0.83,
       padding: const EdgeInsets.fromLTRB(40, 20, 40, 20),
       child: Column(
         children: [
@@ -141,21 +143,37 @@ class _AddRealEstateState extends State<AddRealEstate> {
                               : width > 1000
                                   ? width * 0.4
                                   : width * 0.5,
+                          onChange: (text, errorText) {
+                            if (!Validators.isArabicOnly(text)) {
+                              errorText('ادخل حروف فقط');
+                              noOfErrorsInTextController++;
+                            } else {
+                              errorText('');
+                              noOfErrorsInTextController--;
+                            }
+                          },
                           textController: ownerNameTextController,
                           hintText: 'ادخل اسم الماك',
                           icon: Icons.person_outlined,
                           title: 'اسم المالك',
                         ),
                         /* *!SECTION */
-                        const SizedBox(
-                          height: 20,
-                        ),
+
                         /* *SECTION - Owner Phone And Owner Role*/
                         Row(
                           textDirection: TextDirection.rtl,
                           children: [
                             TextTile(
                               width: width * 0.14,
+                              onChange: (text, errorText) {
+                                if (!Validators.isNumericOnly(text)) {
+                                  errorText('ادخل ارقام فقط');
+                                  noOfErrorsInTextController++;
+                                } else {
+                                  errorText('');
+                                  noOfErrorsInTextController--;
+                                }
+                              },
                               textController: ownerPhoneNumberTextController,
                               hintText: 'ادخل رقم تلفون',
                               icon: Icons.phone_outlined,
@@ -189,53 +207,42 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                               itemCount: ownerRole.length,
                                               itemBuilder: (context, index) {
                                                 /* *SECTION - Roles Item With Hover */
-                                                OnHoverOnButtonValueNotifier
-                                                    onHoverOfFloorItem =
-                                                    OnHoverOnButtonValueNotifier(
-                                                        false);
-                                                return ValueListenableBuilder(
-                                                    valueListenable:
-                                                        onHoverOfFloorItem,
-                                                    builder:
-                                                        (context, value, _) {
-                                                      return MenuButtonCard(
-                                                          backgroundColor:
-                                                              onHoverOfFloorItem
-                                                                      .onHover
-                                                                  ? Colors
-                                                                      .grey[500]
-                                                                  : Colors
-                                                                      .white,
-                                                          icon: Icons.abc,
-                                                          hasIcon: false,
-                                                          onHover:
-                                                              (isHovering) {
-                                                            onHoverOfFloorItem
-                                                                .changeOnHoverState(
-                                                                    isHovering);
-                                                          },
-                                                          onTap: () {
-                                                            ownerRoleTextController
-                                                                    .text =
-                                                                ownerRole
-                                                                    .firstWhere((element) =>
+                                                RxBool onHoverOfFloorItem =
+                                                    false.obs;
+                                                return Obx(() {
+                                                  return MenuButtonCard(
+                                                      backgroundColor:
+                                                          onHoverOfFloorItem
+                                                                  .value
+                                                              ? Colors.grey[500]
+                                                              : Colors.white,
+                                                      icon: Icons.abc,
+                                                      hasIcon: false,
+                                                      onHover: (isHovering) {
+                                                        onHoverOfFloorItem(
+                                                            isHovering);
+                                                      },
+                                                      onTap: () {
+                                                        ownerRoleTextController
+                                                                .text =
+                                                            ownerRole
+                                                                .firstWhere(
+                                                                    (element) =>
                                                                         element
                                                                             .id ==
                                                                         index +
                                                                             1)
-                                                                    .ownerRole;
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          title: ownerRole
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .id ==
-                                                                      index + 1)
-                                                              .ownerRole);
-                                                    });
+                                                                .ownerRole;
+                                                        //NOTE - Change this if it doesn;t work
+                                                        Get.back();
+                                                      },
+                                                      title: ownerRole
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element.id ==
+                                                                  index + 1)
+                                                          .ownerRole);
+                                                });
                                                 /* *!SECTION */
                                               },
                                             ),
@@ -251,9 +258,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                           ],
                         ),
                         /* *!SECTION */
-                        const SizedBox(
-                          height: 20,
-                        ),
+
                         /* *SECTION - Owner Email */
                         TextTile(
                           width: width > 1350
@@ -261,16 +266,23 @@ class _AddRealEstateState extends State<AddRealEstate> {
                               : width > 1000
                                   ? width * 0.4
                                   : width * 0.5,
+                          onChange: (text, errorText) {
+                            if (!GetUtils.isEmail(text)) {
+                              errorText('ادخل البريد صحيحا');
+                              noOfErrorsInTextController++;
+                            } else {
+                              errorText('');
+                              noOfErrorsInTextController--;
+                            }
+                          },
                           textController: ownerEmailTextController,
                           hintText: 'ادخل البريد الالكتروني الماك',
                           icon: Icons.email_outlined,
                           title: 'البريد الالكتروني',
                         ),
                         /* *!SECTION */
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        /* *SECTION - Owner Phone And Owner Role*/
+
+                        /* *SECTION - Owner Password And Owner Confrim Password*/
                         Row(
                           textDirection: TextDirection.rtl,
                           children: [
@@ -278,6 +290,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                               width: width * 0.14,
                               textController: ownerPasswordTextController,
                               hintText: 'ادخل الكلمة السرية',
+                              isPassword: true,
                               icon: Icons.password_outlined,
                               title: 'الكلمة السرية',
                             ),
@@ -288,6 +301,17 @@ class _AddRealEstateState extends State<AddRealEstate> {
                               width: width * 0.14,
                               textController: confirmPasswordTextController,
                               hintText: 'كلمة السرية',
+                              onChange: (text, errorText) {
+                                if (text != ownerPasswordTextController.text) {
+                                  errorText(
+                                      'ادخل كلمة سرية مطابقة للخانة الاولة');
+                                  noOfErrorsInTextController++;
+                                } else {
+                                  errorText('');
+                                  noOfErrorsInTextController--;
+                                }
+                              },
+                              isPassword: true,
                               icon: Icons.password_sharp,
                               title: 'تاكيد كلمة السرية',
                             ),
@@ -295,6 +319,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                         ),
                         /* *!SECTION */
                       ])),
+
 /* *SECTION - Apartement Position And Image WIth Qr Code */
               Column(
                 children: [
@@ -420,53 +445,42 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                               itemCount: realEstates.length,
                                               itemBuilder: (context, index) {
                                                 /* *SECTION - Building Item With Hover */
-                                                OnHoverOnButtonValueNotifier
-                                                    onHoverOfFloorItem =
-                                                    OnHoverOnButtonValueNotifier(
-                                                        false);
-                                                return ValueListenableBuilder(
-                                                    valueListenable:
-                                                        onHoverOfFloorItem,
-                                                    builder:
-                                                        (context, value, _) {
-                                                      return MenuButtonCard(
-                                                          backgroundColor:
-                                                              onHoverOfFloorItem
-                                                                      .onHover
-                                                                  ? Colors
-                                                                      .grey[500]
-                                                                  : Colors
-                                                                      .white,
-                                                          icon: Icons.abc,
-                                                          hasIcon: false,
-                                                          onHover:
-                                                              (isHovering) {
-                                                            onHoverOfFloorItem
-                                                                .changeOnHoverState(
-                                                                    isHovering);
-                                                          },
-                                                          onTap: () {
-                                                            apartementBuildingPositionTextController
-                                                                    .text =
-                                                                realEstates
-                                                                    .firstWhere((element) =>
+                                                RxBool onHoverOfBuildingItem =
+                                                    false.obs;
+                                                return Obx(() {
+                                                  return MenuButtonCard(
+                                                      backgroundColor:
+                                                          onHoverOfBuildingItem
+                                                                  .value
+                                                              ? Colors.grey[500]
+                                                              : Colors.white,
+                                                      icon: Icons.abc,
+                                                      hasIcon: false,
+                                                      onHover: (isHovering) {
+                                                        onHoverOfBuildingItem(
+                                                            isHovering);
+                                                      },
+                                                      onTap: () {
+                                                        apartementBuildingPositionTextController
+                                                                .text =
+                                                            realEstates
+                                                                .firstWhere(
+                                                                    (element) =>
                                                                         element
                                                                             .id ==
                                                                         index +
                                                                             1)
-                                                                    .buildingName;
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          title: realEstates
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .id ==
-                                                                      index + 1)
-                                                              .buildingName);
-                                                    });
+                                                                .buildingName;
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      title: realEstates
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element.id ==
+                                                                  index + 1)
+                                                          .buildingName);
+                                                });
                                                 /* *!SECTION */
                                               },
                                             ),
@@ -516,53 +530,42 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                                   realEstateFloors.length,
                                               itemBuilder: (context, index) {
                                                 /* *SECTION - Floor Item With Hover */
-                                                OnHoverOnButtonValueNotifier
-                                                    onHoverOfFloorItem =
-                                                    OnHoverOnButtonValueNotifier(
-                                                        false);
-                                                return ValueListenableBuilder(
-                                                    valueListenable:
-                                                        onHoverOfFloorItem,
-                                                    builder:
-                                                        (context, value, _) {
-                                                      return MenuButtonCard(
-                                                          backgroundColor:
-                                                              onHoverOfFloorItem
-                                                                      .onHover
-                                                                  ? Colors
-                                                                      .grey[500]
-                                                                  : Colors
-                                                                      .white,
-                                                          icon: Icons.abc,
-                                                          hasIcon: false,
-                                                          onHover:
-                                                              (isHovering) {
-                                                            onHoverOfFloorItem
-                                                                .changeOnHoverState(
-                                                                    isHovering);
-                                                          },
-                                                          onTap: () {
-                                                            apartementBuildingFloorPositionTextController
-                                                                    .text =
-                                                                realEstateFloors
-                                                                    .firstWhere((element) =>
+                                                RxBool onHoverOfFloorItem =
+                                                    false.obs;
+                                                return Obx(() {
+                                                  return MenuButtonCard(
+                                                      backgroundColor:
+                                                          onHoverOfFloorItem
+                                                                  .value
+                                                              ? Colors.grey[500]
+                                                              : Colors.white,
+                                                      icon: Icons.abc,
+                                                      hasIcon: false,
+                                                      onHover: (isHovering) {
+                                                        onHoverOfFloorItem(
+                                                            isHovering);
+                                                      },
+                                                      onTap: () {
+                                                        apartementBuildingFloorPositionTextController
+                                                                .text =
+                                                            realEstateFloors
+                                                                .firstWhere(
+                                                                    (element) =>
                                                                         element
                                                                             .id ==
                                                                         index +
                                                                             1)
-                                                                    .floorName;
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          title: realEstateFloors
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .id ==
-                                                                      index + 1)
-                                                              .floorName);
-                                                    });
+                                                                .floorName;
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      title: realEstateFloors
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element.id ==
+                                                                  index + 1)
+                                                          .floorName);
+                                                });
                                                 /* *!SECTION */
                                               },
                                             ),
@@ -611,53 +614,42 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                               itemCount: apartementState.length,
                                               itemBuilder: (context, index) {
                                                 /* *SECTION - States Item With Hover */
-                                                OnHoverOnButtonValueNotifier
-                                                    onHoverOfFloorItem =
-                                                    OnHoverOnButtonValueNotifier(
-                                                        false);
-                                                return ValueListenableBuilder(
-                                                    valueListenable:
-                                                        onHoverOfFloorItem,
-                                                    builder:
-                                                        (context, value, _) {
-                                                      return MenuButtonCard(
-                                                          backgroundColor:
-                                                              onHoverOfFloorItem
-                                                                      .onHover
-                                                                  ? Colors
-                                                                      .grey[500]
-                                                                  : Colors
-                                                                      .white,
-                                                          icon: Icons.abc,
-                                                          hasIcon: false,
-                                                          onHover:
-                                                              (isHovering) {
-                                                            onHoverOfFloorItem
-                                                                .changeOnHoverState(
-                                                                    isHovering);
-                                                          },
-                                                          onTap: () {
-                                                            apartementStateTextController
-                                                                    .text =
-                                                                apartementState
-                                                                    .firstWhere((element) =>
+                                                RxBool onHoverOfStatesItem =
+                                                    false.obs;
+                                                return Obx(() {
+                                                  return MenuButtonCard(
+                                                      backgroundColor:
+                                                          onHoverOfStatesItem
+                                                                  .value
+                                                              ? Colors.grey[500]
+                                                              : Colors.white,
+                                                      icon: Icons.abc,
+                                                      hasIcon: false,
+                                                      onHover: (isHovering) {
+                                                        onHoverOfStatesItem(
+                                                            isHovering);
+                                                      },
+                                                      onTap: () {
+                                                        apartementStateTextController
+                                                                .text =
+                                                            apartementState
+                                                                .firstWhere(
+                                                                    (element) =>
                                                                         element
                                                                             .id ==
                                                                         index +
                                                                             1)
-                                                                    .state;
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          title: apartementState
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .id ==
-                                                                      index + 1)
-                                                              .state);
-                                                    });
+                                                                .state;
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      title: apartementState
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element.id ==
+                                                                  index + 1)
+                                                          .state);
+                                                });
                                                 /* *!SECTION */
                                               },
                                             ),
@@ -700,7 +692,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
             ],
           ),
           const SizedBox(
-            height: 20,
+            height: 6,
           ),
           /* *SECTION - Action Buttons */
           Row(
@@ -708,37 +700,32 @@ class _AddRealEstateState extends State<AddRealEstate> {
             children: [
               /* *SECTION -  Add Apartement button */
               widget.windowState == 'AddOwner'
-                  ? ValueListenableBuilder(
-                      valueListenable: onSaveButtonHoverValueNotifier,
-                      builder: (context, value, _) {
-                        return MouseRegion(
-                            onEnter: (details) {
-                              onSaveButtonHoverValueNotifier
-                                  .changeOnHoverState(true);
-                            },
-                            onExit: (details) {
-                              onSaveButtonHoverValueNotifier
-                                  .changeOnHoverState(false);
-                            },
-                            child: Container(
-                              width: 150,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  color: onSaveButtonHoverValueNotifier.onHover
-                                      ? Colors.grey[500]
-                                      : Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey[500] ?? Colors.white),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Center(
-                                child: Text(
-                                  'حفظ الوحدة',
-                                  style:
-                                      GoogleFonts.notoSansArabic(fontSize: 18),
-                                ),
+                  ? Obx(() {
+                      return MouseRegion(
+                          onEnter: (details) {
+                            onSaveButtonHover(true);
+                          },
+                          onExit: (details) {
+                            onSaveButtonHover(false);
+                          },
+                          child: Container(
+                            width: 150,
+                            height: 50,
+                            decoration: BoxDecoration(
+                                color: onSaveButtonHover.value
+                                    ? Colors.grey[500]
+                                    : Colors.white,
+                                border: Border.all(
+                                    color: Colors.grey[500] ?? Colors.white),
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Center(
+                              child: Text(
+                                'حفظ الوحدة',
+                                style: GoogleFonts.notoSansArabic(fontSize: 18),
                               ),
-                            ));
-                      })
+                            ),
+                          ));
+                    })
                   : const SizedBox(),
               const SizedBox(
                 width: 20,
@@ -747,77 +734,66 @@ class _AddRealEstateState extends State<AddRealEstate> {
 
               /* *SECTION - Edit Apartement Button */
               widget.windowState == 'EditOwner'
-                  ? ValueListenableBuilder(
-                      valueListenable: onEditButtonHoverValueNotifier,
-                      builder: (context, value, _) {
-                        return GestureDetector(
-                          child: MouseRegion(
-                            onEnter: (details) {
-                              onEditButtonHoverValueNotifier
-                                  .changeOnHoverState(true);
-                            },
-                            onExit: (details) {
-                              onEditButtonHoverValueNotifier
-                                  .changeOnHoverState(false);
-                            },
-                            child: Container(
-                              width: 150,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  color: onEditButtonHoverValueNotifier.onHover
-                                      ? Colors.grey[500]
-                                      : Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey[500] ?? Colors.white),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Center(
-                                child: Text(
-                                  'تعديل الوحدة',
-                                  style:
-                                      GoogleFonts.notoSansArabic(fontSize: 18),
-                                ),
-                              ),
+                  ? Obx(() {
+                      return MouseRegion(
+                        onEnter: (details) {
+                          onEditButtonHover(true);
+                        },
+                        onExit: (details) {
+                          onEditButtonHover(false);
+                        },
+                        child: Container(
+                          width: 150,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: onEditButtonHover.value
+                                  ? Colors.grey[500]
+                                  : Colors.white,
+                              border: Border.all(
+                                  color: Colors.grey[500] ?? Colors.white),
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Center(
+                            child: Text(
+                              'تعديل الوحدة',
+                              style: GoogleFonts.notoSansArabic(fontSize: 18),
                             ),
                           ),
-                        );
-                      })
+                        ),
+                      );
+                    })
                   : const SizedBox(),
               const SizedBox(
                 width: 20,
               ),
               /* *!SECTION */
               /* *SECTION - Cancel Button */
-              ValueListenableBuilder(
-                  valueListenable: onCancelButtonHoverValueNotifier,
-                  builder: (context, value, _) {
-                    return MouseRegion(
-                      onEnter: (details) {
-                        onCancelButtonHoverValueNotifier
-                            .changeOnHoverState(true);
-                      },
-                      onExit: (details) {
-                        onCancelButtonHoverValueNotifier
-                            .changeOnHoverState(false);
-                      },
-                      child: Container(
-                        width: 150,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            color: onCancelButtonHoverValueNotifier.onHover
-                                ? Colors.grey[500]
-                                : Colors.transparent,
-                            border: Border.all(
-                                color: Colors.grey[500] ?? Colors.white),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Center(
-                          child: Text(
-                            'الغاء',
-                            style: GoogleFonts.notoSansArabic(fontSize: 18),
-                          ),
-                        ),
+              Obx(() {
+                return MouseRegion(
+                  onEnter: (details) {
+                    onCancelButtonHover(true);
+                  },
+                  onExit: (details) {
+                    onCancelButtonHover(false);
+                  },
+                  child: Container(
+                    width: 150,
+                    height: 50,
+                    decoration: BoxDecoration(
+                        color: onCancelButtonHover.value
+                            ? Colors.grey[500]
+                            : Colors.transparent,
+                        border:
+                            Border.all(color: Colors.grey[500] ?? Colors.white),
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Center(
+                      child: Text(
+                        'الغاء',
+                        style: GoogleFonts.notoSansArabic(fontSize: 18),
                       ),
-                    );
-                  }),
+                    ),
+                  ),
+                );
+              }),
               /* *!SECTION */
             ],
           )
@@ -839,18 +815,23 @@ class TextTile extends StatelessWidget {
     required this.icon,
     this.onTap,
     this.height = 50,
+    this.onChange,
+    this.isPassword = false,
   });
 
   final double width;
   final double height;
+  final bool isPassword;
   final String title;
   final String hintText;
   final IconData icon;
   final Function? onTap;
+  final Function? onChange;
   final TextEditingController textController;
 
   @override
   Widget build(BuildContext context) {
+    final RxString errorText = ''.obs;
     bool expandable = onTap != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -863,31 +844,63 @@ class TextTile extends StatelessWidget {
         const SizedBox(
           height: 8,
         ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[500] ?? Colors.black),
-              borderRadius: const BorderRadius.all(Radius.circular(20))),
-          width: width,
-          height: height,
-          child: TextField(
-            onTap: () {
-              if (expandable) {
-                onTap!();
-              }
-            },
-            readOnly: expandable,
-            maxLines: height != 50 ? 3 : 1,
-            textDirection: TextDirection.rtl,
-            controller: textController,
-            onChanged: (value) {},
-            decoration: InputDecoration(
-                hintText: hintText,
-                suffixIcon: Icon(icon),
-                border: InputBorder.none,
-                hintTextDirection: TextDirection.rtl),
-          ),
-        ),
+        Obx(() {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              /* *SECTION - TextField */
+              Container(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  decoration: BoxDecoration(
+                      border:
+                          Border.all(color: Colors.grey[500] ?? Colors.black),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(20))),
+                  width: width,
+                  height: height,
+                  child: TextField(
+                    onTap: () {
+                      if (expandable) {
+                        onTap!();
+                      }
+                    },
+                    readOnly: expandable,
+                    maxLines: height != 50 ? 3 : 1,
+                    textDirection: TextDirection.rtl,
+                    controller: textController,
+                    onChanged: (value) {
+                      if (onChange != null) {
+                        onChange!(value, errorText);
+                      }
+                    },
+                    obscureText: isPassword,
+                    enableSuggestions: isPassword ? false : true,
+                    autocorrect: isPassword ? false : true,
+                    decoration: InputDecoration(
+                        hintText: hintText,
+                        suffixIcon: Icon(icon),
+                        border: InputBorder.none,
+                        hintTextDirection: TextDirection.rtl),
+                  )),
+              /* *!SECTION */
+              const SizedBox(
+                height: 5,
+              ),
+              /* *SECTION - Error Text */
+              Visibility(
+                  visible: errorText.isNotEmpty,
+                  child: Text(
+                    errorText.value,
+                    style: GoogleFonts.notoSansArabic(
+                        color: Colors.red, fontSize: 14),
+                  )),
+              SizedBox(
+                height: errorText.isNotEmpty ? 0 : 15,
+              )
+              /* *!SECTION */
+            ],
+          );
+        }),
       ],
     );
   }

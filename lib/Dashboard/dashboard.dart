@@ -1,6 +1,6 @@
 import 'package:aspania_city_group/Dashboard/real_estate_summary.dart';
-import 'package:aspania_city_group/Dashboard/value_notifiers.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
@@ -18,8 +18,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   late AnimationController openMainScreenAnimationController;
   /* *!SECTION */
   /* *SECTION - ValueNotifiers */
-  TabOpenedInTheMainScreenValueNotifier selectedTabVaueNotifier =
-      TabOpenedInTheMainScreenValueNotifier(0);
+  RxInt selectedTabVaueNotifier = 0.obs;
   /* *!SECTION */
   /* *SECTION - Dispose */
   @override
@@ -53,29 +52,26 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 /* *SECTION - Main Screen */
-                ValueListenableBuilder(
-                    valueListenable: selectedTabVaueNotifier,
-                    builder: (context, value, _) {
-                      return SizeTransition(
-                        sizeFactor: openMainScreenAnimationController,
-                        child: Container(
-                          padding: const EdgeInsets.only(
-                              top: 20, left: 20, right: 20, bottom: 20),
-                          width: width > 1250 ? width * 0.80 : width * 0.75,
-                          height: height * 0.95,
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
-                          child: selectedTabVaueNotifier.selectedTab == 0
-                              /* *SECTION - Real Estate Part */
-                              ? const RealEstatesPage()
-                              /* *!SECTION */
-                              /* *TODO - Implement Other Screens */
-                              : const SizedBox(),
-                        ),
-                      );
-                    }),
+                Obx(() {
+                  return SizeTransition(
+                    sizeFactor: openMainScreenAnimationController,
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                          top: 20, left: 20, right: 20, bottom: 20),
+                      width: width > 1250 ? width * 0.80 : width * 0.75,
+                      height: height * 0.95,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      child: selectedTabVaueNotifier.toInt() == 0
+                          /* *SECTION - Real Estate Part */
+                          ? const RealEstatesPage()
+                          /* *!SECTION */
+                          /* *TODO - Implement Other Screens */
+                          : const SizedBox(),
+                    ),
+                  );
+                }),
                 const SizedBox(
                   width: 20,
                 ),
@@ -159,8 +155,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         title: 'الوحدات',
                         icon: Icons.category_outlined,
                         onTap: () {
-                          selectedTabVaueNotifier
-                              .changeSelectedTabInMainScreen(0);
+                          selectedTabVaueNotifier(0);
                           openMainScreenAnimationController.forward(from: 0);
                         },
                       ),
@@ -173,8 +168,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         title: 'الملاك',
                         icon: Icons.people_alt_outlined,
                         onTap: () {
-                          selectedTabVaueNotifier
-                              .changeSelectedTabInMainScreen(1);
+                          selectedTabVaueNotifier(1);
                           openMainScreenAnimationController.forward(from: 0);
                         },
                       ),

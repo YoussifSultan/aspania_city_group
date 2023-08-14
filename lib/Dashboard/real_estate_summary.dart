@@ -1,9 +1,10 @@
-import 'package:aspania_city_group/Dashboard/value_notifiers.dart';
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Add_RealEstate/add_real_estate.dart';
+import '../class/buidlingproperties.dart';
 import 'menu_card_button.dart';
 
 class RealEstatesPage extends StatelessWidget {
@@ -13,14 +14,14 @@ class RealEstatesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> realEstates = [
-      'عمارة رقم ۱',
-      'عمارة رقم ۲',
-      'عمارة رقم ۳',
-      'عمارة رقم ٤',
-      'عمارة رقم ٥',
-      'عمارة رقم ٦',
-      'عمارة رقم ۷'
+    final List<Building> realEstates = [
+      Building(buildingName: 'عمارة رقم ۱', id: 1),
+      Building(buildingName: 'عمارة رقم ۲', id: 2),
+      Building(buildingName: 'عمارة رقم ۳', id: 3),
+      Building(buildingName: 'عمارة رقم ٤', id: 4),
+      Building(buildingName: 'عمارة رقم ٥', id: 5),
+      Building(buildingName: 'عمارة رقم ٦', id: 6),
+      Building(buildingName: 'عمارة رقم ۷', id: 7),
     ];
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -63,7 +64,9 @@ class RealEstatesPage extends StatelessWidget {
                     onShowAllApartementsInRealEstateButtonTap: () {},
                     onShowAllOwnersInRealEstateButtonTap: () {},
                     width: width,
-                    realEstateName: realEstates[index],
+                    realEstateName: realEstates
+                        .firstWhere((element) => element.id == index + 1)
+                        .buildingName,
                   ),
                 );
                 /* *!SECTION */
@@ -92,7 +95,7 @@ class RealEstatesPage extends StatelessWidget {
             onShowAllApartementsInRealEstateButtonTap: () {},
             onShowAllOwnersInRealEstateButtonTap: () {},
             width: width,
-            realEstateName: realEstates.last,
+            realEstateName: realEstates.last.buildingName,
           ),
         ),
         /* *!SECTION */
@@ -120,12 +123,9 @@ class RealEstateActionsWidget extends StatelessWidget {
   final Function onShowAllOwnersInRealEstateButtonTap;
   final Function onShowAllApartementsInRealEstateButtonTap;
   /* *SECTION - OnHover Properties */
-  OnHoverOnButtonValueNotifier onAddingNewApartementButtonHoverValueNotifier =
-      OnHoverOnButtonValueNotifier(false);
-  OnHoverOnButtonValueNotifier onShowAllOwnersInRealEstateValueNotifier =
-      OnHoverOnButtonValueNotifier(false);
-  OnHoverOnButtonValueNotifier onShowAllApartementsInRealEstateValueNotifier =
-      OnHoverOnButtonValueNotifier(false);
+  RxBool onAddingNewApartementButtonHoverValueNotifier = false.obs;
+  RxBool onShowAllOwnersInRealEstateValueNotifier = false.obs;
+  RxBool onShowAllApartementsInRealEstateValueNotifier = false.obs;
   /* *!SECTION */
   @override
   Widget build(BuildContext context) {
@@ -160,80 +160,67 @@ class RealEstateActionsWidget extends StatelessWidget {
             child: Column(
               children: [
                 /* *SECTION - Add New Apartement */
-                ValueListenableBuilder(
-                    valueListenable:
-                        onAddingNewApartementButtonHoverValueNotifier,
-                    builder: (context, value, _) {
-                      return MenuButtonCard(
-                        icon: Icons.add_home_outlined,
-                        title: 'اضف وحدة جديدة',
-                        onHover: (isHovering) {
-                          onAddingNewApartementButtonHoverValueNotifier
-                              .changeOnHoverState(isHovering);
-                        },
-                        menuCardRadius: const BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            topLeft: Radius.circular(20)),
-                        backgroundColor:
-                            onAddingNewApartementButtonHoverValueNotifier
-                                    .onHover
-                                ? Colors.grey[300]
-                                : Colors.grey[50],
-                        onTap: () {
-                          onAddingNewApartementButtonTap();
-                        },
-                      );
-                    }),
+                Obx(() {
+                  return MenuButtonCard(
+                    icon: Icons.add_home_outlined,
+                    title: 'اضف وحدة جديدة',
+                    onHover: (isHovering) {
+                      onAddingNewApartementButtonHoverValueNotifier(isHovering);
+                    },
+                    menuCardRadius: const BorderRadius.only(
+                        topRight: Radius.circular(20),
+                        topLeft: Radius.circular(20)),
+                    backgroundColor:
+                        onAddingNewApartementButtonHoverValueNotifier.value
+                            ? Colors.grey[300]
+                            : Colors.grey[50],
+                    onTap: () {
+                      onAddingNewApartementButtonTap();
+                    },
+                  );
+                }),
                 /* *!SECTION */
                 /* *SECTION - Show Owners In RealEstate */
-                ValueListenableBuilder(
-                    valueListenable: onShowAllOwnersInRealEstateValueNotifier,
-                    builder: (context, value, _) {
-                      return MenuButtonCard(
-                        onHover: (isHovering) {
-                          onShowAllOwnersInRealEstateValueNotifier
-                              .changeOnHoverState(isHovering);
-                        },
-                        icon: Icons.show_chart,
-                        title: 'استعراض الملاك',
-                        menuCardRadius: const BorderRadius.only(),
-                        backgroundColor:
-                            onShowAllOwnersInRealEstateValueNotifier.onHover
-                                ? Colors.grey[300]
-                                : Colors.grey[50],
-                        onTap: () {
-                          onShowAllOwnersInRealEstateButtonTap();
-                        },
-                      );
-                    }),
+                Obx(() {
+                  return MenuButtonCard(
+                    onHover: (isHovering) {
+                      onShowAllOwnersInRealEstateValueNotifier(isHovering);
+                    },
+                    icon: Icons.show_chart,
+                    title: 'استعراض الملاك',
+                    menuCardRadius: const BorderRadius.only(),
+                    backgroundColor:
+                        onShowAllOwnersInRealEstateValueNotifier.value
+                            ? Colors.grey[300]
+                            : Colors.grey[50],
+                    onTap: () {
+                      onShowAllOwnersInRealEstateButtonTap();
+                    },
+                  );
+                }),
                 /* *!SECTION */
                 /* *SECTION - Show all Apartements */
-                ValueListenableBuilder(
-                    valueListenable:
-                        onShowAllApartementsInRealEstateValueNotifier,
-                    builder: (context, value, _) {
-                      return MenuButtonCard(
-                        onHover: (isHovering) {
-                          onShowAllApartementsInRealEstateValueNotifier
-                              .changeOnHoverState(isHovering);
-                        },
-                        icon: Icons.all_inbox,
-                        title: width > 1250
-                            ? 'استعراض جميع الوحدات'
-                            : 'استعراض الوحدات',
-                        menuCardRadius: const BorderRadius.only(
-                            bottomRight: Radius.circular(20),
-                            bottomLeft: Radius.circular(20)),
-                        backgroundColor:
-                            onShowAllApartementsInRealEstateValueNotifier
-                                    .onHover
-                                ? Colors.grey[300]
-                                : Colors.grey[50],
-                        onTap: () {
-                          onShowAllApartementsInRealEstateButtonTap();
-                        },
-                      );
-                    }),
+                Obx(() {
+                  return MenuButtonCard(
+                    onHover: (isHovering) {
+                      onShowAllApartementsInRealEstateValueNotifier(isHovering);
+                    },
+                    icon: Icons.all_inbox,
+                    title: width > 1250
+                        ? 'استعراض جميع الوحدات'
+                        : 'استعراض الوحدات',
+                    menuCardRadius: const BorderRadius.only(
+                        bottomRight: Radius.circular(20),
+                        bottomLeft: Radius.circular(20)),
+                    backgroundColor:
+                        onShowAllApartementsInRealEstateValueNotifier.value
+                            ? Colors.grey[300]
+                            : Colors.grey[50],
+                    onTap: () {
+                      onShowAllApartementsInRealEstateButtonTap();
+                    },
+                  );
+                }),
                 /* *!SECTION */
               ],
             )),
