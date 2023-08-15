@@ -13,9 +13,9 @@ buildingNumber , window State
 )
  */
 class NavigationProperties {
-  static String RealEstateSummaryPageRoute = 'realEstateSummary';
-  static String OwnerPageRoute = 'Owners';
-  static String AddNewRealEstatePageRoute = 'AddNewApartement';
+  static String realEstateSummaryPageRoute = 'realEstateSummary';
+  static String ownerPageRoute = 'Owners';
+  static String addNewRealEstatePageRoute = 'AddNewApartement';
   static List selectedTabNeededParamters = [];
   static RxString selectedTabVaueNotifier = 'Apartemnts'.obs;
 }

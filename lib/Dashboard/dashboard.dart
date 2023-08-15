@@ -21,10 +21,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   /* *SECTION - ValueNotifiers */
   /* *!SECTION */
   /* *SECTION - Dispose */
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   /* *!SECTION */
   /* *SECTION - Init State */
@@ -59,21 +55,21 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     child: Container(
                       padding: const EdgeInsets.only(
                           top: 20, left: 20, right: 20, bottom: 20),
-                      width: width > 1250 ? width * 0.80 : width * 0.75,
+                      width: width > 1250 ? width * 0.80 : width * 0.7,
                       height: height * 0.95,
                       decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.all(Radius.circular(20))),
                       child: NavigationProperties.selectedTabVaueNotifier
                                   .toString() ==
-                              NavigationProperties.RealEstateSummaryPageRoute
+                              NavigationProperties.realEstateSummaryPageRoute
                           /* *SECTION - Real Estate Part */
                           ? const RealEstatesPage()
                           /* *!SECTION */
                           /* *TODO - Implement Other Screens */
                           : NavigationProperties.selectedTabVaueNotifier
                                       .toString() ==
-                                  NavigationProperties.AddNewRealEstatePageRoute
+                                  NavigationProperties.addNewRealEstatePageRoute
                               ? AddRealEstate(
                                   windowState: NavigationProperties
                                       .selectedTabNeededParamters[1],
@@ -97,7 +93,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 /* *!SECTION */
                 /* *SECTION - Drawer */
                 Container(
-                  width: width > 1250 ? width * 0.17 : width * 0.23,
+                  width: width > 1250 ? width * 0.17 : width * 0.25,
                   padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -168,7 +164,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         icon: Icons.category_outlined,
                         onTap: () {
                           NavigationProperties.selectedTabVaueNotifier(
-                              NavigationProperties.RealEstateSummaryPageRoute);
+                              NavigationProperties.realEstateSummaryPageRoute);
                         },
                       ),
                       /* *!SECTION */
@@ -181,7 +177,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         icon: Icons.people_alt_outlined,
                         onTap: () {
                           NavigationProperties.selectedTabVaueNotifier(
-                              NavigationProperties.OwnerPageRoute);
+                              NavigationProperties.ownerPageRoute);
                         },
                       ),
                       /* *!SECTION */
@@ -190,7 +186,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       ),
                       /* *SECTION - Log In Item */
                       MenuButtonCard(
-                        title: 'تسجيل الدخول',
+                        title: width > 1250 ? 'تسجيل الدخول' : 'الدخول',
                         icon: Icons.login_outlined,
                       ),
                       /* *!SECTION */
@@ -199,7 +195,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       ),
                       /* *SECTION - Log Out Item */
                       MenuButtonCard(
-                        title: 'تسجيل الخروج',
+                        title: width > 1250 ? 'تسجيل الخروج' : 'الخروج',
                         icon: Icons.logout_outlined,
                       ),
                       /* *!SECTION */

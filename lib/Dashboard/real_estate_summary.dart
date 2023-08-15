@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../Add_RealEstate/add_real_estate.dart';
 import '../class/buidlingproperties.dart';
 import 'menu_card_button.dart';
 
@@ -24,7 +23,6 @@ class RealEstatesPage extends StatelessWidget {
       Building(buildingName: 'عمارة رقم ۷', id: 7),
     ];
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return ListView(
       shrinkWrap: true,
       children: [
@@ -39,12 +37,12 @@ class RealEstatesPage extends StatelessWidget {
               routeName: 'الوحدات',
               onTap: () {
                 NavigationProperties.selectedTabVaueNotifier(
-                    NavigationProperties.RealEstateSummaryPageRoute);
+                    NavigationProperties.realEstateSummaryPageRoute);
               },
             ),
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 30,
         ),
         /* *!SECTION */
@@ -70,7 +68,7 @@ class RealEstatesPage extends StatelessWidget {
                         'AddOwner'
                       ];
                       NavigationProperties.selectedTabVaueNotifier(
-                          NavigationProperties.AddNewRealEstatePageRoute);
+                          NavigationProperties.addNewRealEstatePageRoute);
                     },
                     onShowAllApartementsInRealEstateButtonTap: () {},
                     onShowAllOwnersInRealEstateButtonTap: () {},
@@ -89,7 +87,7 @@ class RealEstatesPage extends StatelessWidget {
             onAddingNewApartementButtonTap: () {
               NavigationProperties.selectedTabNeededParamters = [7, 'AddOwner'];
               NavigationProperties.selectedTabVaueNotifier(
-                  NavigationProperties.AddNewRealEstatePageRoute);
+                  NavigationProperties.addNewRealEstatePageRoute);
             },
             onShowAllApartementsInRealEstateButtonTap: () {},
             onShowAllOwnersInRealEstateButtonTap: () {},
@@ -122,9 +120,9 @@ class RealEstateActionsWidget extends StatelessWidget {
   final Function onShowAllOwnersInRealEstateButtonTap;
   final Function onShowAllApartementsInRealEstateButtonTap;
   /* *SECTION - OnHover Properties */
-  RxBool onAddingNewApartementButtonHoverValueNotifier = false.obs;
-  RxBool onShowAllOwnersInRealEstateValueNotifier = false.obs;
-  RxBool onShowAllApartementsInRealEstateValueNotifier = false.obs;
+  final RxBool onAddingNewApartementButtonHoverValueNotifier = false.obs;
+  final RxBool onShowAllOwnersInRealEstateValueNotifier = false.obs;
+  final RxBool onShowAllApartementsInRealEstateValueNotifier = false.obs;
   /* *!SECTION */
   @override
   Widget build(BuildContext context) {

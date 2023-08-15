@@ -1,7 +1,8 @@
 import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
 import 'package:aspania_city_group/class/buidlingproperties.dart';
-import 'package:aspania_city_group/class/realEstate.dart';
+import 'package:aspania_city_group/class/realestate.dart';
 import 'package:aspania_city_group/class/validators.dart';
+import 'package:barcode_widget/barcode_widget.dart';
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import "package:get/get.dart";
@@ -33,6 +34,9 @@ class _AddRealEstateState extends State<AddRealEstate> {
   TextEditingController apartementNumberTextController =
       TextEditingController();
   TextEditingController ownerNameTextController = TextEditingController();
+  TextEditingController responsibleNameTextController = TextEditingController();
+  TextEditingController responsiblePhoneNumberTextController =
+      TextEditingController();
   TextEditingController apartementLinkTextController = TextEditingController();
   TextEditingController ownerEmailTextController = TextEditingController();
   TextEditingController ownerPhoneNumberTextController =
@@ -44,6 +48,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
   /* *SECTION - ValueNotfiers */
   RxBool onSaveButtonHover = false.obs;
   RxBool onCancelButtonHover = false.obs;
+  RxString onApartementLinkUpdated = ''.obs;
   RxBool onEditButtonHover = false.obs;
   RxBool onAddRealEstateRouteHover = false.obs;
 
@@ -99,8 +104,9 @@ class _AddRealEstateState extends State<AddRealEstate> {
       apartementBuildingPositionTextController.text = realEstates
           .firstWhere((element) => element.id == widget.buildingNumber)
           .buildingName;
-      apartementLinkTextController.text =
-          'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}';
+      onApartementLinkUpdated(
+          'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+      apartementLinkTextController.text = onApartementLinkUpdated.value;
     }
     super.initState();
   }
@@ -110,13 +116,14 @@ class _AddRealEstateState extends State<AddRealEstate> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    int noOfErrorsInTextController = 0;
+    List<String> ErrorsofTextController = [];
     /* *SECTION - Dialog */
-    return ListView(
+    return Column(
       children: [
         const SizedBox(
           height: 20,
         ),
+        /* *SECTION - Top Part */
         Row(
           textDirection: TextDirection.rtl,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -129,7 +136,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                   routeName: 'الوحدات',
                   onTap: () {
                     NavigationProperties.selectedTabVaueNotifier(
-                        NavigationProperties.RealEstateSummaryPageRoute);
+                        NavigationProperties.realEstateSummaryPageRoute);
                   },
                 ),
                 Text(
@@ -151,85 +158,123 @@ class _AddRealEstateState extends State<AddRealEstate> {
                         return GestureDetector(
                           onTap: () {
                             /* *SECTION - If There Is an Error */
-                            if (noOfErrorsInTextController == 0) {
-                              /* *SECTION - Text Controller 
-      TextEditingController apartementBuildingPositionTextController =
+                            if (ErrorsofTextController.isEmpty) {
+                              /* *SECTION - Text Controllers 
+  TextEditingController apartementBuildingPositionTextController =
       TextEditingController();
-      TextEditingController apartementBuildingFloorPositionTextController =
+  TextEditingController apartementBuildingFloorPositionTextController =
       TextEditingController();
-      TextEditingController apartementStateTextController = TextEditingController();
-      TextEditingController apartementNumberTextController =
+  TextEditingController apartementStateTextController = TextEditingController();
+  TextEditingController apartementNumberTextController =
       TextEditingController();
-      TextEditingController ownerNameTextController = TextEditingController();
-      bool ownerNameTextControllerIsErrorText = false;
-      TextEditingController apartementLinkTextController = TextEditingController();
-      TextEditingController ownerEmailTextController = TextEditingController();
-      TextEditingController ownerPhoneNumberTextController =
+  TextEditingController ownerNameTextController = TextEditingController();
+  TextEditingController responsibleNameTextController = TextEditingController();
+  TextEditingController responsiblePhoneNumberTextController =
       TextEditingController();
-      TextEditingController ownerRoleTextController = TextEditingController();
-      TextEditingController ownerPasswordTextController = TextEditingController();
-      TextEditingController confirmPasswordTextController = TextEditingController();
-                       *!SECTION */
-                              /* *SECTION - If Important Data Empty */
-                              if (!Validators.isListEmpty([
-                                apartementBuildingPositionTextController.text,
-                                apartementBuildingFloorPositionTextController
-                                    .text,
-                                apartementStateTextController.text,
-                                apartementLinkTextController.text,
-                              ])) {
-                                if (!Validators.isListEmpty([
-                                  ownerNameTextController.text,
-                                  ownerEmailTextController.text,
-                                  ownerPhoneNumberTextController.text,
-                                  ownerPasswordTextController.text,
-                                  ownerRoleTextController.text,
-                                ])) {
-                                  //TODO - Get The Last Id
-                                  RealEstateData realEstateData =
-                                      RealEstateData(
-                                          id: 1,
-                                          apartementStatusId:
-                                              apartementStatusID ?? 0,
-                                          apartementPostionInFloorId:
-                                              floorID ?? 0,
-                                          apartementPostionInBuildingId:
-                                              buildingID ?? 0,
-                                          apartementLink:
-                                              apartementLinkTextController.text,
-                                          isApartementHasEnoughData: false,
-                                          apartementName:
-                                              apartementID.toString());
+  TextEditingController apartementLinkTextController = TextEditingController();
+  TextEditingController ownerEmailTextController = TextEditingController();
+  TextEditingController ownerPhoneNumberTextController =
+      TextEditingController();
+  TextEditingController ownerRoleTextController = TextEditingController();
+  TextEditingController ownerPasswordTextController = TextEditingController();
+  TextEditingController confirmPasswordTextController = TextEditingController();
+   *!SECTION */
+                              if (buildingID != null &&
+                                  floorID != null &&
+                                  apartementID != null &&
+                                  apartementStateTextController
+                                      .text.isNotEmpty &&
+                                  apartementNumberTextController
+                                      .text.isNotEmpty &&
+                                  !Validators.isAllElementsInListNotEmpty([
+                                    ownerNameTextController.text,
+                                    ownerPhoneNumberTextController.text,
+                                    responsibleNameTextController.text,
+                                    responsiblePhoneNumberTextController.text,
+                                  ])) {
+                                //TODO - Get The Last Id
+                                RealEstateData realEstateData = RealEstateData(
+                                    id: 1,
+                                    apartementStatusId: apartementStatusID ?? 0,
+                                    apartementPostionInFloorId: floorID ?? 0,
+                                    apartementPostionInBuildingId:
+                                        buildingID ?? 0,
+                                    apartementLink:
+                                        apartementLinkTextController.text,
+                                    isApartementHasEnoughData: false,
+                                    apartementName: apartementID.toString());
 
-                                  Get.closeAllSnackbars();
-                                  NavigationProperties.selectedTabVaueNotifier(
-                                      NavigationProperties
-                                          .RealEstateSummaryPageRoute);
-                                  Get.showSnackbar(const GetSnackBar(
-                                    animationDuration: Duration(seconds: 1),
-                                    duration: Duration(seconds: 2),
-                                    message: 'تم الحفظ بنجاح',
-                                  ));
-                                } else {
-                                  Get.closeAllSnackbars();
-                                  Get.showSnackbar(const GetSnackBar(
-                                    animationDuration: Duration(seconds: 1),
-                                    duration: Duration(seconds: 2),
-                                    message:
-                                        '(اسم المالك\\رقم المالك \\ صلاحيات المالك\\ البريد الالكترونيي \\ الكلمة السرية\\) قم باملاء البيانات المالك ',
-                                  ));
-                                }
-                              } else {
+                                Get.closeAllSnackbars();
+                                NavigationProperties.selectedTabVaueNotifier(
+                                    NavigationProperties
+                                        .realEstateSummaryPageRoute);
+                                Get.showSnackbar(const GetSnackBar(
+                                  animationDuration: Duration(seconds: 1),
+                                  duration: Duration(seconds: 2),
+                                  message: 'تم الحفظ بنجاح',
+                                ));
+                              } else if (buildingID != null &&
+                                  floorID != null &&
+                                  apartementID != null &&
+                                  apartementStateTextController
+                                      .text.isNotEmpty &&
+                                  apartementNumberTextController
+                                      .text.isNotEmpty &&
+                                  ownerNameTextController.text.isNotEmpty &&
+                                  ownerPhoneNumberTextController
+                                      .text.isNotEmpty &&
+                                  responsibleNameTextController
+                                      .text.isNotEmpty &&
+                                  responsiblePhoneNumberTextController
+                                      .text.isNotEmpty) {
+                                //TODO - Get The Last Id
+                                RealEstateData realEstateData = RealEstateData(
+                                    id: 1,
+                                    apartementStatusId: apartementStatusID ?? 0,
+                                    apartementPostionInFloorId: floorID ?? 0,
+                                    apartementPostionInBuildingId:
+                                        buildingID ?? 0,
+                                    apartementLink:
+                                        apartementLinkTextController.text,
+                                    isApartementHasEnoughData: false,
+                                    apartementName: apartementID.toString());
+
+                                Get.closeAllSnackbars();
+                                NavigationProperties.selectedTabVaueNotifier(
+                                    NavigationProperties
+                                        .realEstateSummaryPageRoute);
+                                Get.showSnackbar(const GetSnackBar(
+                                  animationDuration: Duration(seconds: 1),
+                                  duration: Duration(seconds: 2),
+                                  message: 'تم الحفظ بنجاح',
+                                ));
+                              } else if (buildingID == null ||
+                                  floorID == null ||
+                                  apartementID == null ||
+                                  apartementStateTextController.text.isEmpty ||
+                                  apartementNumberTextController.text.isEmpty) {
                                 Get.closeAllSnackbars();
                                 Get.showSnackbar(const GetSnackBar(
                                   animationDuration: Duration(seconds: 1),
                                   duration: Duration(seconds: 2),
                                   message:
-                                      '(رقم العمارة \\رقم الدور \\رقم الوحدة\\حالة الوحدة) قم باملاء البيانات كاملة',
+                                      '(رقم العمارة \\ رقم الدور \\ حالة الوحدة \\ رقم الوحدة) قم باملاء البيانات الوحدة ',
+                                ));
+                              } else if (ownerNameTextController.text.isEmpty ||
+                                  ownerPhoneNumberTextController.text.isEmpty ||
+                                  responsibleNameTextController.text.isEmpty ||
+                                  responsiblePhoneNumberTextController
+                                      .text.isEmpty) {
+                                Get.closeAllSnackbars();
+                                Get.showSnackbar(const GetSnackBar(
+                                  animationDuration: Duration(seconds: 1),
+                                  duration: Duration(seconds: 2),
+                                  message:
+                                      'قم باملاء بيانات المالك ( اسم المالك \\ رقم تليفون المالك \\ اسم المسئول \\ رقم المسئول)',
                                 ));
                               }
-                              /* *!SECTION */
                             }
+
                             /* *!SECTION */
                           },
                           child: MouseRegion(
@@ -273,7 +318,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                           onTap: () {
                             NavigationProperties.selectedTabVaueNotifier(
                                 NavigationProperties
-                                    .RealEstateSummaryPageRoute);
+                                    .realEstateSummaryPageRoute);
                             Get.showSnackbar(const GetSnackBar(
                               animationDuration: Duration(seconds: 1),
                               duration: Duration(seconds: 2),
@@ -318,7 +363,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                   return GestureDetector(
                     onTap: () {
                       NavigationProperties.selectedTabVaueNotifier(
-                          NavigationProperties.RealEstateSummaryPageRoute);
+                          NavigationProperties.realEstateSummaryPageRoute);
                     },
                     child: MouseRegion(
                       onEnter: (details) {
@@ -353,51 +398,48 @@ class _AddRealEstateState extends State<AddRealEstate> {
             /* *!SECTION */
           ],
         ),
+        /* *!SECTION */
         const SizedBox(
           height: 30,
         ),
-        Row(
-          textDirection: TextDirection.rtl,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        /* *SECTION - Adding the Owner Section */
+        Expanded(
+            child: ListView(
+          shrinkWrap: true,
           children: [
-            Container(
-                padding: const EdgeInsets.fromLTRB(20, 10, 15, 20),
-                alignment: Alignment.topRight,
-                decoration: BoxDecoration(
-                    color: Colors.grey[200] ?? Colors.white,
-                    borderRadius: const BorderRadius.all(Radius.circular(20))),
-                width: width > 1350
-                    ? width * 0.32
-                    : width > 1000
-                        ? width * 0.41
-                        : width * 0.52,
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+            Column(
+              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                /* *SECTION - Owner Data */
+                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  /* *SECTION -  Apartement Postion header*/
+                  Text(
+                    'بيانات المالك',
+                    style: GoogleFonts.notoSansArabic(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  /* *!SECTION */
+                  const SizedBox(
+                    height: 20,
+                  ),
+
+                  /* *SECTION - Owner Phone And Owner Name*/
+                  Row(
+                    textDirection: TextDirection.rtl,
                     children: [
-                      /* *SECTION -  Apartement Postion header*/
-                      Text(
-                        'بيانات المالك',
-                        style: GoogleFonts.notoSansArabic(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      /* *!SECTION */
-                      const SizedBox(
-                        height: 20,
-                      ),
                       /* *SECTION - Owner Name */
                       TextTile(
-                        width: width > 1350
-                            ? width * 0.3
-                            : width > 1000
-                                ? width * 0.4
-                                : width * 0.5,
+                        width: width > 1350 ? width * 0.25 : width * 0.33,
                         onChange: (text, errorText) {
                           if (!Validators.isArabicOnly(text)) {
                             errorText('ادخل حروف فقط');
-                            noOfErrorsInTextController++;
+                            ErrorsofTextController.addIf(
+                                !ErrorsofTextController.contains('ownerName'),
+                                'ownerName');
                           } else {
                             errorText('');
-                            noOfErrorsInTextController--;
+                            ErrorsofTextController.remove('ownerName');
                           }
                         },
                         textController: ownerNameTextController,
@@ -405,551 +447,576 @@ class _AddRealEstateState extends State<AddRealEstate> {
                         icon: Icons.person_outlined,
                         title: 'اسم المالك',
                       ),
-                      /* *!SECTION */
-
-                      /* *SECTION - Owner Phone And Owner Role*/
-                      Row(
-                        textDirection: TextDirection.rtl,
-                        children: [
-                          TextTile(
-                            width: width * 0.14,
-                            onChange: (text, errorText) {
-                              if (!Validators.isNumericOnly(text)) {
-                                errorText('ادخل ارقام فقط');
-                                noOfErrorsInTextController++;
-                              } else {
-                                errorText('');
-                                noOfErrorsInTextController--;
-                              }
-                            },
-                            textController: ownerPhoneNumberTextController,
-                            hintText: 'ادخل رقم تلفون',
-                            icon: Icons.phone_outlined,
-                            title: 'رقم تليفون المالك',
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          TextTile(
-                            width: width * 0.14,
-                            textController: ownerRoleTextController,
-                            hintText: 'اختر الصلاحيات ',
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => FluidDialog(
-                                  alignmentDuration: const Duration(seconds: 1),
-                                  alignmentCurve: Curves.bounceInOut,
-                                  // Set the first page of the dialog.
-                                  rootPage: FluidDialogPage(
-                                      alignment: Alignment.bottomCenter,
-                                      //Aligns the dialog to the bottom left.
-                                      builder: (context) {
-                                        /* *SECTION - Role Selection */
-                                        return Container(
-                                          padding: const EdgeInsets.all(10),
-                                          width: width * 0.3,
-                                          height: height * 0.2,
-                                          child: ListView.builder(
-                                            itemCount: ownerRole.length,
-                                            itemBuilder: (context, index) {
-                                              /* *SECTION - Roles Item With Hover */
-                                              RxBool onHoverOfFloorItem =
-                                                  false.obs;
-                                              return Obx(() {
-                                                return MenuButtonCard(
-                                                    backgroundColor:
-                                                        onHoverOfFloorItem.value
-                                                            ? Colors.grey[500]
-                                                            : Colors.white,
-                                                    icon: Icons.abc,
-                                                    hasIcon: false,
-                                                    onHover: (isHovering) {
-                                                      onHoverOfFloorItem(
-                                                          isHovering);
-                                                    },
-                                                    onTap: () {
-                                                      ownerRoleTextController
-                                                              .text =
-                                                          ownerRole
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .id ==
-                                                                      index + 1)
-                                                              .ownerRole;
-                                                      //NOTE - Change this if it doesn;t work
-                                                      Get.back();
-                                                    },
-                                                    title: ownerRole
-                                                        .firstWhere((element) =>
-                                                            element.id ==
-                                                            index + 1)
-                                                        .ownerRole);
-                                              });
-                                              /* *!SECTION */
-                                            },
-                                          ),
-                                        );
-                                        /* *!SECTION */
-                                      }),
-                                ),
-                              );
-                            },
-                            icon: Icons.manage_accounts_outlined,
-                            title: 'صلاحيات المالك',
-                          ),
-                        ],
+                      const SizedBox(
+                        width: 20,
                       ),
-                      /* *!SECTION */
-
-                      /* *SECTION - apartement buiding Position */
-                      Row(
-                        textDirection: TextDirection.rtl,
-                        children: [
-                          TextTile(
-                            width: 220,
-                            onChange: (text, errorText) {},
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => FluidDialog(
-                                  alignmentDuration: const Duration(seconds: 1),
-                                  alignmentCurve: Curves.bounceInOut,
-                                  // Set the first page of the dialog.
-                                  rootPage: FluidDialogPage(
-                                      alignment: Alignment.bottomCenter,
-                                      //Aligns the dialog to the bottom left.
-                                      builder: (context) {
-                                        /* *SECTION - Building Selection */
-                                        return Container(
-                                          padding: const EdgeInsets.all(10),
-                                          width: width * 0.3,
-                                          height: height * 0.4,
-                                          child: ListView.builder(
-                                            itemCount: realEstates.length,
-                                            itemBuilder: (context, index) {
-                                              /* *SECTION - Building Item With Hover */
-                                              RxBool onHoverOfBuildingItem =
-                                                  false.obs;
-                                              return Obx(() {
-                                                return MenuButtonCard(
-                                                    backgroundColor:
-                                                        onHoverOfBuildingItem
-                                                                .value
-                                                            ? Colors.grey[500]
-                                                            : Colors.white,
-                                                    icon: Icons.abc,
-                                                    hasIcon: false,
-                                                    onHover: (isHovering) {
-                                                      onHoverOfBuildingItem(
-                                                          isHovering);
-                                                    },
-                                                    onTap: () {
-                                                      Building building =
-                                                          realEstates
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .id ==
-                                                                      index +
-                                                                          1);
-                                                      buildingID = building.id;
-                                                      apartementBuildingPositionTextController
-                                                              .text =
-                                                          building.buildingName;
-                                                      apartementLinkTextController
-                                                              .text =
-                                                          'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}';
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    title: realEstates
-                                                        .firstWhere((element) =>
-                                                            element.id ==
-                                                            index + 1)
-                                                        .buildingName);
-                                              });
-                                              /* *!SECTION */
-                                            },
-                                          ),
-                                        );
-                                        /* *!SECTION */
-                                      }),
-                                ),
-                              );
-                            },
-                            textController:
-                                apartementBuildingPositionTextController,
-                            hintText: 'ادخل رقم العمارة',
-                            icon: Icons.home_filled,
-                            title: 'رقم العمارة',
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          /* *SECTION - Floor Tile */
-                          TextTile(
-                            width: 220,
-                            textController:
-                                apartementBuildingFloorPositionTextController,
-                            hintText: 'ادخل رقم الدور',
-                            icon: Icons.file_upload_outlined,
-                            onTap: () {
-                              /* *SECTION - Show Floor Selection */
-
-                              showDialog(
-                                context: context,
-                                builder: (context) => FluidDialog(
-                                  alignmentDuration: const Duration(seconds: 1),
-                                  alignmentCurve: Curves.bounceInOut,
-                                  // Set the first page of the dialog.
-                                  rootPage: FluidDialogPage(
-                                      alignment: Alignment.bottomCenter,
-                                      //Aligns the dialog to the bottom left.
-                                      builder: (context) {
-                                        /* *SECTION - Floors Selection */
-                                        return Container(
-                                          padding: const EdgeInsets.all(10),
-                                          width: width * 0.3,
-                                          height: height * 0.4,
-                                          child: ListView.builder(
-                                            itemCount: realEstateFloors.length,
-                                            itemBuilder: (context, index) {
-                                              /* *SECTION - Floor Item With Hover */
-                                              RxBool onHoverOfFloorItem =
-                                                  false.obs;
-                                              return Obx(() {
-                                                return MenuButtonCard(
-                                                    backgroundColor:
-                                                        onHoverOfFloorItem.value
-                                                            ? Colors.grey[500]
-                                                            : Colors.white,
-                                                    icon: Icons.abc,
-                                                    hasIcon: false,
-                                                    onHover: (isHovering) {
-                                                      onHoverOfFloorItem(
-                                                          isHovering);
-                                                    },
-                                                    onTap: () {
-                                                      Floor floor =
-                                                          realEstateFloors
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .id ==
-                                                                      index +
-                                                                          1);
-                                                      floorID = floor.id;
-                                                      apartementBuildingFloorPositionTextController
-                                                              .text =
-                                                          floor.floorName;
-                                                      apartementLinkTextController
-                                                              .text =
-                                                          'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}';
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    title: realEstateFloors
-                                                        .firstWhere((element) =>
-                                                            element.id ==
-                                                            index + 1)
-                                                        .floorName);
-                                              });
-                                              /* *!SECTION */
-                                            },
-                                          ),
-                                        );
-                                        /* *!SECTION */
-                                      }),
-                                ),
-                              );
-                              /* *!SECTION */
-                            },
-                            title: 'رقم الدور',
-                          ),
-                          /* *!SECTION */
-                        ],
-                      )
-                      /* *!SECTION */
-                      ,
-                      /* *SECTION - apartement number with apartement State  */
-                      Row(
-                        textDirection: TextDirection.rtl,
-                        children: [
-                          /* *SECTION - Apartement State */
-                          TextTile(
-                            width: 220,
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => FluidDialog(
-                                  alignmentDuration: const Duration(seconds: 1),
-                                  alignmentCurve: Curves.bounceInOut,
-                                  // Set the first page of the dialog.
-                                  rootPage: FluidDialogPage(
-                                      alignment: Alignment.bottomCenter,
-                                      //Aligns the dialog to the bottom left.
-                                      builder: (context) {
-                                        /* *SECTION - States Selection */
-                                        return Container(
-                                          padding: const EdgeInsets.all(10),
-                                          width: width * 0.3,
-                                          height: height * 0.3,
-                                          child: ListView.builder(
-                                            itemCount: apartementState.length,
-                                            itemBuilder: (context, index) {
-                                              /* *SECTION - States Item With Hover */
-                                              RxBool onHoverOfStatesItem =
-                                                  false.obs;
-                                              return Obx(() {
-                                                return MenuButtonCard(
-                                                    backgroundColor:
-                                                        onHoverOfStatesItem
-                                                                .value
-                                                            ? Colors.grey[500]
-                                                            : Colors.white,
-                                                    icon: Icons.abc,
-                                                    hasIcon: false,
-                                                    onHover: (isHovering) {
-                                                      onHoverOfStatesItem(
-                                                          isHovering);
-                                                    },
-                                                    onTap: () {
-                                                      apartementStateTextController
-                                                              .text =
-                                                          apartementState
-                                                              .firstWhere(
-                                                                  (element) =>
-                                                                      element
-                                                                          .id ==
-                                                                      index + 1)
-                                                              .state;
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    title: apartementState
-                                                        .firstWhere((element) =>
-                                                            element.id ==
-                                                            index + 1)
-                                                        .state);
-                                              });
-                                              /* *!SECTION */
-                                            },
-                                          ),
-                                        );
-                                        /* *!SECTION */
-                                      }),
-                                ),
-                              );
-                            },
-                            textController: apartementStateTextController,
-                            hintText: 'اختر حالة الوحدة',
-                            icon: Icons.build_outlined,
-                            title: 'حالة الوحدة',
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          /* *!SECTION */
-                          /* *SECTION - Apartement Number */
-                          TextTile(
-                            width: 220,
-                            onChange: (text, errorText) {
-                              if (!Validators.isNumericOnly(text)) {
-                                errorText('ادخل ارقام فقط');
-                              } else {
-                                apartementID = int.parse(text);
-                                apartementLinkTextController.text =
-                                    'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}';
-                              }
-                            },
-                            textController: apartementNumberTextController,
-                            hintText: 'ادخل رقم الوحدة',
-                            icon: Icons.numbers_outlined,
-                            title: 'رقم الوحدة',
-                          ),
-                          /* *!SECTION */
-                        ],
-                      )
 
                       /* *!SECTION */
-                    ])),
-
-            /* *SECTION - Apartement Position And Image WIth Qr Code */
-            Column(
-              children: [
-                /* *SECTION - Link And Qrcode */
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    /* *SECTION - QrCode */
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        height: 200,
-                        padding: const EdgeInsets.fromLTRB(20, 10, 15, 10),
-                        alignment: Alignment.topRight,
-                        decoration: BoxDecoration(
-                            color: Colors.grey[200] ?? Colors.white,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20))),
-                        width: width > 1350
-                            ? width * 0.14
-                            : width > 1000
-                                ? width * 0.19
-                                : width * 0.24,
-                        child: widget.windowState == 'AddOwner'
-                            ? const Center(
-                                child: Icon(
-                                  Icons.add_a_photo_outlined,
-                                  size: 30,
-                                ),
-                              )
-                            : const CircleAvatar(
-                                backgroundImage:
-                                    AssetImage('assets/images/download.png')),
-                      ),
-                    ),
-                    /* *!SECTION */
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    /* *SECTION - Link  */
-                    Container(
-                        height: 200,
-                        padding: const EdgeInsets.fromLTRB(20, 10, 15, 10),
-                        alignment: Alignment.topRight,
-                        decoration: BoxDecoration(
-                            color: Colors.grey[200] ?? Colors.white,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20))),
-                        width: width > 1350
-                            ? width * 0.14
-                            : width > 1000
-                                ? width * 0.19
-                                : width * 0.24,
-                        child: TextTile(
-                          width: 200,
-                          height: 100,
-                          textController: apartementLinkTextController,
-                          hintText: 'انتظهر ظهور الرابط',
-                          icon: Icons.link,
-                          onTap: () {},
-                          title: 'رابط الدخول',
-                        )),
-                    /* *!SECTION */
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                /* *SECTION - Apartement Postion */
-
-                Container(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 15, 10),
-                  alignment: Alignment.topRight,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[200] ?? Colors.white,
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(20))),
-                  width: width > 1350
-                      ? width * 0.3
-                      : width > 1000
-                          ? width * 0.4
-                          : width * 0.5,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      /* *SECTION -  Apartement Postion header*/
-                      Text(
-                        'بيانات الدخول المالك',
-                        style: GoogleFonts.notoSansArabic(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      /* *!SECTION */
-                      /* *SECTION - Owner Email */
+                      /* *SECTION - Owner Phone */
                       TextTile(
-                        width: width > 1350
-                            ? width * 0.3
-                            : width > 1000
-                                ? width * 0.4
-                                : width * 0.5,
+                        width: width > 1350 ? width * 0.17 : width * 0.23,
                         onChange: (text, errorText) {
-                          if (!GetUtils.isEmail(text)) {
-                            errorText('ادخل البريد صحيحا');
-                            noOfErrorsInTextController++;
+                          if (!Validators.isNumericOrEmptyOnly(text)) {
+                            errorText('ادخل ارقام فقط');
+                            ErrorsofTextController.addIf(
+                                !ErrorsofTextController.contains('ownerName'),
+                                'ownerPhone');
                           } else {
                             errorText('');
-                            noOfErrorsInTextController--;
+                            ErrorsofTextController.remove('ownerPhone');
                           }
                         },
-                        textController: ownerEmailTextController,
-                        hintText: 'ادخل البريد الالكتروني الماك',
-                        icon: Icons.email_outlined,
-                        title: 'البريد الالكتروني',
-                      ),
-                      /* *!SECTION */
-
-                      /* *SECTION - Owner Password And Owner Confrim Password*/
-                      Row(
-                        textDirection: TextDirection.rtl,
-                        children: [
-                          TextTile(
-                            width: width * 0.13,
-                            textController: ownerPasswordTextController,
-                            hintText: 'ادخل الكلمة السرية',
-                            isPassword: true,
-                            onChange: (text, errorText) {
-                              if (text != confirmPasswordTextController.text) {
-                                errorText(
-                                    'ادخل كلمة سرية مطابقة للخانة الاولة');
-                                noOfErrorsInTextController++;
-                              } else {
-                                errorText('');
-                                noOfErrorsInTextController--;
-                              }
-                            },
-                            icon: Icons.password_outlined,
-                            title: 'الكلمة السرية',
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          TextTile(
-                            width: width * 0.13,
-                            textController: confirmPasswordTextController,
-                            hintText: 'كلمة السرية',
-                            onChange: (text, errorText) {
-                              if (text != ownerPasswordTextController.text) {
-                                errorText(
-                                    'ادخل كلمة سرية مطابقة للخانة الاولة');
-                                noOfErrorsInTextController++;
-                              } else {
-                                errorText('');
-                                noOfErrorsInTextController--;
-                              }
-                            },
-                            isPassword: true,
-                            icon: Icons.password_sharp,
-                            title: 'تاكيد كلمة السرية',
-                          ),
-                        ],
+                        textController: ownerPhoneNumberTextController,
+                        hintText: 'ادخل رقم تلفون',
+                        icon: Icons.phone_outlined,
+                        title: 'رقم تليفون المالك',
                       ),
                       /* *!SECTION */
                     ],
                   ),
+                  /* *!SECTION */
+                  /* *SECTION - Responsible Phone And Resopnsible Name*/
+                  Row(
+                    textDirection: TextDirection.rtl,
+                    children: [
+                      /* *SECTION - Responsible Name */
+                      TextTile(
+                        width: width > 1350 ? width * 0.25 : width * 0.33,
+                        onChange: (text, errorText) {
+                          if (!Validators.isArabicOnly(text)) {
+                            errorText('ادخل حروف فقط');
+                            ErrorsofTextController.addIf(
+                                !ErrorsofTextController.contains(
+                                    'responsibleName'),
+                                'responsibleName');
+                          } else {
+                            errorText('');
+                            ErrorsofTextController.remove('responsibleName');
+                          }
+                        },
+                        textController: responsibleNameTextController,
+                        hintText: 'ادخل اسم المسئول عن الوحدة',
+                        icon: Icons.handshake_outlined,
+                        title: 'اسم المسئول',
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+
+                      /* *!SECTION */
+                      /* *SECTION - responsible Phone */
+                      TextTile(
+                        width: width > 1350 ? width * 0.17 : width * 0.23,
+                        onChange: (text, errorText) {
+                          if (!Validators.isNumericOrEmptyOnly(text)) {
+                            errorText('ادخل ارقام فقط');
+                            ErrorsofTextController.addIf(
+                                !ErrorsofTextController.contains(
+                                    'responsiblePhone'),
+                                'responsiblePhone');
+                          } else {
+                            errorText('');
+                            ErrorsofTextController.remove('responsiblePhone');
+                          }
+                        },
+                        textController: responsiblePhoneNumberTextController,
+                        hintText: 'ادخل رقم تليفون',
+                        icon: Icons.mobile_friendly_outlined,
+                        title: 'رقم تليفون المسئول',
+                      ),
+                      /* *!SECTION */
+                      const SizedBox(
+                        width: 20,
+                      ),
+                    ],
+                  ),
+                  /* *!SECTION */
+
+                  /* *SECTION - apartement buiding Position */
+                  Row(
+                    textDirection: TextDirection.rtl,
+                    children: [
+                      TextTile(
+                        width: width > 1350 ? width * 0.17 : width * 0.23,
+                        onChange: (text, errorText) {},
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => FluidDialog(
+                              alignmentDuration: const Duration(seconds: 1),
+                              alignmentCurve: Curves.bounceInOut,
+                              // Set the first page of the dialog.
+                              rootPage: FluidDialogPage(
+                                  alignment: Alignment.bottomCenter,
+                                  //Aligns the dialog to the bottom left.
+                                  builder: (context) {
+                                    /* *SECTION - Building Selection */
+                                    return Container(
+                                      padding: const EdgeInsets.all(10),
+                                      width: width * 0.3,
+                                      height: height * 0.4,
+                                      child: ListView.builder(
+                                        itemCount: realEstates.length,
+                                        itemBuilder: (context, index) {
+                                          /* *SECTION - Building Item With Hover */
+                                          RxBool onHoverOfBuildingItem =
+                                              false.obs;
+                                          return Obx(() {
+                                            return MenuButtonCard(
+                                                backgroundColor:
+                                                    onHoverOfBuildingItem.value
+                                                        ? Colors.grey[500]
+                                                        : Colors.white,
+                                                icon: Icons.abc,
+                                                hasIcon: false,
+                                                onHover: (isHovering) {
+                                                  onHoverOfBuildingItem(
+                                                      isHovering);
+                                                },
+                                                onTap: () {
+                                                  Building building =
+                                                      realEstates.firstWhere(
+                                                          (element) =>
+                                                              element.id ==
+                                                              index + 1);
+                                                  buildingID = building.id;
+                                                  apartementBuildingPositionTextController
+                                                          .text =
+                                                      building.buildingName;
+
+                                                  onApartementLinkUpdated(
+                                                      'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                                                  apartementLinkTextController
+                                                          .text =
+                                                      onApartementLinkUpdated
+                                                          .value;
+                                                  Navigator.of(context).pop();
+                                                },
+                                                title: realEstates
+                                                    .firstWhere((element) =>
+                                                        element.id == index + 1)
+                                                    .buildingName);
+                                          });
+                                          /* *!SECTION */
+                                        },
+                                      ),
+                                    );
+                                    /* *!SECTION */
+                                  }),
+                            ),
+                          );
+                        },
+                        textController:
+                            apartementBuildingPositionTextController,
+                        hintText: 'ادخل رقم العمارة',
+                        icon: Icons.home_filled,
+                        title: 'رقم العمارة',
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      /* *SECTION - Floor Tile */
+                      TextTile(
+                        width: width > 1350 ? width * 0.17 : width * 0.23,
+                        textController:
+                            apartementBuildingFloorPositionTextController,
+                        hintText: 'ادخل رقم الدور',
+                        icon: Icons.file_upload_outlined,
+                        onTap: () {
+                          /* *SECTION - Show Floor Selection */
+
+                          showDialog(
+                            context: context,
+                            builder: (context) => FluidDialog(
+                              alignmentDuration: const Duration(seconds: 1),
+                              alignmentCurve: Curves.bounceInOut,
+                              // Set the first page of the dialog.
+                              rootPage: FluidDialogPage(
+                                  alignment: Alignment.bottomCenter,
+                                  //Aligns the dialog to the bottom left.
+                                  builder: (context) {
+                                    /* *SECTION - Floors Selection */
+                                    return Container(
+                                      padding: const EdgeInsets.all(10),
+                                      width: width * 0.3,
+                                      height: height * 0.4,
+                                      child: ListView.builder(
+                                        itemCount: realEstateFloors.length,
+                                        itemBuilder: (context, index) {
+                                          /* *SECTION - Floor Item With Hover */
+                                          RxBool onHoverOfFloorItem = false.obs;
+                                          return Obx(() {
+                                            return MenuButtonCard(
+                                                backgroundColor:
+                                                    onHoverOfFloorItem.value
+                                                        ? Colors.grey[500]
+                                                        : Colors.white,
+                                                icon: Icons.abc,
+                                                hasIcon: false,
+                                                onHover: (isHovering) {
+                                                  onHoverOfFloorItem(
+                                                      isHovering);
+                                                },
+                                                onTap: () {
+                                                  Floor floor = realEstateFloors
+                                                      .firstWhere((element) =>
+                                                          element.id ==
+                                                          index + 1);
+                                                  floorID = floor.id;
+                                                  apartementBuildingFloorPositionTextController
+                                                      .text = floor.floorName;
+
+                                                  onApartementLinkUpdated(
+                                                      'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                                                  apartementLinkTextController
+                                                          .text =
+                                                      onApartementLinkUpdated
+                                                          .value;
+                                                  Navigator.of(context).pop();
+                                                },
+                                                title: realEstateFloors
+                                                    .firstWhere((element) =>
+                                                        element.id == index + 1)
+                                                    .floorName);
+                                          });
+                                          /* *!SECTION */
+                                        },
+                                      ),
+                                    );
+                                    /* *!SECTION */
+                                  }),
+                            ),
+                          );
+                          /* *!SECTION */
+                        },
+                        title: 'رقم الدور',
+                      ),
+                      /* *!SECTION */
+                    ],
+                  )
+                  /* *!SECTION */
+                  ,
+                  /* *SECTION - apartement number with apartement State  */
+                  Row(
+                    textDirection: TextDirection.rtl,
+                    children: [
+                      /* *SECTION - Apartement State */
+                      TextTile(
+                        width: width > 1350 ? width * 0.17 : width * 0.23,
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => FluidDialog(
+                              alignmentDuration: const Duration(seconds: 1),
+                              alignmentCurve: Curves.bounceInOut,
+                              // Set the first page of the dialog.
+                              rootPage: FluidDialogPage(
+                                  alignment: Alignment.bottomCenter,
+                                  //Aligns the dialog to the bottom left.
+                                  builder: (context) {
+                                    /* *SECTION - States Selection */
+                                    return Container(
+                                      padding: const EdgeInsets.all(10),
+                                      width: width * 0.3,
+                                      height: height * 0.3,
+                                      child: ListView.builder(
+                                        itemCount: apartementState.length,
+                                        itemBuilder: (context, index) {
+                                          /* *SECTION - States Item With Hover */
+                                          RxBool onHoverOfStatesItem =
+                                              false.obs;
+                                          return Obx(() {
+                                            return MenuButtonCard(
+                                                backgroundColor:
+                                                    onHoverOfStatesItem.value
+                                                        ? Colors.grey[500]
+                                                        : Colors.white,
+                                                icon: Icons.abc,
+                                                hasIcon: false,
+                                                onHover: (isHovering) {
+                                                  onHoverOfStatesItem(
+                                                      isHovering);
+                                                },
+                                                onTap: () {
+                                                  apartementStateTextController
+                                                          .text =
+                                                      apartementState
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element.id ==
+                                                                  index + 1)
+                                                          .state;
+                                                  Navigator.of(context).pop();
+                                                },
+                                                title: apartementState
+                                                    .firstWhere((element) =>
+                                                        element.id == index + 1)
+                                                    .state);
+                                          });
+                                          /* *!SECTION */
+                                        },
+                                      ),
+                                    );
+                                    /* *!SECTION */
+                                  }),
+                            ),
+                          );
+                        },
+                        textController: apartementStateTextController,
+                        hintText: 'اختر حالة الوحدة',
+                        icon: Icons.build_outlined,
+                        title: 'حالة الوحدة',
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      /* *!SECTION */
+                      /* *SECTION - Apartement Number */
+                      TextTile(
+                        width: width > 1350 ? width * 0.17 : width * 0.23,
+                        onChange: (text, errorText) {
+                          if (!Validators.isNumericOrEmptyOnly(text)) {
+                            errorText('ادخل ارقام فقط');
+                          } else {
+                            apartementID = int.parse(text);
+                            onApartementLinkUpdated(
+                                'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                            apartementLinkTextController.text =
+                                onApartementLinkUpdated.value;
+                          }
+                        },
+                        textController: apartementNumberTextController,
+                        hintText: 'ادخل رقم الوحدة',
+                        icon: Icons.numbers_outlined,
+                        title: 'رقم الوحدة',
+                      ),
+                      /* *!SECTION */
+                    ],
+                  )
+
+                  /* *!SECTION */
+                ]),
+                const SizedBox(
+                  height: 20,
+                ),
+                /* *!SECTION */
+                /* *SECTION - Apartement Position And Qr Code */
+                Column(
+                  textDirection: TextDirection.rtl,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /* *SECTION -  Apartement Postion header*/
+                    Text(
+                      'بيانات الدخول المالك',
+                      style: GoogleFonts.notoSansArabic(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    /* *!SECTION */
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    /* *SECTION - Owner Email with owner Role    */
+                    Row(
+                      textDirection: TextDirection.rtl,
+                      children: [
+                        TextTile(
+                          width: width > 1350 ? width * 0.25 : width * 0.33,
+                          onChange: (text, errorText) {
+                            if (!GetUtils.isEmail(text)) {
+                              errorText('ادخل البريد صحيحا');
+                              ErrorsofTextController.addIf(
+                                  !ErrorsofTextController.contains('email'),
+                                  'email');
+                            } else {
+                              errorText('');
+                              ErrorsofTextController.remove('email');
+                            }
+                          },
+                          textController: ownerEmailTextController,
+                          hintText: 'ادخل البريد الالكتروني الماك',
+                          icon: Icons.email_outlined,
+                          title: 'البريد الالكتروني',
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        TextTile(
+                          width: width > 1350 ? width * 0.17 : width * 0.23,
+                          textController: ownerRoleTextController,
+                          hintText: 'اختر الصلاحيات ',
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => FluidDialog(
+                                alignmentDuration: const Duration(seconds: 1),
+                                alignmentCurve: Curves.bounceInOut,
+                                // Set the first page of the dialog.
+                                rootPage: FluidDialogPage(
+                                    alignment: Alignment.bottomCenter,
+                                    //Aligns the dialog to the bottom left.
+                                    builder: (context) {
+                                      /* *SECTION - Role Selection */
+                                      return Container(
+                                        padding: const EdgeInsets.all(10),
+                                        width: width * 0.3,
+                                        height: height * 0.2,
+                                        child: ListView.builder(
+                                          itemCount: ownerRole.length,
+                                          itemBuilder: (context, index) {
+                                            /* *SECTION - Roles Item With Hover */
+                                            RxBool onHoverOfFloorItem =
+                                                false.obs;
+                                            return Obx(() {
+                                              return MenuButtonCard(
+                                                  backgroundColor:
+                                                      onHoverOfFloorItem.value
+                                                          ? Colors.grey[500]
+                                                          : Colors.white,
+                                                  icon: Icons.abc,
+                                                  hasIcon: false,
+                                                  onHover: (isHovering) {
+                                                    onHoverOfFloorItem(
+                                                        isHovering);
+                                                  },
+                                                  onTap: () {
+                                                    ownerRoleTextController
+                                                            .text =
+                                                        ownerRole
+                                                            .firstWhere(
+                                                                (element) =>
+                                                                    element
+                                                                        .id ==
+                                                                    index + 1)
+                                                            .ownerRole;
+                                                    //NOTE - Change this if it doesn;t work
+                                                    Get.back();
+                                                  },
+                                                  title: ownerRole
+                                                      .firstWhere((element) =>
+                                                          element.id ==
+                                                          index + 1)
+                                                      .ownerRole);
+                                            });
+                                            /* *!SECTION */
+                                          },
+                                        ),
+                                      );
+                                      /* *!SECTION */
+                                    }),
+                              ),
+                            );
+                          },
+                          icon: Icons.manage_accounts_outlined,
+                          title: 'صلاحيات المالك',
+                        ),
+                      ],
+                    ),
+                    /* *!SECTION */
+
+                    /* *SECTION - Owner Password And Owner Confrim Password*/
+                    Row(
+                      textDirection: TextDirection.rtl,
+                      children: [
+                        TextTile(
+                          width: width > 1350 ? width * 0.17 : width * 0.23,
+                          textController: ownerPasswordTextController,
+                          hintText: 'ادخل الكلمة السرية',
+                          isPassword: true,
+                          onChange: (text, errorText) {
+                            if (text != confirmPasswordTextController.text) {
+                              errorText('ادخل كلمة سرية مطابقة للخانة الاولة');
+                              ErrorsofTextController.addIf(
+                                  !ErrorsofTextController.contains('password'),
+                                  'password');
+                            } else {
+                              errorText('');
+                              ErrorsofTextController.remove('password');
+                            }
+                          },
+                          icon: Icons.password_outlined,
+                          title: 'الكلمة السرية',
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        TextTile(
+                          width: width > 1350 ? width * 0.17 : width * 0.23,
+                          textController: confirmPasswordTextController,
+                          hintText: 'كلمة السرية',
+                          onChange: (text, errorText) {
+                            if (text != ownerPasswordTextController.text) {
+                              errorText('ادخل كلمة سرية مطابقة للخانة الاولة');
+                              ErrorsofTextController.addIf(
+                                  !ErrorsofTextController.contains(
+                                      'confirmpassword'),
+                                  'confirmpassword');
+                            } else {
+                              errorText('');
+                              ErrorsofTextController.remove('confirmpassword');
+                            }
+                          },
+                          isPassword: true,
+                          icon: Icons.password_sharp,
+                          title: 'تاكيد كلمة السرية',
+                        ),
+                      ],
+                    ),
+                    /* *!SECTION */
+                  ],
+                ),
+
+                /* *SECTION - Link And Qrcode */
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  textDirection: TextDirection.rtl,
+                  children: [
+                    /* *SECTION - Link  */
+                    TextTile(
+                      width: 200,
+                      height: 100,
+                      textController: apartementLinkTextController,
+                      hintText: 'انتظهر ظهور الرابط',
+                      icon: Icons.link,
+                      onTap: () {},
+                      title: 'رابط الدخول',
+                    ),
+                    /* *!SECTION */
+                    /* *SECTION - Qr Code */
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        clipBehavior: Clip.hardEdge,
+                        height: 200,
+                        alignment: Alignment.topRight,
+                        decoration: BoxDecoration(
+                            color: Colors.grey[200] ?? Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(20))),
+                        width: width > 1350
+                            ? width * 0.14
+                            : width > 1000
+                                ? width * 0.19
+                                : width * 0.24,
+                        child: Obx(() {
+                          return BarcodeWidget(
+                            barcode: Barcode.qrCode(),
+                            data: onApartementLinkUpdated.value,
+                          );
+                        }),
+                      ),
+                    ),
+                    /* *!SECTION */
+                  ],
                 ),
                 /* *!SECTION */
               ],
             ),
-
-            /* *!SECTION */
+            const SizedBox(
+              height: 15,
+            ),
           ],
-        ),
-        const SizedBox(
-          height: 15,
-        ),
+        ))
+        /* *!SECTION */
       ],
     );
 
@@ -994,7 +1061,7 @@ class TextTile extends StatelessWidget {
               GoogleFonts.notoSansArabic(fontSize: 18, color: Colors.grey[500]),
         ),
         const SizedBox(
-          height: 8,
+          height: 10,
         ),
         Obx(() {
           return Column(
@@ -1047,7 +1114,7 @@ class TextTile extends StatelessWidget {
                         color: Colors.red, fontSize: 14),
                   )),
               SizedBox(
-                height: errorText.isNotEmpty ? 0 : 15,
+                height: errorText.isNotEmpty ? 5 : 15,
               )
               /* *!SECTION */
             ],

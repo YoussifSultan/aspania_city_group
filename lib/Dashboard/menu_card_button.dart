@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MenuButtonCard extends StatelessWidget {
-  MenuButtonCard({
+  const MenuButtonCard({
     required this.icon,
     required this.title,
     this.onTap,
@@ -12,13 +12,13 @@ class MenuButtonCard extends StatelessWidget {
     this.hasIcon = true,
     super.key,
   });
-  String title;
-  Function? onTap;
-  Function? onHover;
-  IconData icon;
-  bool hasIcon;
-  BorderRadius? menuCardRadius;
-  Color? backgroundColor;
+  final String title;
+  final Function? onTap;
+  final Function? onHover;
+  final IconData icon;
+  final bool hasIcon;
+  final BorderRadius? menuCardRadius;
+  final Color? backgroundColor;
   @override
   Widget build(BuildContext context) {
     return InkWell(

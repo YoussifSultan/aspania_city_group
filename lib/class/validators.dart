@@ -11,7 +11,10 @@ class Validators {
     return true;
   }
 
-  static bool isNumericOnly(String text) {
+  static bool isNumericOrEmptyOnly(String text) {
+    if (text.isEmpty) {
+      return true;
+    }
     if (int.tryParse(text) == null) {
       return false;
     } else {
@@ -26,6 +29,19 @@ class Validators {
         return true;
       }
       if (sampleText == '') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static bool isAllElementsInListNotEmpty(List<String> text) {
+    for (var element in text) {
+      String sampleText = element.trim();
+      if (sampleText.characters.isNotEmpty) {
+        return true;
+      }
+      if (sampleText != '') {
         return true;
       }
     }

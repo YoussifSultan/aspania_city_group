@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   responsive_builder: ^0.7.0
   google_fonts: ^5.1.0
+  barcode_widget: ^2.0.4
   fluid_dialog: ^2.0.0
   get: ^4.6.5
 dev_dependencies:
