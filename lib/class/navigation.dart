@@ -16,6 +16,7 @@ class NavigationProperties {
   static String realEstateSummaryPageRoute = 'realEstateSummary';
   static String ownerPageRoute = 'Owners';
   static String addNewRealEstatePageRoute = 'AddNewApartement';
+  static String showAllRealEstatePageRoute = 'showAllApartements';
   static List selectedTabNeededParamters = [];
   static RxString selectedTabVaueNotifier = 'Apartemnts'.obs;
 }

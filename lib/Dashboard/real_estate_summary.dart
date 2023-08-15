@@ -70,7 +70,10 @@ class RealEstatesPage extends StatelessWidget {
                       NavigationProperties.selectedTabVaueNotifier(
                           NavigationProperties.addNewRealEstatePageRoute);
                     },
-                    onShowAllApartementsInRealEstateButtonTap: () {},
+                    onShowAllApartementsInRealEstateButtonTap: () {
+                      NavigationProperties.selectedTabVaueNotifier(
+                          NavigationProperties.showAllRealEstatePageRoute);
+                    },
                     onShowAllOwnersInRealEstateButtonTap: () {},
                     width: width,
                     realEstateName: realEstates

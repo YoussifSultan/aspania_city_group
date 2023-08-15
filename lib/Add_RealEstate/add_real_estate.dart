@@ -159,26 +159,6 @@ class _AddRealEstateState extends State<AddRealEstate> {
                           onTap: () {
                             /* *SECTION - If There Is an Error */
                             if (ErrorsofTextController.isEmpty) {
-                              /* *SECTION - Text Controllers 
-  TextEditingController apartementBuildingPositionTextController =
-      TextEditingController();
-  TextEditingController apartementBuildingFloorPositionTextController =
-      TextEditingController();
-  TextEditingController apartementStateTextController = TextEditingController();
-  TextEditingController apartementNumberTextController =
-      TextEditingController();
-  TextEditingController ownerNameTextController = TextEditingController();
-  TextEditingController responsibleNameTextController = TextEditingController();
-  TextEditingController responsiblePhoneNumberTextController =
-      TextEditingController();
-  TextEditingController apartementLinkTextController = TextEditingController();
-  TextEditingController ownerEmailTextController = TextEditingController();
-  TextEditingController ownerPhoneNumberTextController =
-      TextEditingController();
-  TextEditingController ownerRoleTextController = TextEditingController();
-  TextEditingController ownerPasswordTextController = TextEditingController();
-  TextEditingController confirmPasswordTextController = TextEditingController();
-   *!SECTION */
                               if (buildingID != null &&
                                   floorID != null &&
                                   apartementID != null &&
@@ -230,13 +210,21 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                 //TODO - Get The Last Id
                                 RealEstateData realEstateData = RealEstateData(
                                     id: 1,
+                                    ownerName: ownerNameTextController.text,
+                                    ownerPhoneNumber:
+                                        ownerPhoneNumberTextController.text,
+                                    responsibleName:
+                                        responsibleNameTextController.text,
+                                    responsiblePhone:
+                                        responsiblePhoneNumberTextController
+                                            .text,
                                     apartementStatusId: apartementStatusID ?? 0,
                                     apartementPostionInFloorId: floorID ?? 0,
                                     apartementPostionInBuildingId:
                                         buildingID ?? 0,
                                     apartementLink:
                                         apartementLinkTextController.text,
-                                    isApartementHasEnoughData: false,
+                                    isApartementHasEnoughData: true,
                                     apartementName: apartementID.toString());
 
                                 Get.closeAllSnackbars();

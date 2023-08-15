@@ -1,5 +1,6 @@
 import 'package:aspania_city_group/Add_RealEstate/add_real_estate.dart';
 import 'package:aspania_city_group/Dashboard/real_estate_summary.dart';
+import 'package:aspania_city_group/DataTableForApartements/ShowAllApartements.dart';
 import 'package:aspania_city_group/class/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -76,7 +77,12 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                   buildingNumber: NavigationProperties
                                       .selectedTabNeededParamters[0],
                                 )
-                              : const SizedBox(),
+                              : NavigationProperties.selectedTabVaueNotifier
+                                          .toString() ==
+                                      NavigationProperties
+                                          .showAllRealEstatePageRoute
+                                  ? const ShowwAllAprtementsPage()
+                                  : const SizedBox(),
                     ),
                   );
                 }),

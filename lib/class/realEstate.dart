@@ -7,12 +7,16 @@ class RealEstateData {
       required this.apartementLink,
       required this.isApartementHasEnoughData,
       required this.apartementName,
+      this.responsibleName = '',
+      this.responsiblePhone = '',
       this.ownerName = '',
       this.ownerMail = '',
       this.ownerPassword = '',
       this.ownerPhoneNumber = '',
       this.ownerRole = ''}) {
     if (!isApartementHasEnoughData) {
+      responsibleName = 'None';
+      responsiblePhone = 'None';
       ownerName = 'None';
       ownerMail = 'None';
       ownerPassword = '12345678910';
@@ -27,6 +31,8 @@ class RealEstateData {
   late String ownerRole;
   late String ownerMail;
   late String ownerPassword;
+  late String responsibleName;
+  late String responsiblePhone;
   String apartementLink;
   int apartementPostionInBuildingId;
   int apartementPostionInFloorId;
