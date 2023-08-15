@@ -1,4 +1,4 @@
-import 'package:fluid_dialog/fluid_dialog.dart';
+import 'package:aspania_city_group/class/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,6 +28,26 @@ class RealEstatesPage extends StatelessWidget {
     return ListView(
       shrinkWrap: true,
       children: [
+        const SizedBox(
+          height: 20,
+        ),
+        /* *SECTION - Routes  */
+        Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            RouteTextWIthHover(
+              routeName: 'الوحدات',
+              onTap: () {
+                NavigationProperties.selectedTabVaueNotifier(
+                    NavigationProperties.RealEstateSummaryPageRoute);
+              },
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 30,
+        ),
+        /* *!SECTION */
         Directionality(
           textDirection: TextDirection.rtl,
           child: GridView.builder(
@@ -40,26 +60,17 @@ class RealEstatesPage extends StatelessWidget {
                   childAspectRatio: 1.3,
                   crossAxisSpacing: 20),
               itemBuilder: (context, index) {
-                /* *SECTION - RealEstate 3 */
+                /* *SECTION - RealEstate 1 -6  */
                 return Directionality(
                   textDirection: TextDirection.ltr,
                   child: RealEstateActionsWidget(
                     onAddingNewApartementButtonTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => FluidDialog(
-                          // Set the first page of the dialog.
-                          rootPage: FluidDialogPage(
-                              alignment: Alignment
-                                  .center, //Aligns the dialog to the bottom left.
-                              builder: (context) {
-                                return AddRealEstate(
-                                  windowState: 'AddOwner',
-                                  buildingNumber: index + 1,
-                                );
-                              }),
-                        ),
-                      );
+                      NavigationProperties.selectedTabNeededParamters = [
+                        index + 1,
+                        'AddOwner'
+                      ];
+                      NavigationProperties.selectedTabVaueNotifier(
+                          NavigationProperties.AddNewRealEstatePageRoute);
                     },
                     onShowAllApartementsInRealEstateButtonTap: () {},
                     onShowAllOwnersInRealEstateButtonTap: () {},
@@ -76,21 +87,9 @@ class RealEstatesPage extends StatelessWidget {
         Center(
           child: RealEstateActionsWidget(
             onAddingNewApartementButtonTap: () {
-              showDialog(
-                context: context,
-                builder: (context) => FluidDialog(
-                  // Set the first page of the dialog.
-                  rootPage: FluidDialogPage(
-                      alignment: Alignment
-                          .center, //Aligns the dialog to the bottom left.
-                      builder: (context) {
-                        return const AddRealEstate(
-                          buildingNumber: 7,
-                          windowState: 'AddOwner',
-                        );
-                      }),
-                ),
-              );
+              NavigationProperties.selectedTabNeededParamters = [7, 'AddOwner'];
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.AddNewRealEstatePageRoute);
             },
             onShowAllApartementsInRealEstateButtonTap: () {},
             onShowAllOwnersInRealEstateButtonTap: () {},
@@ -187,7 +186,9 @@ class RealEstateActionsWidget extends StatelessWidget {
                       onShowAllOwnersInRealEstateValueNotifier(isHovering);
                     },
                     icon: Icons.show_chart,
-                    title: 'استعراض الملاك',
+                    title: width > 1250
+                        ? 'استعراض الوحدات المسجلة'
+                        : 'الوحدات المسجلة',
                     menuCardRadius: const BorderRadius.only(),
                     backgroundColor:
                         onShowAllOwnersInRealEstateValueNotifier.value
@@ -206,9 +207,8 @@ class RealEstateActionsWidget extends StatelessWidget {
                       onShowAllApartementsInRealEstateValueNotifier(isHovering);
                     },
                     icon: Icons.all_inbox,
-                    title: width > 1250
-                        ? 'استعراض جميع الوحدات'
-                        : 'استعراض الوحدات',
+                    title:
+                        width > 1250 ? 'استعراض جميع الوحدات' : 'جميع الوحدات',
                     menuCardRadius: const BorderRadius.only(
                         bottomRight: Radius.circular(20),
                         bottomLeft: Radius.circular(20)),

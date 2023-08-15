@@ -18,4 +18,17 @@ class Validators {
       return true;
     }
   }
+
+  static bool isListEmpty(List<String> text) {
+    for (var element in text) {
+      String sampleText = element.trim();
+      if (sampleText.characters.isEmpty) {
+        return true;
+      }
+      if (sampleText == '') {
+        return true;
+      }
+    }
+    return false;
+  }
 }

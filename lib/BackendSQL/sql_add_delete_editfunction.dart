@@ -1,0 +1,3 @@
+class SQLFunctions {
+  void SaveStatement() {}
+}

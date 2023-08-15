@@ -38,3 +38,10 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+class Arguments {
+  final String key;
+  final dynamic value;
+
+  Arguments({required this.key, required this.value});
+}

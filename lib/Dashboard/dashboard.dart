@@ -1,4 +1,6 @@
+import 'package:aspania_city_group/Add_RealEstate/add_real_estate.dart';
 import 'package:aspania_city_group/Dashboard/real_estate_summary.dart';
+import 'package:aspania_city_group/class/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,15 +17,12 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   /* *SECTION -  Animations */
-  late AnimationController openMainScreenAnimationController;
   /* *!SECTION */
   /* *SECTION - ValueNotifiers */
-  RxInt selectedTabVaueNotifier = 0.obs;
   /* *!SECTION */
   /* *SECTION - Dispose */
   @override
   void dispose() {
-    openMainScreenAnimationController.dispose();
     super.dispose();
   }
 
@@ -31,8 +30,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   /* *SECTION - Init State */
   @override
   void initState() {
-    openMainScreenAnimationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 700));
     super.initState();
   }
 
@@ -53,8 +50,12 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               children: [
                 /* *SECTION - Main Screen */
                 Obx(() {
-                  return SizeTransition(
-                    sizeFactor: openMainScreenAnimationController,
+                  AnimationController openMainScreenAnimationController =
+                      AnimationController(
+                          vsync: this, duration: const Duration(seconds: 1));
+                  openMainScreenAnimationController.forward();
+                  return FadeTransition(
+                    opacity: openMainScreenAnimationController,
                     child: Container(
                       padding: const EdgeInsets.only(
                           top: 20, left: 20, right: 20, bottom: 20),
@@ -63,12 +64,23 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: selectedTabVaueNotifier.toInt() == 0
+                      child: NavigationProperties.selectedTabVaueNotifier
+                                  .toString() ==
+                              NavigationProperties.RealEstateSummaryPageRoute
                           /* *SECTION - Real Estate Part */
                           ? const RealEstatesPage()
                           /* *!SECTION */
                           /* *TODO - Implement Other Screens */
-                          : const SizedBox(),
+                          : NavigationProperties.selectedTabVaueNotifier
+                                      .toString() ==
+                                  NavigationProperties.AddNewRealEstatePageRoute
+                              ? AddRealEstate(
+                                  windowState: NavigationProperties
+                                      .selectedTabNeededParamters[1],
+                                  buildingNumber: NavigationProperties
+                                      .selectedTabNeededParamters[0],
+                                )
+                              : const SizedBox(),
                     ),
                   );
                 }),
@@ -155,8 +167,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         title: 'الوحدات',
                         icon: Icons.category_outlined,
                         onTap: () {
-                          selectedTabVaueNotifier(0);
-                          openMainScreenAnimationController.forward(from: 0);
+                          NavigationProperties.selectedTabVaueNotifier(
+                              NavigationProperties.RealEstateSummaryPageRoute);
                         },
                       ),
                       /* *!SECTION */
@@ -168,8 +180,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         title: 'الملاك',
                         icon: Icons.people_alt_outlined,
                         onTap: () {
-                          selectedTabVaueNotifier(1);
-                          openMainScreenAnimationController.forward(from: 0);
+                          NavigationProperties.selectedTabVaueNotifier(
+                              NavigationProperties.OwnerPageRoute);
                         },
                       ),
                       /* *!SECTION */
