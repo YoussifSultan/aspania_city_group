@@ -41,6 +41,7 @@ dependencies:
   barcode_widget: ^2.0.4
   fluid_dialog: ^2.0.0
   http: ^1.1.0
+  mouse_parallax: ^1.1.0
   get: ^4.6.5
 dev_dependencies:
   flutter_test:
