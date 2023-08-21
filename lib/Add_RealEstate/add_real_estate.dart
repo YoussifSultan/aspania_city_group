@@ -16,10 +16,11 @@ class AddRealEstate extends StatefulWidget {
     super.key,
     this.buildingNumber = -1,
     required this.windowState,
+    this.dataToEdit,
   });
   final int buildingNumber;
-  static String routeName = '/AddRealEstate';
   final String windowState;
+  final RealEstateData? dataToEdit;
   @override
   State<AddRealEstate> createState() => _AddRealEstateState();
 }
@@ -52,6 +53,16 @@ class _AddRealEstateState extends State<AddRealEstate> {
   RxBool onEditButtonHover = false.obs;
   RxBool onAddRealEstateRouteHover = false.obs;
 
+  /* *!SECTION */
+  /* *SECTION - Edit Data */
+  RealEstateData realEstateDataToEdit = RealEstateData(
+      id: 0,
+      apartementStatusId: 0,
+      apartementPostionInFloorId: 1,
+      apartementPostionInBuildingId: 2,
+      apartementLink: 'None',
+      isApartementHasEnoughData: false,
+      apartementName: '126');
   /* *!SECTION */
   /* *SECTION - Data Saved */
 
@@ -96,7 +107,66 @@ class _AddRealEstateState extends State<AddRealEstate> {
   /* *SECTION -  initstate*/
   @override
   void initState() {
-    if (widget.windowState == 'EditOwner') {}
+    if (widget.windowState == 'EditOwner') {
+      if (widget.dataToEdit != null) {
+        realEstateDataToEdit = widget.dataToEdit!;
+        /* *SECTION - Text Controllers 
+  TextEditingController apartementBuildingPositionTextController =
+      TextEditingController();
+  TextEditingController apartementBuildingFloorPositionTextController =
+      TextEditingController();
+  TextEditingController apartementStateTextController = TextEditingController();
+  TextEditingController apartementNumberTextController =
+      TextEditingController();
+  TextEditingController ownerNameTextController = TextEditingController();
+  TextEditingController responsibleNameTextController = TextEditingController();
+  TextEditingController responsiblePhoneNumberTextController =
+      TextEditingController();
+  TextEditingController apartementLinkTextController = TextEditingController();
+  TextEditingController ownerEmailTextController = TextEditingController();
+  TextEditingController ownerPhoneNumberTextController =
+      TextEditingController();
+  TextEditingController ownerRoleTextController = TextEditingController();
+  TextEditingController ownerPasswordTextController = TextEditingController();
+  TextEditingController confirmPasswordTextController = TextEditingController();
+  *!SECTION */
+        apartementBuildingPositionTextController.text = realEstates
+            .firstWhere((element) =>
+                element.id ==
+                realEstateDataToEdit.apartementPostionInBuildingId)
+            .buildingName;
+        apartementBuildingFloorPositionTextController.text = realEstateFloors
+            .firstWhere((element) =>
+                element.id == realEstateDataToEdit.apartementPostionInFloorId)
+            .floorName;
+        apartementStateTextController.text = apartementState
+            .firstWhere((element) =>
+                element.id == realEstateDataToEdit.apartementStatusId)
+            .state;
+        apartementNumberTextController.text =
+            realEstateDataToEdit.apartementName;
+        buildingID = realEstateDataToEdit.apartementPostionInBuildingId;
+        floorID = realEstateDataToEdit.apartementPostionInFloorId;
+        apartementID = int.parse(realEstateDataToEdit.apartementName);
+        apartementStatusID = realEstateDataToEdit.apartementStatusId;
+        onApartementLinkUpdated(
+            'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+        apartementLinkTextController.text = realEstateDataToEdit.apartementLink;
+        if (realEstateDataToEdit.isApartementHasEnoughData) {
+          ownerNameTextController.text = realEstateDataToEdit.ownerName;
+          responsibleNameTextController.text =
+              realEstateDataToEdit.responsibleName;
+          ownerPhoneNumberTextController.text =
+              realEstateDataToEdit.ownerPhoneNumber;
+          responsiblePhoneNumberTextController.text =
+              realEstateDataToEdit.responsiblePhone;
+          ownerEmailTextController.text = realEstateDataToEdit.ownerMail;
+          ownerPasswordTextController.text = realEstateDataToEdit.ownerPassword;
+          confirmPasswordTextController.text =
+              realEstateDataToEdit.ownerPassword;
+        }
+      }
+    }
     if (widget.buildingNumber != -1) {
       buildingID = realEstates
           .firstWhere((element) => element.id == widget.buildingNumber)
@@ -129,24 +199,62 @@ class _AddRealEstateState extends State<AddRealEstate> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             /* *SECTION - Routes  */
-            Row(
-              textDirection: TextDirection.rtl,
-              children: [
-                RouteTextWIthHover(
-                  routeName: 'الوحدات',
-                  onTap: () {
-                    NavigationProperties.selectedTabVaueNotifier(
-                        NavigationProperties.realEstateSummaryPageRoute);
-                  },
-                ),
-                Text(
-                  ' / ',
-                  style: GoogleFonts.notoSansArabic(
-                      color: Colors.black, fontSize: 28),
-                ),
-                const RouteTextWIthHover(routeName: 'اضافة وحدة'),
-              ],
-            ),
+            widget.windowState == 'AddOwner'
+                ? Row(
+                    textDirection: TextDirection.rtl,
+                    children: [
+                      RouteTextWIthHover(
+                        routeName: 'الوحدات',
+                        onTap: () {
+                          NavigationProperties.selectedTabVaueNotifier(
+                              NavigationProperties.realEstateSummaryPageRoute);
+                        },
+                      ),
+                      Text(
+                        ' / ',
+                        style: GoogleFonts.notoSansArabic(
+                            color: Colors.black, fontSize: 28),
+                      ),
+                      const RouteTextWIthHover(routeName: 'اضافة وحدة'),
+                    ],
+                  )
+                : widget.windowState == 'EditOwner'
+                    ? SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          textDirection: TextDirection.rtl,
+                          children: [
+                            RouteTextWIthHover(
+                              routeName: 'الوحدات',
+                              onTap: () {
+                                NavigationProperties.selectedTabVaueNotifier(
+                                    NavigationProperties
+                                        .realEstateSummaryPageRoute);
+                              },
+                            ),
+                            Text(
+                              ' / ',
+                              style: GoogleFonts.notoSansArabic(
+                                  color: Colors.black, fontSize: 28),
+                            ),
+                            RouteTextWIthHover(
+                              routeName: 'عرض جميع الوحدات',
+                              onTap: () {
+                                NavigationProperties.selectedTabVaueNotifier(
+                                    NavigationProperties
+                                        .showAllRealEstatePageRoute);
+                              },
+                            ),
+                            Text(
+                              ' / ',
+                              style: GoogleFonts.notoSansArabic(
+                                  color: Colors.black, fontSize: 28),
+                            ),
+                            const RouteTextWIthHover(routeName: ' تعديل وحدة'),
+                          ],
+                        ),
+                      )
+                    : const SizedBox(),
             /* *!SECTION */
             /* *SECTION - Action Buttons */
             Row(

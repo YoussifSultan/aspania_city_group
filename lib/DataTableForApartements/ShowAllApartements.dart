@@ -1,11 +1,14 @@
+import 'dart:convert';
+
 import 'package:aspania_city_group/class/realestate.dart';
-import 'package:data_table_2/data_table_2.dart';
+import 'package:davi/davi.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../class/buidlingproperties.dart';
 import '../class/navigation.dart';
+import 'package:http/http.dart' as http;
 
 class ShowwAllAprtementsPage extends StatefulWidget {
   const ShowwAllAprtementsPage({super.key});
@@ -15,11 +18,288 @@ class ShowwAllAprtementsPage extends StatefulWidget {
 }
 
 class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
+  DaviModel<RealEstateData>? _model;
+  int lastindexOfRealEstateLoaded = 10;
+  final List<RealEstateData> _realEstates = [
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+    RealEstateData(
+        id: 19,
+        apartementStatusId: 3,
+        apartementPostionInFloorId: 1,
+        apartementPostionInBuildingId: 4,
+        apartementLink: 'www.spain-city.com/id?14125',
+        isApartementHasEnoughData: true,
+        apartementName: '125',
+        ownerName: 'يوسف اسامة',
+        ownerPhoneNumber: '01020314813',
+        responsibleName: 'اسامة خليل',
+        responsiblePhone: '0111657889'),
+  ];
+  Future<String> getData() async {
+    final queryParameters = {
+      'acc': 'n1yrefrb0p0tyoussif26dec',
+    };
+    var url = Uri.https(
+        'www.spain-city.com',
+        '/SQLFunctions/'
+            'INSERT INTO `Floors` (`idFloor`, `FloorName`) VALUES (\'5\', \'Update\');',
+        queryParameters);
+    print("link : $url");
+    var response = await http.get(url);
+    print('Status Code :${response.statusCode}');
+    print('Data : ${response.body}');
+    return response.body;
+  }
+
+  @override
+  void initState() {
+    getData();
+    /* *SECTION - Important Lists */
+    final List<Building> buildings = [
+      Building(buildingName: 'عمارة رقم ۱', id: 1),
+      Building(buildingName: 'عمارة رقم ۲', id: 2),
+      Building(buildingName: 'عمارة رقم ۳', id: 3),
+      Building(buildingName: 'عمارة رقم ٤', id: 4),
+      Building(buildingName: 'عمارة رقم ٥', id: 5),
+      Building(buildingName: 'عمارة رقم ٦', id: 6),
+      Building(buildingName: 'عمارة رقم ۷', id: 7),
+    ];
+    final List<Floor> realEstateFloors = [
+      Floor(floorName: 'الارضي المنخفض', id: 1),
+      Floor(floorName: 'الارضي مرتفع', id: 2),
+      Floor(floorName: 'الاول', id: 3),
+      Floor(floorName: 'الثاني', id: 4),
+      Floor(floorName: 'الثالث', id: 5),
+      Floor(floorName: 'الرابع', id: 6),
+    ];
+    final List<ApartementStatus> apartementState = [
+      ApartementStatus(state: 'مقيم', id: 1),
+      ApartementStatus(state: 'تحت التشطيب', id: 2),
+      ApartementStatus(state: 'مباعة \\ مغلق', id: 3),
+      ApartementStatus(state: 'طرف الشركة', id: 4),
+    ];
+    /* *!SECTION */
+    _model = DaviModel(
+      rows: _realEstates.getRange(0, lastindexOfRealEstateLoaded).toList(),
+      onSort: (sortedColumns) {},
+      columns: [
+        // Set the name of the column
+
+        DaviColumn(
+            stringValue: (row) => row.apartementName,
+            name: 'رقم الوحدة',
+            width: 100,
+            sortable: true),
+        DaviColumn(
+            stringValue: (row) => realEstateFloors
+                .firstWhere(
+                    (element) => element.id == row.apartementPostionInFloorId)
+                .floorName,
+            name: 'الدور',
+            width: 150,
+            sortable: true),
+        DaviColumn(
+            width: 200,
+            stringValue: (row) => buildings
+                .firstWhere((element) =>
+                    element.id == row.apartementPostionInBuildingId)
+                .buildingName,
+            name: 'العمارة',
+            sortable: true),
+        DaviColumn(
+            width: 200,
+            name: 'رقم التليفون المسئول',
+            stringValue: (row) => row.responsiblePhone,
+            sortable: true),
+        DaviColumn(
+            width: 300,
+            name: 'اسم المسئول',
+            stringValue: (row) => row.responsibleName,
+            sortable: true),
+        DaviColumn(
+            width: 300,
+            name: 'اسم المالك',
+            stringValue: (row) => row.ownerName,
+            sortable: true),
+        DaviColumn(
+            width: 150,
+            name: 'الوحدة',
+            stringValue: (row) => apartementState
+                .firstWhere((element) => element.id == row.apartementStatusId)
+                .state,
+            sortable: true),
+        DaviColumn(
+            name: 'التسلسل',
+            width: 75,
+            intValue: (row) => row.id,
+            sortable: true),
+      ],
+    );
+  }
+
+  bool _loading = false;
+
+  void _onLastRowWidget(bool visible) {
+    if (visible && !_loading) {
+      setState(() {
+        _loading = true;
+      });
+      if (_realEstates.length > lastindexOfRealEstateLoaded + 5) {
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {
+            _loading = false;
+            List<RealEstateData> newValues = _realEstates
+                .getRange(lastindexOfRealEstateLoaded,
+                    lastindexOfRealEstateLoaded + 5)
+                .toList();
+            lastindexOfRealEstateLoaded += 5;
+            _model!.addRows(newValues);
+          });
+        });
+      } else if ((_realEstates.length - lastindexOfRealEstateLoaded) <= 4) {
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {
+            _loading = false;
+            List<RealEstateData> newValues = _realEstates
+                .getRange(
+                    lastindexOfRealEstateLoaded,
+                    lastindexOfRealEstateLoaded +
+                        (_realEstates.length - lastindexOfRealEstateLoaded))
+                .toList();
+            lastindexOfRealEstateLoaded = _realEstates.length;
+            _model!.addRows(newValues);
+          });
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    RxBool onEditButtonHover = false.obs;
 
+    int selectedRow = 1;
     return Column(
         /* *SECTION - Dialog */
         children: [
@@ -50,410 +330,102 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                   const RouteTextWIthHover(routeName: 'عرض جميع الوحدات'),
                 ],
               ),
+              /* *SECTION - edit Button */
+              Obx(() {
+                return GestureDetector(
+                  onTap: () {
+                    NavigationProperties.selectedTabNeededParamters = [
+                      -1,
+                      'EditOwner',
+                      _realEstates[selectedRow]
+                    ];
+                    NavigationProperties.selectedTabVaueNotifier(
+                        NavigationProperties.addNewRealEstatePageRoute);
+                  },
+                  child: MouseRegion(
+                    onEnter: (details) {
+                      onEditButtonHover(true);
+                    },
+                    onExit: (details) {
+                      onEditButtonHover(false);
+                    },
+                    child: Container(
+                      width: 150,
+                      height: 50,
+                      decoration: BoxDecoration(
+                          color: onEditButtonHover.value
+                              ? Colors.grey[500]
+                              : Colors.transparent,
+                          border: Border.all(
+                              color: Colors.grey[500] ?? Colors.white),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Center(
+                        child: Text(
+                          'تعديل الوحدة',
+                          style: GoogleFonts.notoSansArabic(fontSize: 18),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+              /* *!SECTION */
               /* *!SECTION */
             ],
           ),
           const SizedBox(
             height: 30,
           ),
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: Expanded(
-              child: PaginatedDataTable2(
-                columnSpacing: 12,
-                horizontalMargin: 12,
-                minWidth: 1500,
-                wrapInCard: true,
-                horizontalScrollController: ScrollController(),
-                sortArrowAlwaysVisible: true,
-                autoRowsToHeight:
-                    true, // Datatable widget that have the property columns and rows.
-                columns: [
-                  // Set the name of the column
-                  DataColumn2(
-                    onSort: (columnIndex, ascending) {},
-                    fixedWidth: 75,
-                    label: const Text('التسلسل'),
-                    numeric: true,
-                  ),
-                  const DataColumn2(
-                    fixedWidth: 100,
-                    label: Text('الوحدة'),
-                    numeric: true,
-                  ),
-                  const DataColumn2(
-                    fixedWidth: 300,
-                    label: Text('اسم المالك'),
-                  ),
-                  const DataColumn2(
-                    fixedWidth: 300,
-                    label: Text('اسم المسئول'),
-                  ),
-                  const DataColumn2(
-                    fixedWidth: 150,
-                    label: Text('رقم التليفون المسئول'),
-                  ),
-                  const DataColumn2(
-                    fixedWidth: 150,
-                    label: Text('العمارة'),
-                  ),
-                  const DataColumn2(
-                    label: Text('الدور'),
-                  ),
-                  const DataColumn2(
-                    label: Text('رقم الوحدة'),
-                  ),
-                ],
-                source: RealEstateDataSource(context),
+          DaviTheme(
+            data: DaviThemeData(
+                scrollbar: const TableScrollbarThemeData(
+                    horizontalOnlyWhenNeeded: false,
+                    verticalOnlyWhenNeeded: false),
+                header: HeaderThemeData(
+                    color: Colors.green[50],
+                    bottomBorderHeight: 4,
+                    bottomBorderColor: Colors.blue),
+                headerCell: HeaderCellThemeData(
+                    height: 40,
+                    alignment: Alignment.center,
+                    textStyle: const TextStyle(
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                    resizeAreaWidth: 10,
+                    resizeAreaHoverColor: Colors.blue.withOpacity(.5),
+                    sortIconColors: SortIconColors.all(Colors.green),
+                    expandableName: false)),
+            child: Davi<RealEstateData>(
+              _model,
+              onLastRowWidget: _onLastRowWidget,
+              tapToSortEnabled: true,
+              rowColor: (row) {
+                if (row.data.id == selectedRow) {
+                  return Colors.grey;
+                }
+                if (row.index.isEven) {
+                  return Colors.grey.withOpacity(0.2);
+                } else {
+                  return Colors.white;
+                }
+              },
+              lastRowWidget: const Center(
+                child: SizedBox(
+                  height: 100,
+                  width: 50,
+                  child: CircularProgressIndicator(
+                      color: Colors.black, strokeWidth: 1),
+                ),
               ),
+              visibleRowsCount: int.parse((height / 50).toStringAsFixed(0)),
+              columnWidthBehavior: ColumnWidthBehavior.scrollable,
+              onRowTap: (data) {
+                selectedRow = data.id;
+              },
             ),
-
-            /* *!SECTION */
           )
+          /* *!SECTION */
         ]);
   }
-}
-
-class RealEstateDataSource extends DataTableSource {
-  final List<RealEstateData> _realEstates = [
-    RealEstateData(
-        id: 1,
-        apartementStatusId: 1,
-        apartementPostionInFloorId: 2,
-        apartementPostionInBuildingId: 3,
-        apartementLink: 'www.spain-city.com/id?23150',
-        isApartementHasEnoughData: false,
-        apartementName: '150'),
-    RealEstateData(
-        id: 2,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: false,
-        apartementName: '125'),
-    RealEstateData(
-        id: 3,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 4,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 4,
-        apartementPostionInBuildingId: 1,
-        apartementLink: 'www.spain-city.com/id?41450',
-        isApartementHasEnoughData: true,
-        apartementName: '450',
-        ownerName: 'محمد مصطفى',
-        ownerPhoneNumber: '01265789897',
-        responsibleName: 'مرسي محمود',
-        responsiblePhone: '0152089252'),
-    RealEstateData(
-        id: 1,
-        apartementStatusId: 1,
-        apartementPostionInFloorId: 2,
-        apartementPostionInBuildingId: 3,
-        apartementLink: 'www.spain-city.com/id?23150',
-        isApartementHasEnoughData: false,
-        apartementName: '150'),
-    RealEstateData(
-        id: 2,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: false,
-        apartementName: '125'),
-    RealEstateData(
-        id: 3,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 4,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 4,
-        apartementPostionInBuildingId: 1,
-        apartementLink: 'www.spain-city.com/id?41450',
-        isApartementHasEnoughData: true,
-        apartementName: '450',
-        ownerName: 'محمد مصطفى',
-        ownerPhoneNumber: '01265789897',
-        responsibleName: 'مرسي محمود',
-        responsiblePhone: '0152089252'),
-    RealEstateData(
-        id: 1,
-        apartementStatusId: 1,
-        apartementPostionInFloorId: 2,
-        apartementPostionInBuildingId: 3,
-        apartementLink: 'www.spain-city.com/id?23150',
-        isApartementHasEnoughData: false,
-        apartementName: '150'),
-    RealEstateData(
-        id: 2,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: false,
-        apartementName: '125'),
-    RealEstateData(
-        id: 3,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 4,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 4,
-        apartementPostionInBuildingId: 1,
-        apartementLink: 'www.spain-city.com/id?41450',
-        isApartementHasEnoughData: true,
-        apartementName: '450',
-        ownerName: 'محمد مصطفى',
-        ownerPhoneNumber: '01265789897',
-        responsibleName: 'مرسي محمود',
-        responsiblePhone: '0152089252'),
-    RealEstateData(
-        id: 1,
-        apartementStatusId: 1,
-        apartementPostionInFloorId: 2,
-        apartementPostionInBuildingId: 3,
-        apartementLink: 'www.spain-city.com/id?23150',
-        isApartementHasEnoughData: false,
-        apartementName: '150'),
-    RealEstateData(
-        id: 2,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: false,
-        apartementName: '125'),
-    RealEstateData(
-        id: 3,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 4,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 4,
-        apartementPostionInBuildingId: 1,
-        apartementLink: 'www.spain-city.com/id?41450',
-        isApartementHasEnoughData: true,
-        apartementName: '450',
-        ownerName: 'محمد مصطفى',
-        ownerPhoneNumber: '01265789897',
-        responsibleName: 'مرسي محمود',
-        responsiblePhone: '0152089252'),
-    RealEstateData(
-        id: 1,
-        apartementStatusId: 1,
-        apartementPostionInFloorId: 2,
-        apartementPostionInBuildingId: 3,
-        apartementLink: 'www.spain-city.com/id?23150',
-        isApartementHasEnoughData: false,
-        apartementName: '150'),
-    RealEstateData(
-        id: 2,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: false,
-        apartementName: '125'),
-    RealEstateData(
-        id: 3,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 4,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 4,
-        apartementPostionInBuildingId: 1,
-        apartementLink: 'www.spain-city.com/id?41450',
-        isApartementHasEnoughData: true,
-        apartementName: '450',
-        ownerName: 'محمد مصطفى',
-        ownerPhoneNumber: '01265789897',
-        responsibleName: 'مرسي محمود',
-        responsiblePhone: '0152089252'),
-  ];
-  RealEstateDataSource.empty(this.context) {
-    realEstate = [];
-  }
-
-  RealEstateDataSource(this.context,
-      [sortedByCalories = false,
-      this.hasRowTaps = false,
-      this.hasRowHeightOverrides = false,
-      this.hasZebraStripes = false]) {
-    realEstate = _realEstates;
-    if (sortedByCalories) {
-      sort((d) => d.ownerName, true);
-    }
-  }
-
-  final BuildContext context;
-  late List<RealEstateData> realEstate;
-  // Add row tap handlers and show snackbar
-  bool hasRowTaps = false;
-  // Override height values for certain rows
-  bool hasRowHeightOverrides = false;
-  // Color each Row by index's parity
-  bool hasZebraStripes = false;
-
-  void sort<T>(
-      Comparable<T> Function(RealEstateData d) getField, bool ascending) {
-    realEstate.sort((a, b) {
-      final aValue = getField(a);
-      final bValue = getField(b);
-      return ascending
-          ? Comparable.compare(aValue, bValue)
-          : Comparable.compare(bValue, aValue);
-    });
-    notifyListeners();
-  }
-
-  @override
-  DataRow getRow(int index, [Color? color]) {
-    assert(index >= 0);
-    if (index >= realEstate.length) throw 'index > _desserts.length';
-    final apartement = realEstate[index];
-    /* *SECTION - Important Lists */
-    final List<Building> realEstates = [
-      Building(buildingName: 'عمارة رقم ۱', id: 1),
-      Building(buildingName: 'عمارة رقم ۲', id: 2),
-      Building(buildingName: 'عمارة رقم ۳', id: 3),
-      Building(buildingName: 'عمارة رقم ٤', id: 4),
-      Building(buildingName: 'عمارة رقم ٥', id: 5),
-      Building(buildingName: 'عمارة رقم ٦', id: 6),
-      Building(buildingName: 'عمارة رقم ۷', id: 7),
-    ];
-    final List<Floor> realEstateFloors = [
-      Floor(floorName: 'الارضي المنخفض', id: 1),
-      Floor(floorName: 'الارضي مرتفع', id: 2),
-      Floor(floorName: 'الاول', id: 3),
-      Floor(floorName: 'الثاني', id: 4),
-      Floor(floorName: 'الثالث', id: 5),
-      Floor(floorName: 'الرابع', id: 6),
-    ];
-    final List<ApartementStatus> apartementState = [
-      ApartementStatus(state: 'مقيم', id: 1),
-      ApartementStatus(state: 'تحت التشطيب', id: 2),
-      ApartementStatus(state: 'مباعة \\ مغلق', id: 3),
-      ApartementStatus(state: 'طرف الشركة', id: 4),
-    ];
-    /* *!SECTION */
-    return DataRow2.byIndex(
-      index: index,
-      color: color != null
-          ? MaterialStateProperty.all(color)
-          : (hasZebraStripes && index.isEven
-              ? MaterialStateProperty.all(Theme.of(context).highlightColor)
-              : null),
-      onTap: hasRowTaps
-          ? () => Get.showSnackbar(
-              GetSnackBar(message: 'Tapped on row ${apartement.ownerName}'))
-          : null,
-      onDoubleTap: hasRowTaps
-          ? () => Get.showSnackbar(GetSnackBar(
-              message: 'Double Tapped on row ${apartement.ownerName}'))
-          : null,
-      onLongPress: hasRowTaps
-          ? () => Get.showSnackbar(GetSnackBar(
-              message: 'Long pressed on row ${apartement.ownerName}'))
-          : null,
-      onSecondaryTap: hasRowTaps
-          ? () => Get.showSnackbar(GetSnackBar(
-              message: 'Right clicked on row ${apartement.ownerName}'))
-          : null,
-      onSecondaryTapDown: hasRowTaps
-          ? (d) => Get.showSnackbar(GetSnackBar(
-              message: 'Right button down on row ${apartement.ownerName}'))
-          : null,
-      cells: [
-        DataCell(Text(apartement.id.toString())),
-        DataCell(
-          Container(
-            width: 75,
-            height: 25,
-            decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(5)),
-                color: apartement.isApartementHasEnoughData
-                    ? const Color.fromRGBO(198, 238, 204, 1)
-                    : const Color.fromRGBO(253, 200, 208, 1),
-                border: Border.all(
-                    color: apartement.isApartementHasEnoughData
-                        ? const Color.fromRGBO(58, 107, 68, 1)
-                        : const Color.fromRGBO(145, 58, 67, 1))),
-            child: Center(
-                child: Text(
-              apartement.isApartementHasEnoughData ? 'مسجلة' : 'غير مسجلة',
-            )),
-          ),
-        ),
-        DataCell(Text(apartement.ownerName)),
-        DataCell(Text(apartement.responsibleName)),
-        DataCell(Text(apartement.responsiblePhone)),
-        DataCell(Text(realEstates
-            .firstWhere((element) =>
-                element.id == apartement.apartementPostionInBuildingId)
-            .buildingName)),
-        DataCell(Text(realEstateFloors
-            .firstWhere((element) =>
-                element.id == apartement.apartementPostionInFloorId)
-            .floorName)),
-        DataCell(Text(apartement.apartementName)),
-      ],
-    );
-  }
-
-  @override
-  int get rowCount => realEstate.length;
-
-  @override
-  bool get isRowCountApproximate => false;
-
-  @override
-  // TODO: implement selectedRowCount
-  int get selectedRowCount => 0;
 }

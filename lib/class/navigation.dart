@@ -9,7 +9,7 @@ selectedTabVaueNotifier has only
 1. Apartements
 2. Owners
 3. AddNewApartement(
-buildingNumber , window State
+buildingNumber , window State , realestate data
 )
  */
 class NavigationProperties {

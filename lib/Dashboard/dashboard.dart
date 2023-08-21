@@ -76,6 +76,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                       .selectedTabNeededParamters[1],
                                   buildingNumber: NavigationProperties
                                       .selectedTabNeededParamters[0],
+                                  dataToEdit: NavigationProperties
+                                      .selectedTabNeededParamters[2],
                                 )
                               : NavigationProperties.selectedTabVaueNotifier
                                           .toString() ==

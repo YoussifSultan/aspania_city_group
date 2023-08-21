@@ -38,4 +38,11 @@ class RealEstateData {
   int apartementPostionInFloorId;
   int apartementStatusId;
   String apartementName;
+  @override
+  String toString() {
+    return 'ID : $id || OwnerName : $ownerName || OwnerPhone : $ownerPhoneNumber || ownerMail $ownerMail'
+        'ownerRole : $ownerRole || ownerPassword : $ownerPassword || apartementLink : $apartementLink'
+        'Building Id : $apartementPostionInBuildingId || Floor Id : $apartementPostionInFloorId '
+        'Apartement Name : $apartementName';
+  }
 }

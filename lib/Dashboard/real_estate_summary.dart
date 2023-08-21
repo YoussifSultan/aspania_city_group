@@ -1,4 +1,5 @@
 import 'package:aspania_city_group/class/navigation.dart';
+import 'package:aspania_city_group/class/realestate.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -65,7 +66,15 @@ class RealEstatesPage extends StatelessWidget {
                     onAddingNewApartementButtonTap: () {
                       NavigationProperties.selectedTabNeededParamters = [
                         index + 1,
-                        'AddOwner'
+                        'AddOwner',
+                        RealEstateData(
+                            id: 0,
+                            apartementStatusId: 0,
+                            apartementPostionInFloorId: 0,
+                            apartementPostionInBuildingId: 0,
+                            apartementLink: 'None',
+                            isApartementHasEnoughData: false,
+                            apartementName: 'None')
                       ];
                       NavigationProperties.selectedTabVaueNotifier(
                           NavigationProperties.addNewRealEstatePageRoute);
