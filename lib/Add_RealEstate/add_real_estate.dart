@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
 import 'package:aspania_city_group/class/buidlingproperties.dart';
 import 'package:aspania_city_group/class/realestate.dart';
@@ -10,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../class/navigation.dart';
 import '../class/role.dart';
+import 'package:http/http.dart' as http;
 
 class AddRealEstate extends StatefulWidget {
   const AddRealEstate({
@@ -181,6 +184,70 @@ class _AddRealEstateState extends State<AddRealEstate> {
     super.initState();
   }
 
+  Future<String> insertData(RealEstateData apartement) async {
+    int newID = await getLastID() + 1;
+    final queryParameters = {
+      "Password": "n1yrefrb0p0tyoussif26dec",
+      "Query":
+          "INSERT INTO `SpainCity`.`RealEstates` (`idRealEstates`, `isApartementHasEnoughData`, `ownerName`,`ownerPhoneNumber`, `ownerRole`, `ownerMail`, `ownerPassword`,`responsibleName`, `responsiblePhone`, `apartementLink`, `apartementPostionInBuildingId`, `apartementPostionInFloorId`, `apartementStatusId`, `apartementName`) VALUES (${newID.toString()}, ${apartement.isApartementHasEnoughData == true ? 1 : 0}, \'${apartement.ownerName}\', \'${apartement.ownerPhoneNumber}\', ${apartement.ownerRole}, \'${apartement.ownerMail}\', \'${apartement.ownerPassword}\', \'${apartement.responsibleName}\', \'${apartement.responsiblePhone}\', \'${apartement.apartementLink}\',  ${apartement.apartementPostionInBuildingId}, ${apartement.apartementPostionInFloorId}, ${apartement.apartementStatusId}, \'${apartement.apartementName}\');",
+    };
+    var jsonResult = json.encode(queryParameters);
+    var url = Uri.parse('https://spain-city.com/SQLFunctions/');
+    print("link : $url");
+    var response = await http.post(url, body: jsonResult, headers: {
+      "Content-Type": "application/json",
+    });
+    print('Status Code :${response.statusCode}');
+    print('Data : ${response.body}');
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return response.body;
+    }
+  }
+
+  Future<String> editData(RealEstateData apartement) async {
+    final queryParameters = {
+      "Password": "n1yrefrb0p0tyoussif26dec",
+      "Query":
+          "UPDATE `SpainCity`.`RealEstates` SET `idRealEstates` = ${apartement.id}, `isApartementHasEnoughData` = ${apartement.isApartementHasEnoughData == true ? 1 : 0}, `ownerName` = \'${apartement.ownerName}\', `ownerPhoneNumber` = \'${apartement.ownerPhoneNumber}\', `ownerRole` = ${apartement.ownerRole}, `ownerMail` = \'${apartement.ownerMail}\', `ownerPassword` = \'${apartement.ownerPassword}\', `responsibleName` = \'${apartement.responsibleName}\', `responsiblePhone` = \'${apartement.responsiblePhone}\', `apartementLink` = \'${apartement.apartementLink}\', `apartementPostionInBuildingId` = ${apartement.apartementPostionInBuildingId}, `apartementPostionInFloorId` = ${apartement.apartementPostionInFloorId}, `apartementStatusId` = ${apartement.apartementStatusId}, `apartementName` = \'${apartement.apartementName}\' WHERE (`idRealEstates` = ${apartement.id});",
+    };
+    var jsonResult = json.encode(queryParameters);
+    var url = Uri.parse('https://spain-city.com/SQLFunctions/');
+    print("link : $url");
+    var response = await http.post(url, body: jsonResult, headers: {
+      "Content-Type": "application/json",
+    });
+    print('Status Code :${response.statusCode}');
+    print('Data : ${response.body}');
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      return response.body;
+    }
+  }
+
+  Future<int> getLastID() async {
+    final queryParameters = {
+      "Password": "n1yrefrb0p0tyoussif26dec",
+      "Query": "SELECT MAX(idRealEstates) FROM RealEstates;"
+    };
+    var jsonResult = json.encode(queryParameters);
+    var url = Uri.parse('https://spain-city.com/SQLFunctions/');
+    print("link : $url");
+    var response = await http.post(url, body: jsonResult, headers: {
+      "Content-Type": "application/json",
+    });
+    print('Status Code :${response.statusCode}');
+    print('Data : ${response.body}');
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      return data[0][0];
+    } else {
+      return int.parse(response.body);
+    }
+  }
+
   /* *!SECTION */
   @override
   Widget build(BuildContext context) {
@@ -264,7 +331,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                 widget.windowState == 'AddOwner'
                     ? Obx(() {
                         return GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             /* *SECTION - If There Is an Error */
                             if (ErrorsofTextController.isEmpty) {
                               if (buildingID != null &&
@@ -283,15 +350,15 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                 //TODO - Get The Last Id
                                 RealEstateData realEstateData = RealEstateData(
                                     id: 1,
-                                    apartementStatusId: apartementStatusID ?? 0,
-                                    apartementPostionInFloorId: floorID ?? 0,
+                                    apartementStatusId: apartementStatusID ?? 1,
+                                    apartementPostionInFloorId: floorID ?? 1,
                                     apartementPostionInBuildingId:
-                                        buildingID ?? 0,
+                                        buildingID ?? 1,
                                     apartementLink:
                                         apartementLinkTextController.text,
                                     isApartementHasEnoughData: false,
                                     apartementName: apartementID.toString());
-
+                                await insertData(realEstateData);
                                 Get.closeAllSnackbars();
                                 NavigationProperties.selectedTabVaueNotifier(
                                     NavigationProperties
@@ -326,15 +393,15 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                     responsiblePhone:
                                         responsiblePhoneNumberTextController
                                             .text,
-                                    apartementStatusId: apartementStatusID ?? 0,
-                                    apartementPostionInFloorId: floorID ?? 0,
+                                    apartementStatusId: apartementStatusID ?? 1,
+                                    apartementPostionInFloorId: floorID ?? 1,
                                     apartementPostionInBuildingId:
-                                        buildingID ?? 0,
+                                        buildingID ?? 1,
                                     apartementLink:
                                         apartementLinkTextController.text,
                                     isApartementHasEnoughData: true,
                                     apartementName: apartementID.toString());
-
+                                await insertData(realEstateData);
                                 Get.closeAllSnackbars();
                                 NavigationProperties.selectedTabVaueNotifier(
                                     NavigationProperties
@@ -411,15 +478,111 @@ class _AddRealEstateState extends State<AddRealEstate> {
                 widget.windowState == 'EditOwner'
                     ? Obx(() {
                         return GestureDetector(
-                          onTap: () {
-                            NavigationProperties.selectedTabVaueNotifier(
-                                NavigationProperties
-                                    .realEstateSummaryPageRoute);
-                            Get.showSnackbar(const GetSnackBar(
-                              animationDuration: Duration(seconds: 1),
-                              duration: Duration(seconds: 2),
-                              message: 'تم التعديل بنجاح',
-                            ));
+                          onTap: () async {
+                            if (ErrorsofTextController.isEmpty) {
+                              if (buildingID != null &&
+                                  floorID != null &&
+                                  apartementID != null &&
+                                  apartementStateTextController
+                                      .text.isNotEmpty &&
+                                  apartementNumberTextController
+                                      .text.isNotEmpty &&
+                                  !Validators.isAllElementsInListNotEmpty([
+                                    ownerNameTextController.text,
+                                    ownerPhoneNumberTextController.text,
+                                    responsibleNameTextController.text,
+                                    responsiblePhoneNumberTextController.text,
+                                  ])) {
+                                //TODO - Get The Last Id
+                                RealEstateData realEstateData = RealEstateData(
+                                    id: widget.dataToEdit!.id,
+                                    apartementStatusId: apartementStatusID ?? 1,
+                                    apartementPostionInFloorId: floorID ?? 1,
+                                    apartementPostionInBuildingId:
+                                        buildingID ?? 1,
+                                    apartementLink:
+                                        apartementLinkTextController.text,
+                                    isApartementHasEnoughData: false,
+                                    apartementName: apartementID.toString());
+                                await editData(realEstateData);
+                                Get.closeAllSnackbars();
+                                NavigationProperties.selectedTabVaueNotifier(
+                                    NavigationProperties
+                                        .realEstateSummaryPageRoute);
+                                Get.showSnackbar(const GetSnackBar(
+                                  animationDuration: Duration(seconds: 1),
+                                  duration: Duration(seconds: 2),
+                                  message: 'تم الحفظ بنجاح',
+                                ));
+                              } else if (buildingID != null &&
+                                  floorID != null &&
+                                  apartementID != null &&
+                                  apartementStateTextController
+                                      .text.isNotEmpty &&
+                                  apartementNumberTextController
+                                      .text.isNotEmpty &&
+                                  ownerNameTextController.text.isNotEmpty &&
+                                  ownerPhoneNumberTextController
+                                      .text.isNotEmpty &&
+                                  responsibleNameTextController
+                                      .text.isNotEmpty &&
+                                  responsiblePhoneNumberTextController
+                                      .text.isNotEmpty) {
+                                //TODO - Get The Last Id
+                                RealEstateData realEstateData = RealEstateData(
+                                    id: widget.dataToEdit!.id,
+                                    ownerName: ownerNameTextController.text,
+                                    ownerPhoneNumber:
+                                        ownerPhoneNumberTextController.text,
+                                    responsibleName:
+                                        responsibleNameTextController.text,
+                                    responsiblePhone:
+                                        responsiblePhoneNumberTextController
+                                            .text,
+                                    apartementStatusId: apartementStatusID ?? 1,
+                                    apartementPostionInFloorId: floorID ?? 1,
+                                    apartementPostionInBuildingId:
+                                        buildingID ?? 1,
+                                    apartementLink:
+                                        apartementLinkTextController.text,
+                                    isApartementHasEnoughData: true,
+                                    apartementName: apartementID.toString());
+                                await editData(realEstateData);
+                                Get.closeAllSnackbars();
+                                NavigationProperties.selectedTabVaueNotifier(
+                                    NavigationProperties
+                                        .realEstateSummaryPageRoute);
+                                Get.showSnackbar(const GetSnackBar(
+                                  animationDuration: Duration(seconds: 1),
+                                  duration: Duration(seconds: 2),
+                                  message: 'تم الحفظ بنجاح',
+                                ));
+                              } else if (buildingID == null ||
+                                  floorID == null ||
+                                  apartementID == null ||
+                                  apartementStateTextController.text.isEmpty ||
+                                  apartementNumberTextController.text.isEmpty) {
+                                Get.closeAllSnackbars();
+                                Get.showSnackbar(const GetSnackBar(
+                                  animationDuration: Duration(seconds: 1),
+                                  duration: Duration(seconds: 2),
+                                  message:
+                                      '(رقم العمارة \\ رقم الدور \\ حالة الوحدة \\ رقم الوحدة) قم باملاء البيانات الوحدة ',
+                                ));
+                              } else if (ownerNameTextController.text.isEmpty ||
+                                  ownerPhoneNumberTextController.text.isEmpty ||
+                                  responsibleNameTextController.text.isEmpty ||
+                                  responsiblePhoneNumberTextController
+                                      .text.isEmpty) {
+                                Get.closeAllSnackbars();
+                                Get.showSnackbar(const GetSnackBar(
+                                  animationDuration: Duration(seconds: 1),
+                                  duration: Duration(seconds: 2),
+                                  message:
+                                      'قم باملاء بيانات المالك ( اسم المالك \\ رقم تليفون المالك \\ اسم المسئول \\ رقم المسئول)',
+                                ));
+                              }
+                            }
                           },
                           child: MouseRegion(
                             onEnter: (details) {
@@ -842,6 +1005,13 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                                                   element.id ==
                                                                   index + 1)
                                                           .state;
+                                                  apartementStatusID =
+                                                      apartementState
+                                                          .firstWhere(
+                                                              (element) =>
+                                                                  element.id ==
+                                                                  index + 1)
+                                                          .id;
                                                   Navigator.of(context).pop();
                                                 },
                                                 title: apartementState

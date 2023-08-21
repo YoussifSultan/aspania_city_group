@@ -13,7 +13,7 @@ class RealEstateData {
       this.ownerMail = '',
       this.ownerPassword = '',
       this.ownerPhoneNumber = '',
-      this.ownerRole = ''}) {
+      this.ownerRole = 0}) {
     if (!isApartementHasEnoughData) {
       responsibleName = 'None';
       responsiblePhone = 'None';
@@ -21,14 +21,14 @@ class RealEstateData {
       ownerMail = 'None';
       ownerPassword = '12345678910';
       ownerPhoneNumber = '01020314813';
-      ownerRole = 'None';
+      ownerRole = 0;
     }
   }
   int id;
   bool isApartementHasEnoughData;
   late String ownerName;
   late String ownerPhoneNumber;
-  late String ownerRole;
+  late int ownerRole;
   late String ownerMail;
   late String ownerPassword;
   late String responsibleName;

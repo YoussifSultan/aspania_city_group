@@ -19,160 +19,56 @@ class ShowwAllAprtementsPage extends StatefulWidget {
 
 class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
   DaviModel<RealEstateData>? _model;
-  int lastindexOfRealEstateLoaded = 10;
-  final List<RealEstateData> _realEstates = [
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-    RealEstateData(
-        id: 19,
-        apartementStatusId: 3,
-        apartementPostionInFloorId: 1,
-        apartementPostionInBuildingId: 4,
-        apartementLink: 'www.spain-city.com/id?14125',
-        isApartementHasEnoughData: true,
-        apartementName: '125',
-        ownerName: 'يوسف اسامة',
-        ownerPhoneNumber: '01020314813',
-        responsibleName: 'اسامة خليل',
-        responsiblePhone: '0111657889'),
-  ];
-  Future<String> getData() async {
+  int lastindexOfRealEstateLoaded = 0;
+  List<RealEstateData> _realEstates = [];
+
+  Future<List<RealEstateData>> getData() async {
+    var client = http.Client();
     final queryParameters = {
-      'acc': 'n1yrefrb0p0tyoussif26dec',
+      "Password": "n1yrefrb0p0tyoussif26dec",
+      "Query": "SELECT * FROM `RealEstates`",
     };
-    var url = Uri.https(
-        'www.spain-city.com',
-        '/SQLFunctions/'
-            'INSERT INTO `Floors` (`idFloor`, `FloorName`) VALUES (\'5\', \'Update\');',
-        queryParameters);
+    var jsonResult = json.encode(queryParameters);
+    var url = Uri.parse('https://spain-city.com/SQLFunctions/');
     print("link : $url");
-    var response = await http.get(url);
+    var response = await http.post(url, body: jsonResult, headers: {
+      "Content-Type": "application/json",
+    });
     print('Status Code :${response.statusCode}');
     print('Data : ${response.body}');
-    return response.body;
+    List<RealEstateData> apartements = [];
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      for (var element in data) {
+        apartements.add(RealEstateData(
+            id: element[0],
+            apartementStatusId: element[12],
+            apartementPostionInFloorId: element[11],
+            apartementPostionInBuildingId: element[10],
+            apartementLink: element[9],
+            isApartementHasEnoughData: element[1] == 1 ? true : false,
+            apartementName: element[13],
+            ownerName: element[2],
+            ownerPhoneNumber: element[3],
+            responsibleName: element[7],
+            responsiblePhone: element[8]));
+      }
+    } else {
+      apartements.add(RealEstateData(
+          id: 400,
+          apartementStatusId: 400,
+          apartementPostionInFloorId: 400,
+          apartementPostionInBuildingId: 400,
+          apartementLink: response.body,
+          isApartementHasEnoughData: false,
+          apartementName: response.body));
+    }
+    return apartements;
   }
 
   @override
   void initState() {
-    getData();
     /* *SECTION - Important Lists */
     final List<Building> buildings = [
       Building(buildingName: 'عمارة رقم ۱', id: 1),
@@ -241,12 +137,55 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
             stringValue: (row) => row.ownerName,
             sortable: true),
         DaviColumn(
-            width: 150,
-            name: 'الوحدة',
-            stringValue: (row) => apartementState
-                .firstWhere((element) => element.id == row.apartementStatusId)
-                .state,
-            sortable: true),
+          width: 150,
+          name: 'حالة الوحدة',
+          cellBuilder: (context, row) {
+            return Center(
+              child: Container(
+                width: 100,
+                height: 25,
+                decoration: BoxDecoration(
+                  color: row.data.apartementStatusId == 1
+                      ? Colors.greenAccent.withOpacity(0.2)
+                      : row.data.apartementStatusId == 2
+                          ? Colors.yellowAccent.withOpacity(0.2)
+                          : row.data.apartementStatusId == 3
+                              ? Colors.blueAccent.withOpacity(0.2)
+                              : Colors.redAccent.withOpacity(0.2),
+                  border: Border.all(
+                    color: row.data.apartementStatusId == 1
+                        ? Colors.green.shade900
+                        : row.data.apartementStatusId == 2
+                            ? Colors.yellow.shade900
+                            : row.data.apartementStatusId == 3
+                                ? Colors.blue.shade900
+                                : Colors.red.shade900,
+                  ),
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                ),
+                child: Center(
+                  child: Text(
+                    apartementState
+                        .firstWhere((element) =>
+                            element.id == row.data.apartementStatusId)
+                        .state,
+                    style: TextStyle(
+                      color: row.data.apartementStatusId == 1
+                          ? Colors.green.shade900
+                          : row.data.apartementStatusId == 2
+                              ? Colors.yellow.shade900
+                              : row.data.apartementStatusId == 3
+                                  ? Colors.blue.shade900
+                                  : Colors.red.shade900,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+          sortable: true,
+          intValue: (row) => row.apartementStatusId,
+        ),
         DaviColumn(
             name: 'التسلسل',
             width: 75,
@@ -298,6 +237,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     RxBool onEditButtonHover = false.obs;
+    RxBool onDeleteButtonHover = false.obs;
 
     int selectedRow = 1;
     return Column(
@@ -330,102 +270,180 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                   const RouteTextWIthHover(routeName: 'عرض جميع الوحدات'),
                 ],
               ),
-              /* *SECTION - edit Button */
-              Obx(() {
-                return GestureDetector(
-                  onTap: () {
-                    NavigationProperties.selectedTabNeededParamters = [
-                      -1,
-                      'EditOwner',
-                      _realEstates[selectedRow]
-                    ];
-                    NavigationProperties.selectedTabVaueNotifier(
-                        NavigationProperties.addNewRealEstatePageRoute);
-                  },
-                  child: MouseRegion(
-                    onEnter: (details) {
-                      onEditButtonHover(true);
-                    },
-                    onExit: (details) {
-                      onEditButtonHover(false);
-                    },
-                    child: Container(
-                      width: 150,
-                      height: 50,
-                      decoration: BoxDecoration(
-                          color: onEditButtonHover.value
-                              ? Colors.grey[500]
-                              : Colors.transparent,
-                          border: Border.all(
-                              color: Colors.grey[500] ?? Colors.white),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Center(
-                        child: Text(
-                          'تعديل الوحدة',
-                          style: GoogleFonts.notoSansArabic(fontSize: 18),
+              Row(
+                children: [
+                  /* *SECTION - edit Button */
+                  Obx(() {
+                    return GestureDetector(
+                      onTap: () {
+                        NavigationProperties.selectedTabNeededParamters = [
+                          -1,
+                          'EditOwner',
+                          _realEstates.firstWhere(
+                              (element) => element.id == selectedRow)
+                        ];
+                        NavigationProperties.selectedTabVaueNotifier(
+                            NavigationProperties.addNewRealEstatePageRoute);
+                      },
+                      child: MouseRegion(
+                        onEnter: (details) {
+                          onEditButtonHover(true);
+                        },
+                        onExit: (details) {
+                          onEditButtonHover(false);
+                        },
+                        child: Container(
+                          width: 150,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: onEditButtonHover.value
+                                  ? Colors.grey[500]
+                                  : Colors.transparent,
+                              border: Border.all(
+                                  color: Colors.grey[500] ?? Colors.white),
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Center(
+                            child: Text(
+                              'تعديل الوحدة',
+                              style: GoogleFonts.notoSansArabic(fontSize: 18),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    );
+                  }),
+                  /* *!SECTION */
+                  const SizedBox(
+                    width: 20,
                   ),
-                );
-              }),
-              /* *!SECTION */
-              /* *!SECTION */
+                  /* *SECTION - Delete Button */
+                  Obx(() {
+                    return GestureDetector(
+                      onTap: () async {
+                        var client = http.Client();
+                        final queryParameters = {
+                          "Password": "n1yrefrb0p0tyoussif26dec",
+                          "Query":
+                              "DELETE FROM `SpainCity`.`RealEstates` WHERE (`idRealEstates` = $selectedRow);",
+                        };
+                        var jsonResult = json.encode(queryParameters);
+                        var url =
+                            Uri.parse('https://spain-city.com/SQLFunctions/');
+                        print("link : $url");
+                        var response =
+                            await http.post(url, body: jsonResult, headers: {
+                          "Content-Type": "application/json",
+                        });
+                        print('Status Code :${response.statusCode}');
+                        print('Data : ${response.body}');
+
+                        if (response.statusCode == 200) {
+                          NavigationProperties.selectedTabVaueNotifier(
+                              NavigationProperties.showAllRealEstatePageRoute);
+                        } else {}
+                      },
+                      child: MouseRegion(
+                        onEnter: (details) {
+                          onDeleteButtonHover(true);
+                        },
+                        onExit: (details) {
+                          onDeleteButtonHover(false);
+                        },
+                        child: Container(
+                          width: 150,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: onDeleteButtonHover.value
+                                  ? Colors.grey[500]
+                                  : Colors.transparent,
+                              border: Border.all(
+                                  color: Colors.grey[500] ?? Colors.white),
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Center(
+                            child: Text(
+                              'حذف الوحدة',
+                              style: GoogleFonts.notoSansArabic(fontSize: 18),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                  /* *!SECTION */
+                  /* *!SECTION */
+                ],
+              )
             ],
           ),
           const SizedBox(
             height: 30,
           ),
-          DaviTheme(
-            data: DaviThemeData(
-                scrollbar: const TableScrollbarThemeData(
-                    horizontalOnlyWhenNeeded: false,
-                    verticalOnlyWhenNeeded: false),
-                header: HeaderThemeData(
-                    color: Colors.green[50],
-                    bottomBorderHeight: 4,
-                    bottomBorderColor: Colors.blue),
-                headerCell: HeaderCellThemeData(
-                    height: 40,
-                    alignment: Alignment.center,
-                    textStyle: const TextStyle(
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue),
-                    resizeAreaWidth: 10,
-                    resizeAreaHoverColor: Colors.blue.withOpacity(.5),
-                    sortIconColors: SortIconColors.all(Colors.green),
-                    expandableName: false)),
-            child: Davi<RealEstateData>(
-              _model,
-              onLastRowWidget: _onLastRowWidget,
-              tapToSortEnabled: true,
-              rowColor: (row) {
-                if (row.data.id == selectedRow) {
-                  return Colors.grey;
-                }
-                if (row.index.isEven) {
-                  return Colors.grey.withOpacity(0.2);
-                } else {
-                  return Colors.white;
-                }
-              },
-              lastRowWidget: const Center(
-                child: SizedBox(
-                  height: 100,
-                  width: 50,
-                  child: CircularProgressIndicator(
-                      color: Colors.black, strokeWidth: 1),
-                ),
-              ),
-              visibleRowsCount: int.parse((height / 50).toStringAsFixed(0)),
-              columnWidthBehavior: ColumnWidthBehavior.scrollable,
-              onRowTap: (data) {
-                selectedRow = data.id;
-              },
-            ),
+          FutureBuilder<List<RealEstateData>>(
+            future: getData(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                _realEstates = snapshot.data!;
+                return DaviTheme(
+                  data: DaviThemeData(
+                      columnDividerThickness: 0,
+                      scrollbar: const TableScrollbarThemeData(
+                          horizontalOnlyWhenNeeded: false,
+                          verticalOnlyWhenNeeded: true),
+                      header: const HeaderThemeData(
+                          color: Colors.grey,
+                          bottomBorderHeight: 4,
+                          bottomBorderColor: Colors.white),
+                      headerCell: HeaderCellThemeData(
+                          height: 40,
+                          alignment: Alignment.center,
+                          textStyle: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          resizeAreaWidth: 10,
+                          resizeAreaHoverColor: Colors.blue.withOpacity(.5),
+                          sortPriorityGap: 20,
+                          sortIconColors: SortIconColors.all(Colors.white),
+                          expandableName: false)),
+                  child: Container(
+                    clipBehavior: Clip.hardEdge,
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                    child: Davi<RealEstateData>(
+                      _model,
+                      onLastRowWidget: _onLastRowWidget,
+                      tapToSortEnabled: true,
+                      rowColor: (row) {
+                        if (row.data.id == selectedRow) {
+                          return Colors.grey;
+                        }
+                        if (row.index.isEven) {
+                          return Colors.grey.withOpacity(0.2);
+                        } else {
+                          return Colors.white;
+                        }
+                      },
+                      lastRowWidget: const Center(
+                        child: SizedBox(
+                          height: 100,
+                          width: 50,
+                          child: CircularProgressIndicator(
+                              color: Colors.black, strokeWidth: 1),
+                        ),
+                      ),
+                      visibleRowsCount:
+                          int.parse((height / 50).toStringAsFixed(0)),
+                      columnWidthBehavior: ColumnWidthBehavior.scrollable,
+                      onRowTap: (data) {
+                        selectedRow = data.id;
+                      },
+                    ),
+                  ),
+                );
+              }
+              return const CircularProgressIndicator();
+            },
           )
-          /* *!SECTION */
         ]);
   }
 }
