@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aspania_city_group/Add_RealEstate/text_tile.dart';
 import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
 import 'package:aspania_city_group/class/buidlingproperties.dart';
 import 'package:aspania_city_group/class/realestate.dart';
@@ -12,7 +13,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../class/navigation.dart';
 import '../class/role.dart';
-import 'package:http/http.dart' as http;
+
+import '../sql_functions.dart';
 
 class AddRealEstate extends StatefulWidget {
   const AddRealEstate({
@@ -186,65 +188,40 @@ class _AddRealEstateState extends State<AddRealEstate> {
 
   Future<String> insertData(RealEstateData apartement) async {
     int newID = await getLastID() + 1;
-    final queryParameters = {
-      "Password": "n1yrefrb0p0tyoussif26dec",
-      "Query":
+    var insertDataResponse = await SQLFunctions.sendQuery(
+      query:
           "INSERT INTO `SpainCity`.`RealEstates` (`idRealEstates`, `isApartementHasEnoughData`, `ownerName`,`ownerPhoneNumber`, `ownerRole`, `ownerMail`, `ownerPassword`,`responsibleName`, `responsiblePhone`, `apartementLink`, `apartementPostionInBuildingId`, `apartementPostionInFloorId`, `apartementStatusId`, `apartementName`) VALUES (${newID.toString()}, ${apartement.isApartementHasEnoughData == true ? 1 : 0}, \'${apartement.ownerName}\', \'${apartement.ownerPhoneNumber}\', ${apartement.ownerRole}, \'${apartement.ownerMail}\', \'${apartement.ownerPassword}\', \'${apartement.responsibleName}\', \'${apartement.responsiblePhone}\', \'${apartement.apartementLink}\',  ${apartement.apartementPostionInBuildingId}, ${apartement.apartementPostionInFloorId}, ${apartement.apartementStatusId}, \'${apartement.apartementName}\');",
-    };
-    var jsonResult = json.encode(queryParameters);
-    var url = Uri.parse('https://spain-city.com/SQLFunctions/');
-    print("link : $url");
-    var response = await http.post(url, body: jsonResult, headers: {
-      "Content-Type": "application/json",
-    });
-    print('Status Code :${response.statusCode}');
-    print('Data : ${response.body}');
-    if (response.statusCode == 200) {
-      return response.body;
+    );
+
+    if (insertDataResponse.statusCode == 200) {
+      return insertDataResponse.body;
     } else {
-      return response.body;
+      return insertDataResponse.body;
     }
   }
 
   Future<String> editData(RealEstateData apartement) async {
-    final queryParameters = {
-      "Password": "n1yrefrb0p0tyoussif26dec",
-      "Query":
+    var updateDataResponse = await SQLFunctions.sendQuery(
+      query:
           "UPDATE `SpainCity`.`RealEstates` SET `idRealEstates` = ${apartement.id}, `isApartementHasEnoughData` = ${apartement.isApartementHasEnoughData == true ? 1 : 0}, `ownerName` = \'${apartement.ownerName}\', `ownerPhoneNumber` = \'${apartement.ownerPhoneNumber}\', `ownerRole` = ${apartement.ownerRole}, `ownerMail` = \'${apartement.ownerMail}\', `ownerPassword` = \'${apartement.ownerPassword}\', `responsibleName` = \'${apartement.responsibleName}\', `responsiblePhone` = \'${apartement.responsiblePhone}\', `apartementLink` = \'${apartement.apartementLink}\', `apartementPostionInBuildingId` = ${apartement.apartementPostionInBuildingId}, `apartementPostionInFloorId` = ${apartement.apartementPostionInFloorId}, `apartementStatusId` = ${apartement.apartementStatusId}, `apartementName` = \'${apartement.apartementName}\' WHERE (`idRealEstates` = ${apartement.id});",
-    };
-    var jsonResult = json.encode(queryParameters);
-    var url = Uri.parse('https://spain-city.com/SQLFunctions/');
-    print("link : $url");
-    var response = await http.post(url, body: jsonResult, headers: {
-      "Content-Type": "application/json",
-    });
-    print('Status Code :${response.statusCode}');
-    print('Data : ${response.body}');
-    if (response.statusCode == 200) {
-      return response.body;
+    );
+
+    if (updateDataResponse.statusCode == 200) {
+      return updateDataResponse.body;
     } else {
-      return response.body;
+      return updateDataResponse.body;
     }
   }
 
   Future<int> getLastID() async {
-    final queryParameters = {
-      "Password": "n1yrefrb0p0tyoussif26dec",
-      "Query": "SELECT MAX(idRealEstates) FROM RealEstates;"
-    };
-    var jsonResult = json.encode(queryParameters);
-    var url = Uri.parse('https://spain-city.com/SQLFunctions/');
-    print("link : $url");
-    var response = await http.post(url, body: jsonResult, headers: {
-      "Content-Type": "application/json",
-    });
-    print('Status Code :${response.statusCode}');
-    print('Data : ${response.body}');
-    if (response.statusCode == 200) {
-      var data = json.decode(response.body);
+    var getLastIDResponse = await SQLFunctions.sendQuery(
+        query: "SELECT MAX(idRealEstates) FROM RealEstates;");
+
+    if (getLastIDResponse.statusCode == 200) {
+      var data = json.decode(getLastIDResponse.body);
       return data[0][0];
     } else {
-      return int.parse(response.body);
+      return int.parse(getLastIDResponse.body);
     }
   }
 
@@ -253,7 +230,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    List<String> ErrorsofTextController = [];
+    List<String> errorsofTextController = [];
     /* *SECTION - Dialog */
     return Column(
       children: [
@@ -333,7 +310,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                         return GestureDetector(
                           onTap: () async {
                             /* *SECTION - If There Is an Error */
-                            if (ErrorsofTextController.isEmpty) {
+                            if (errorsofTextController.isEmpty) {
                               if (buildingID != null &&
                                   floorID != null &&
                                   apartementID != null &&
@@ -347,7 +324,6 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                     responsibleNameTextController.text,
                                     responsiblePhoneNumberTextController.text,
                                   ])) {
-                                //TODO - Get The Last Id
                                 RealEstateData realEstateData = RealEstateData(
                                     id: 1,
                                     apartementStatusId: apartementStatusID ?? 1,
@@ -382,7 +358,6 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                       .text.isNotEmpty &&
                                   responsiblePhoneNumberTextController
                                       .text.isNotEmpty) {
-                                //TODO - Get The Last Id
                                 RealEstateData realEstateData = RealEstateData(
                                     id: 1,
                                     ownerName: ownerNameTextController.text,
@@ -449,7 +424,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                               },
                               child: Container(
                                 width: 150,
-                                height: 50,
+                                height: 40,
                                 decoration: BoxDecoration(
                                     color: onSaveButtonHover.value
                                         ? Colors.grey[500]
@@ -479,7 +454,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                     ? Obx(() {
                         return GestureDetector(
                           onTap: () async {
-                            if (ErrorsofTextController.isEmpty) {
+                            if (errorsofTextController.isEmpty) {
                               if (buildingID != null &&
                                   floorID != null &&
                                   apartementID != null &&
@@ -493,7 +468,6 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                     responsibleNameTextController.text,
                                     responsiblePhoneNumberTextController.text,
                                   ])) {
-                                //TODO - Get The Last Id
                                 RealEstateData realEstateData = RealEstateData(
                                     id: widget.dataToEdit!.id,
                                     apartementStatusId: apartementStatusID ?? 1,
@@ -528,7 +502,6 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                       .text.isNotEmpty &&
                                   responsiblePhoneNumberTextController
                                       .text.isNotEmpty) {
-                                //TODO - Get The Last Id
                                 RealEstateData realEstateData = RealEstateData(
                                     id: widget.dataToEdit!.id,
                                     ownerName: ownerNameTextController.text,
@@ -593,7 +566,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                             },
                             child: Container(
                               width: 150,
-                              height: 50,
+                              height: 40,
                               decoration: BoxDecoration(
                                   color: onEditButtonHover.value
                                       ? Colors.grey[500]
@@ -693,12 +666,12 @@ class _AddRealEstateState extends State<AddRealEstate> {
                         onChange: (text, errorText) {
                           if (!Validators.isArabicOnly(text)) {
                             errorText('ادخل حروف فقط');
-                            ErrorsofTextController.addIf(
-                                !ErrorsofTextController.contains('ownerName'),
+                            errorsofTextController.addIf(
+                                !errorsofTextController.contains('ownerName'),
                                 'ownerName');
                           } else {
                             errorText('');
-                            ErrorsofTextController.remove('ownerName');
+                            errorsofTextController.remove('ownerName');
                           }
                         },
                         textController: ownerNameTextController,
@@ -717,12 +690,12 @@ class _AddRealEstateState extends State<AddRealEstate> {
                         onChange: (text, errorText) {
                           if (!Validators.isNumericOrEmptyOnly(text)) {
                             errorText('ادخل ارقام فقط');
-                            ErrorsofTextController.addIf(
-                                !ErrorsofTextController.contains('ownerName'),
+                            errorsofTextController.addIf(
+                                !errorsofTextController.contains('ownerName'),
                                 'ownerPhone');
                           } else {
                             errorText('');
-                            ErrorsofTextController.remove('ownerPhone');
+                            errorsofTextController.remove('ownerPhone');
                           }
                         },
                         textController: ownerPhoneNumberTextController,
@@ -744,13 +717,13 @@ class _AddRealEstateState extends State<AddRealEstate> {
                         onChange: (text, errorText) {
                           if (!Validators.isArabicOnly(text)) {
                             errorText('ادخل حروف فقط');
-                            ErrorsofTextController.addIf(
-                                !ErrorsofTextController.contains(
-                                    'responsibleName'),
+                            errorsofTextController.addIf(
+                                !errorsofTextController
+                                    .contains('responsibleName'),
                                 'responsibleName');
                           } else {
                             errorText('');
-                            ErrorsofTextController.remove('responsibleName');
+                            errorsofTextController.remove('responsibleName');
                           }
                         },
                         textController: responsibleNameTextController,
@@ -769,13 +742,13 @@ class _AddRealEstateState extends State<AddRealEstate> {
                         onChange: (text, errorText) {
                           if (!Validators.isNumericOrEmptyOnly(text)) {
                             errorText('ادخل ارقام فقط');
-                            ErrorsofTextController.addIf(
-                                !ErrorsofTextController.contains(
-                                    'responsiblePhone'),
+                            errorsofTextController.addIf(
+                                !errorsofTextController
+                                    .contains('responsiblePhone'),
                                 'responsiblePhone');
                           } else {
                             errorText('');
-                            ErrorsofTextController.remove('responsiblePhone');
+                            errorsofTextController.remove('responsiblePhone');
                           }
                         },
                         textController: responsiblePhoneNumberTextController,
@@ -1090,12 +1063,12 @@ class _AddRealEstateState extends State<AddRealEstate> {
                           onChange: (text, errorText) {
                             if (!GetUtils.isEmail(text)) {
                               errorText('ادخل البريد صحيحا');
-                              ErrorsofTextController.addIf(
-                                  !ErrorsofTextController.contains('email'),
+                              errorsofTextController.addIf(
+                                  !errorsofTextController.contains('email'),
                                   'email');
                             } else {
                               errorText('');
-                              ErrorsofTextController.remove('email');
+                              errorsofTextController.remove('email');
                             }
                           },
                           textController: ownerEmailTextController,
@@ -1191,12 +1164,12 @@ class _AddRealEstateState extends State<AddRealEstate> {
                           onChange: (text, errorText) {
                             if (text != confirmPasswordTextController.text) {
                               errorText('ادخل كلمة سرية مطابقة للخانة الاولة');
-                              ErrorsofTextController.addIf(
-                                  !ErrorsofTextController.contains('password'),
+                              errorsofTextController.addIf(
+                                  !errorsofTextController.contains('password'),
                                   'password');
                             } else {
                               errorText('');
-                              ErrorsofTextController.remove('password');
+                              errorsofTextController.remove('password');
                             }
                           },
                           icon: Icons.password_outlined,
@@ -1212,13 +1185,13 @@ class _AddRealEstateState extends State<AddRealEstate> {
                           onChange: (text, errorText) {
                             if (text != ownerPasswordTextController.text) {
                               errorText('ادخل كلمة سرية مطابقة للخانة الاولة');
-                              ErrorsofTextController.addIf(
-                                  !ErrorsofTextController.contains(
-                                      'confirmpassword'),
+                              errorsofTextController.addIf(
+                                  !errorsofTextController
+                                      .contains('confirmpassword'),
                                   'confirmpassword');
                             } else {
                               errorText('');
-                              ErrorsofTextController.remove('confirmpassword');
+                              errorsofTextController.remove('confirmpassword');
                             }
                           },
                           isPassword: true,
@@ -1287,106 +1260,5 @@ class _AddRealEstateState extends State<AddRealEstate> {
     );
 
     /* *!SECTION */
-  }
-}
-
-class TextTile extends StatelessWidget {
-  const TextTile({
-    super.key,
-    required this.width,
-    required this.textController,
-    required this.title,
-    required this.hintText,
-    required this.icon,
-    this.onTap,
-    this.height = 50,
-    this.onChange,
-    this.isPassword = false,
-  });
-
-  final double width;
-  final double height;
-  final bool isPassword;
-  final String title;
-  final String hintText;
-  final IconData icon;
-  final Function? onTap;
-  final Function? onChange;
-  final TextEditingController textController;
-
-  @override
-  Widget build(BuildContext context) {
-    final RxString errorText = ''.obs;
-    bool expandable = onTap != null;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          title,
-          style:
-              GoogleFonts.notoSansArabic(fontSize: 18, color: Colors.grey[500]),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Obx(() {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              /* *SECTION - TextField */
-              Container(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  decoration: BoxDecoration(
-                      border:
-                          Border.all(color: Colors.grey[500] ?? Colors.black),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(20))),
-                  width: width,
-                  height: height,
-                  child: TextField(
-                    onTap: () {
-                      if (expandable) {
-                        onTap!();
-                      }
-                    },
-                    readOnly: expandable,
-                    maxLines: height != 50 ? 3 : 1,
-                    textDirection: TextDirection.rtl,
-                    controller: textController,
-                    onChanged: (value) {
-                      if (onChange != null) {
-                        onChange!(value, errorText);
-                      }
-                    },
-                    obscureText: isPassword,
-                    enableSuggestions: isPassword ? false : true,
-                    autocorrect: isPassword ? false : true,
-                    decoration: InputDecoration(
-                        hintText: hintText,
-                        suffixIcon: Icon(icon),
-                        border: InputBorder.none,
-                        hintTextDirection: TextDirection.rtl),
-                  )),
-              /* *!SECTION */
-              const SizedBox(
-                height: 5,
-              ),
-              /* *SECTION - Error Text */
-              Visibility(
-                  visible: errorText.isNotEmpty,
-                  child: Text(
-                    errorText.value,
-                    style: GoogleFonts.notoSansArabic(
-                        color: Colors.red, fontSize: 14),
-                  )),
-              SizedBox(
-                height: errorText.isNotEmpty ? 5 : 15,
-              )
-              /* *!SECTION */
-            ],
-          );
-        }),
-      ],
-    );
   }
 }

@@ -67,7 +67,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           /* *SECTION - Real Estate Part */
                           ? const RealEstatesPage()
                           /* *!SECTION */
-                          /* *TODO - Implement Other Screens */
                           : NavigationProperties.selectedTabVaueNotifier
                                       .toString() ==
                                   NavigationProperties.addNewRealEstatePageRoute
@@ -108,7 +107,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       /* *SECTION - Aspania City Image */
-                      /* *TODO - Change Image */
                       Container(
                         width: 100,
                         height: 100,
