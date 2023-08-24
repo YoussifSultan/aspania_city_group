@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:aspania_city_group/class/realestate.dart';
-import 'package:aspania_city_group/sql_functions.dart';
+import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:davi/davi.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../Common_Used/button_tile.dart';
 import '../class/buidlingproperties.dart';
-import '../class/navigation.dart';
+import '../Common_Used/navigation.dart';
 
 class ShowwAllAprtementsPage extends StatefulWidget {
   const ShowwAllAprtementsPage({super.key});
@@ -24,11 +25,27 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
   List<RealEstateData> _realEstates = [];
   late ScrollController horizontalScrollControllerOfDataTable =
       ScrollController(initialScrollOffset: 1000);
-
+  int buildingId = NavigationProperties.selectedTabNeededParamters[0];
+  String allApartementsOrFullyRecordedOnly =
+      NavigationProperties.selectedTabNeededParamters[1];
+  bool _loading = false;
+  bool reahedTheEndOfTable = false;
+  int selectedRow = 0;
   Future<void> getData() async {
-    var getDataResponse =
-        await SQLFunctions.sendQuery(query: "SELECT * FROM `RealEstates`");
-
+    var getDataResponse;
+    if (allApartementsOrFullyRecordedOnly == 'All_Apartements') {
+      getDataResponse = await SQLFunctions.sendQuery(
+          query:
+              "SELECT * FROM SpainCity.RealEstates where apartementPostionInBuildingId = $buildingId");
+    } else if (allApartementsOrFullyRecordedOnly == 'Recorded_Apartements') {
+      getDataResponse = await SQLFunctions.sendQuery(
+          query:
+              "SELECT * FROM SpainCity.RealEstates where apartementPostionInBuildingId = $buildingId and isApartementHasEnoughData =1");
+    } else if (allApartementsOrFullyRecordedOnly == 'All_Owners') {
+      getDataResponse = await SQLFunctions.sendQuery(
+          query:
+              "SELECT * FROM SpainCity.RealEstates where isApartementHasEnoughData = 1");
+    }
     List<RealEstateData> apartements = [];
 
     if (getDataResponse.statusCode == 200) {
@@ -57,11 +74,46 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
           isApartementHasEnoughData: false,
           apartementName: getDataResponse.body));
     }
-    print('fetched data');
-    if (_model != null) {
-      print(apartements);
+    if (_model != null && apartements.isNotEmpty) {
+      selectedRow = apartements.first.id;
       _realEstates = apartements;
       _model!.notifyUpdate();
+    }
+  }
+
+  void _onLastRowWidget(bool visible) {
+    if (visible && !_loading) {
+      setState(() {
+        _loading = true;
+      });
+      if (_realEstates.length > lastindexOfRealEstateLoaded + 5) {
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {
+            _loading = false;
+            List<RealEstateData> newValues = _realEstates
+                .getRange(lastindexOfRealEstateLoaded,
+                    lastindexOfRealEstateLoaded + 5)
+                .toList();
+            lastindexOfRealEstateLoaded += 5;
+            _model!.addRows(newValues);
+          });
+        });
+      } else if ((_realEstates.length - lastindexOfRealEstateLoaded) <= 4) {
+        Future.delayed(const Duration(seconds: 2), () {
+          setState(() {
+            _loading = false;
+            List<RealEstateData> newValues = _realEstates
+                .getRange(
+                    lastindexOfRealEstateLoaded,
+                    lastindexOfRealEstateLoaded +
+                        (_realEstates.length - lastindexOfRealEstateLoaded))
+                .toList();
+            lastindexOfRealEstateLoaded = _realEstates.length;
+            _model!.addRows(newValues);
+            reahedTheEndOfTable = true;
+          });
+        });
+      }
     }
   }
 
@@ -71,6 +123,10 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
 
     getData();
 
+    _model = returnTheTableUX();
+  }
+
+  DaviModel<RealEstateData> returnTheTableUX() {
     /* *SECTION - Important Lists */
     final List<Building> buildings = [
       Building(buildingName: 'عمارة رقم ۱', id: 1),
@@ -96,7 +152,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
       ApartementStatus(state: 'طرف الشركة', id: 4),
     ];
     /* *!SECTION */
-    _model = DaviModel(
+    return DaviModel(
       rows: _realEstates.getRange(0, lastindexOfRealEstateLoaded).toList(),
       onSort: (sortedColumns) {},
       columns: [
@@ -197,49 +253,9 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
     );
   }
 
-  bool _loading = false;
-
-  void _onLastRowWidget(bool visible) {
-    if (visible && !_loading) {
-      setState(() {
-        _loading = true;
-      });
-      if (_realEstates.length > lastindexOfRealEstateLoaded + 5) {
-        Future.delayed(const Duration(seconds: 2), () {
-          setState(() {
-            _loading = false;
-            List<RealEstateData> newValues = _realEstates
-                .getRange(lastindexOfRealEstateLoaded,
-                    lastindexOfRealEstateLoaded + 5)
-                .toList();
-            lastindexOfRealEstateLoaded += 5;
-            _model!.addRows(newValues);
-          });
-        });
-      } else if ((_realEstates.length - lastindexOfRealEstateLoaded) <= 4) {
-        Future.delayed(const Duration(seconds: 2), () {
-          setState(() {
-            _loading = false;
-            List<RealEstateData> newValues = _realEstates
-                .getRange(
-                    lastindexOfRealEstateLoaded,
-                    lastindexOfRealEstateLoaded +
-                        (_realEstates.length - lastindexOfRealEstateLoaded))
-                .toList();
-            lastindexOfRealEstateLoaded = _realEstates.length;
-            _model!.addRows(newValues);
-          });
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    RxBool onEditButtonHover = false.obs;
-    RxBool onDeleteButtonHover = false.obs;
-    int selectedRow = 1;
     return Column(
         /* *SECTION - Dialog */
         children: [
@@ -247,133 +263,71 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
             height: 20,
           ),
           /* *SECTION - Top Part */
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              height: 60,
-              width: MediaQuery.sizeOf(context).width * 0.75,
-              child: Row(
-                textDirection: TextDirection.rtl,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  /* *SECTION - Routes  */
-                  Row(
-                    textDirection: TextDirection.rtl,
-                    children: [
-                      RouteTextWIthHover(
-                        routeName: 'الوحدات',
-                        onTap: () {
-                          NavigationProperties.selectedTabVaueNotifier(
-                              NavigationProperties.realEstateSummaryPageRoute);
-                        },
-                      ),
-                      Text(
-                        ' / ',
-                        style: GoogleFonts.notoSansArabic(
-                            color: Colors.black, fontSize: 28),
-                      ),
-                      const RouteTextWIthHover(routeName: 'عرض جميع الوحدات'),
+          Row(
+              textDirection: TextDirection.rtl,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  height: 50,
+                  child: RoutesBuilder(
+                    routeLabels: [
+                      'الوحدات',
+                      buildingId != -1
+                          ? 'عرض وحدات العمارة $buildingId'
+                          : 'عرض جميع الملاك',
+                    ],
+                    routeScreen: [
+                      NavigationProperties.realEstateSummaryPageRoute,
+                      NavigationProperties.nonePageRoute
                     ],
                   ),
-                  Row(
-                    children: [
-                      /* *SECTION - edit Button */
-                      Obx(() {
-                        return GestureDetector(
-                          onTap: () {
-                            NavigationProperties.selectedTabNeededParamters = [
-                              -1,
-                              'EditOwner',
-                              _realEstates.firstWhere(
-                                  (element) => element.id == selectedRow)
-                            ];
-                            NavigationProperties.selectedTabVaueNotifier(
-                                NavigationProperties.addNewRealEstatePageRoute);
-                          },
-                          child: MouseRegion(
-                            onEnter: (details) {
-                              onEditButtonHover(true);
-                            },
-                            onExit: (details) {
-                              onEditButtonHover(false);
-                            },
-                            child: Container(
-                              width: 150,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                  color: onEditButtonHover.value
-                                      ? Colors.grey[500]
-                                      : Colors.transparent,
-                                  border: Border.all(
-                                      color: Colors.grey[500] ?? Colors.white),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Center(
-                                child: Text(
-                                  'تعديل الوحدة',
-                                  style:
-                                      GoogleFonts.notoSansArabic(fontSize: 18),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                      /* *!SECTION */
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      /* *SECTION - Delete Button */
-                      Obx(() {
-                        return GestureDetector(
-                          onTap: () async {
-                            var deleteResponse = await SQLFunctions.sendQuery(
-                                query:
-                                    "DELETE FROM `SpainCity`.`RealEstates` WHERE (`idRealEstates` = $selectedRow);");
+                ),
+                Row(
+                  children: [
+                    /* *SECTION - edit Button */
 
-                            if (deleteResponse.statusCode == 200) {
-                              await getData();
-                              _model!.notifyUpdate();
-                              Get.showSnackbar(const GetSnackBar(
-                                message: 'تم الحذف بنجاح',
-                              ));
-                            } else {}
-                          },
-                          child: MouseRegion(
-                            onEnter: (details) {
-                              onDeleteButtonHover(true);
-                            },
-                            onExit: (details) {
-                              onDeleteButtonHover(false);
-                            },
-                            child: Container(
-                              width: 150,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                  color: onDeleteButtonHover.value
-                                      ? Colors.grey[500]
-                                      : Colors.transparent,
-                                  border: Border.all(
-                                      color: Colors.grey[500] ?? Colors.white),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Center(
-                                child: Text(
-                                  'حذف الوحدة',
-                                  style:
-                                      GoogleFonts.notoSansArabic(fontSize: 18),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                      /* *!SECTION */
-                      /* *!SECTION */
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ),
+                    ButtonTile(
+                      buttonText: 'تعديل الوحدة',
+                      onTap: () {
+                        NavigationProperties.selectedTabNeededParamters = [
+                          -1,
+                          'EditOwner',
+                          _realEstates.firstWhere(
+                              (element) => element.id == selectedRow)
+                        ];
+                        NavigationProperties.selectedTabVaueNotifier(
+                            NavigationProperties.addNewRealEstatePageRoute);
+                      },
+                    ),
+                    /* *!SECTION */
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    /* *SECTION - Delete Button */
+                    ButtonTile(
+                      buttonText: 'حذف الوحدة',
+                      onTap: () async {
+                        var deleteResponse = await SQLFunctions.sendQuery(
+                            query:
+                                "DELETE FROM `SpainCity`.`RealEstates` WHERE (`idRealEstates` = $selectedRow);");
+
+                        if (deleteResponse.statusCode == 200) {
+                          setState(() {
+                            _model!.removeRow(_realEstates.firstWhere(
+                                (element) => element.id == selectedRow));
+                          });
+
+                          Get.showSnackbar(const GetSnackBar(
+                            message: 'تم الحذف بنجاح',
+                          ));
+                        } else {}
+                      },
+                    ),
+                  ],
+                ),
+
+                /* *!SECTION */
+              ]),
           const SizedBox(
             height: 30,
           ),
@@ -419,14 +373,24 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                     return Colors.white;
                   }
                 },
-                lastRowWidget: const Center(
-                  child: SizedBox(
-                    height: 100,
-                    width: 50,
-                    child: CircularProgressIndicator(
-                        color: Colors.black, strokeWidth: 1),
-                  ),
-                ),
+                lastRowWidget: !reahedTheEndOfTable
+                    ? const Center(
+                        child: SizedBox(
+                          height: 100,
+                          width: 50,
+                          child: CircularProgressIndicator(
+                              color: Colors.black, strokeWidth: 1),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          'تم تحميل الوحدات',
+                          style: GoogleFonts.notoSansArabic(
+                            fontSize: 25,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                 visibleRowsCount: int.parse((height / 50).toStringAsFixed(0)),
                 columnWidthBehavior: ColumnWidthBehavior.scrollable,
                 onRowTap: (data) {
@@ -434,7 +398,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                 },
               ),
             ),
-          ),
+          )
         ]);
   }
 }

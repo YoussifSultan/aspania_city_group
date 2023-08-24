@@ -1,4 +1,4 @@
-import 'package:aspania_city_group/class/navigation.dart';
+import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/class/realestate.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -80,10 +80,21 @@ class RealEstatesPage extends StatelessWidget {
                           NavigationProperties.addNewRealEstatePageRoute);
                     },
                     onShowAllApartementsInRealEstateButtonTap: () {
+                      NavigationProperties.selectedTabNeededParamters = [
+                        index + 1,
+                        'All_Apartements'
+                      ];
                       NavigationProperties.selectedTabVaueNotifier(
-                          NavigationProperties.showAllRealEstatePageRoute);
+                          NavigationProperties.dataTableOfApartements);
                     },
-                    onShowAllOwnersInRealEstateButtonTap: () {},
+                    onShowAllOwnersInRealEstateButtonTap: () {
+                      NavigationProperties.selectedTabNeededParamters = [
+                        index + 1,
+                        'Recorded_Apartements'
+                      ];
+                      NavigationProperties.selectedTabVaueNotifier(
+                          NavigationProperties.dataTableOfApartements);
+                    },
                     width: width,
                     realEstateName: realEstates
                         .firstWhere((element) => element.id == index + 1)
@@ -97,12 +108,37 @@ class RealEstatesPage extends StatelessWidget {
         Center(
           child: RealEstateActionsWidget(
             onAddingNewApartementButtonTap: () {
-              NavigationProperties.selectedTabNeededParamters = [7, 'AddOwner'];
+              NavigationProperties.selectedTabNeededParamters = [
+                7,
+                'AddOwner',
+                RealEstateData(
+                    id: 0,
+                    apartementStatusId: 0,
+                    apartementPostionInFloorId: 0,
+                    apartementPostionInBuildingId: 0,
+                    apartementLink: 'None',
+                    isApartementHasEnoughData: false,
+                    apartementName: 'None')
+              ];
               NavigationProperties.selectedTabVaueNotifier(
                   NavigationProperties.addNewRealEstatePageRoute);
             },
-            onShowAllApartementsInRealEstateButtonTap: () {},
-            onShowAllOwnersInRealEstateButtonTap: () {},
+            onShowAllApartementsInRealEstateButtonTap: () {
+              NavigationProperties.selectedTabNeededParamters = [
+                7,
+                'All_Apartements'
+              ];
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.dataTableOfApartements);
+            },
+            onShowAllOwnersInRealEstateButtonTap: () {
+              NavigationProperties.selectedTabNeededParamters = [
+                7,
+                'Recorded_Apartements'
+              ];
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.dataTableOfApartements);
+            },
             width: width,
             realEstateName: realEstates.last.buildingName,
           ),

@@ -9,19 +9,58 @@ selectedTabVaueNotifier has only
 1. Apartements
 2. Owners
 3. AddNewApartement(
-buildingNumber , window State , realestate data
+buildingNumber , window State (Edit_Owner, Add_Owner), realestate data
+)
+4. Show AllRealEstate (
+  index of building , All_Apartements ORRR Recorded_Apartements ORRR All_Owners
 )
  */
 class NavigationProperties {
   static String realEstateSummaryPageRoute = 'realEstateSummary';
   static String ownerPageRoute = 'Owners';
+  static String nonePageRoute = 'None';
   static String addNewRealEstatePageRoute = 'AddNewApartement';
-  static String showAllRealEstatePageRoute = 'showAllApartements';
+  static String dataTableOfApartements = 'showAllApartements';
   static List selectedTabNeededParamters = [];
   static RxString selectedTabVaueNotifier = 'Apartemnts'.obs;
 }
 
 /* *!SECTION */
+
+class RoutesBuilder extends StatelessWidget {
+  const RoutesBuilder(
+      {super.key, required this.routeLabels, required this.routeScreen});
+  final List<String> routeLabels;
+  final List<String> routeScreen;
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: ListView.separated(
+        shrinkWrap: true,
+        itemCount: routeLabels.length,
+        scrollDirection: Axis.horizontal,
+        separatorBuilder: (context, index) {
+          return Text(
+            ' / ',
+            style:
+                GoogleFonts.notoSansArabic(color: Colors.black, fontSize: 28),
+          );
+        },
+        itemBuilder: (context, index) {
+          return RouteTextWIthHover(
+              routeName: routeLabels[index],
+              onTap: () {
+                if (routeScreen[index] != NavigationProperties.nonePageRoute) {
+                  NavigationProperties.selectedTabVaueNotifier(
+                      routeScreen[index]);
+                }
+              });
+        },
+      ),
+    );
+  }
+}
 
 class RouteTextWIthHover extends StatelessWidget {
   const RouteTextWIthHover({

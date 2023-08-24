@@ -5,7 +5,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mouse_parallax/mouse_parallax.dart';
 
-import '../Add_RealEstate/text_tile.dart';
+import '../Common_Used/button_tile.dart';
+import '../Common_Used/text_tile.dart';
 
 class SigninScreen extends StatefulWidget {
   const SigninScreen({super.key});
@@ -154,33 +155,10 @@ class _SigninScreenState extends State<SigninScreen> {
                         icon: Icons.password_outlined),
 
                     /* *!SECTION */
-
-                    Obx(
-                      () => GestureDetector(
-                        onTap: () => validateDataEnteredAndPushTheDashboard(),
-                        child: MouseRegion(
-                          onEnter: (event) => onLoginHover(true),
-                          onExit: (event) => onLoginHover(false),
-                          child: Container(
-                            width: 150,
-                            alignment: Alignment.center,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: onLoginHover.value
-                                    ? Colors.grey
-                                    : Colors.grey[200],
-                                border: Border.all(color: Colors.black)),
-                            child: Text(
-                              'تسجيل الدخول',
-                              style: GoogleFonts.notoSansArabic(
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
+                    ButtonTile(
+                      onTap: () => validateDataEnteredAndPushTheDashboard(),
+                      buttonText: 'تسجيل الدخول',
+                    ),
                   ]),
                 ),
               ),
@@ -197,7 +175,7 @@ class _SigninScreenState extends State<SigninScreen> {
 
   void validateDataEnteredAndPushTheDashboard() {
     if (account.text == 'admin123@gmail.com' && password.text == 'admin2876') {
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Dashboard()),
       );

@@ -16,7 +16,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Flutter Demo',
-      scrollBehavior: MaterialScrollBehavior().copyWith(
+      defaultTransition: Transition.fadeIn,
+      transitionDuration: const Duration(seconds: 1),
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {
           PointerDeviceKind.mouse,
           PointerDeviceKind.touch,
@@ -44,7 +46,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Dashboard(),
+      home: const SigninScreen(),
     );
   }
 }

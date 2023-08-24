@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import 'package:aspania_city_group/Add_RealEstate/text_tile.dart';
+import 'package:aspania_city_group/Common_Used/button_tile.dart';
+import 'package:aspania_city_group/Common_Used/text_tile.dart';
 import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
 import 'package:aspania_city_group/class/buidlingproperties.dart';
 import 'package:aspania_city_group/class/realestate.dart';
@@ -11,10 +12,11 @@ import 'package:flutter/material.dart';
 import "package:get/get.dart";
 import 'package:google_fonts/google_fonts.dart';
 
-import '../class/navigation.dart';
+import '../Common_Used/dialog_tile.dart';
+import '../Common_Used/navigation.dart';
 import '../class/role.dart';
 
-import '../sql_functions.dart';
+import '../Common_Used/sql_functions.dart';
 
 class AddRealEstate extends StatefulWidget {
   const AddRealEstate({
@@ -52,13 +54,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
   TextEditingController confirmPasswordTextController = TextEditingController();
   /* *!SECTION */
   /* *SECTION - ValueNotfiers */
-  RxBool onSaveButtonHover = false.obs;
-  RxBool onCancelButtonHover = false.obs;
   RxString onApartementLinkUpdated = ''.obs;
-  RxBool onEditButtonHover = false.obs;
-  RxBool onAddRealEstateRouteHover = false.obs;
-
-  /* *!SECTION */
   /* *SECTION - Edit Data */
   RealEstateData realEstateDataToEdit = RealEstateData(
       id: 0,
@@ -101,13 +97,14 @@ class _AddRealEstateState extends State<AddRealEstate> {
     ApartementStatus(state: 'مباعة \\ مغلق', id: 3),
     ApartementStatus(state: 'طرف الشركة', id: 4),
   ];
-
   final List<OwnerRole> ownerRole = [
     const OwnerRole(
         id: 1, ownerRole: 'Admin', roles: ['ssss', 'sss', 'sscsmahbchs']),
     const OwnerRole(
         id: 2, ownerRole: 'Owner', roles: ['ssss', 'sss', 'sscsmahbchs']),
   ];
+  List<String> errorsofTextController = [];
+
   /* *!SECTION */
   /* *SECTION -  initstate*/
   @override
@@ -115,26 +112,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
     if (widget.windowState == 'EditOwner') {
       if (widget.dataToEdit != null) {
         realEstateDataToEdit = widget.dataToEdit!;
-        /* *SECTION - Text Controllers 
-  TextEditingController apartementBuildingPositionTextController =
-      TextEditingController();
-  TextEditingController apartementBuildingFloorPositionTextController =
-      TextEditingController();
-  TextEditingController apartementStateTextController = TextEditingController();
-  TextEditingController apartementNumberTextController =
-      TextEditingController();
-  TextEditingController ownerNameTextController = TextEditingController();
-  TextEditingController responsibleNameTextController = TextEditingController();
-  TextEditingController responsiblePhoneNumberTextController =
-      TextEditingController();
-  TextEditingController apartementLinkTextController = TextEditingController();
-  TextEditingController ownerEmailTextController = TextEditingController();
-  TextEditingController ownerPhoneNumberTextController =
-      TextEditingController();
-  TextEditingController ownerRoleTextController = TextEditingController();
-  TextEditingController ownerPasswordTextController = TextEditingController();
-  TextEditingController confirmPasswordTextController = TextEditingController();
-  *!SECTION */
+
         apartementBuildingPositionTextController.text = realEstates
             .firstWhere((element) =>
                 element.id ==
@@ -225,12 +203,102 @@ class _AddRealEstateState extends State<AddRealEstate> {
     }
   }
 
+  void validateAndSendData(String state) async {
+    if (errorsofTextController.isEmpty) {
+      if (buildingID != null &&
+          floorID != null &&
+          apartementID != null &&
+          apartementStateTextController.text.isNotEmpty &&
+          apartementNumberTextController.text.isNotEmpty &&
+          !Validators.isAllElementsInListNotEmpty([
+            ownerNameTextController.text,
+            ownerPhoneNumberTextController.text,
+            responsibleNameTextController.text,
+            responsiblePhoneNumberTextController.text,
+          ])) {
+        RealEstateData realEstateData = RealEstateData(
+            id: widget.dataToEdit!.id,
+            apartementStatusId: apartementStatusID ?? 1,
+            apartementPostionInFloorId: floorID ?? 1,
+            apartementPostionInBuildingId: buildingID ?? 1,
+            apartementLink: apartementLinkTextController.text,
+            isApartementHasEnoughData: false,
+            apartementName: apartementID.toString());
+        state == 'Add'
+            ? await insertData(realEstateData)
+            : await editData(realEstateData);
+        Get.closeAllSnackbars();
+        NavigationProperties.selectedTabVaueNotifier(
+            NavigationProperties.realEstateSummaryPageRoute);
+        Get.showSnackbar(GetSnackBar(
+          animationDuration: const Duration(seconds: 1),
+          duration: const Duration(seconds: 2),
+          message: state == 'Add' ? 'تم الحفظ بنجاح' : 'تم التعديل بنجاح',
+        ));
+      } else if (buildingID != null &&
+          floorID != null &&
+          apartementID != null &&
+          apartementStateTextController.text.isNotEmpty &&
+          apartementNumberTextController.text.isNotEmpty &&
+          ownerNameTextController.text.isNotEmpty &&
+          ownerPhoneNumberTextController.text.isNotEmpty &&
+          responsibleNameTextController.text.isNotEmpty &&
+          responsiblePhoneNumberTextController.text.isNotEmpty) {
+        RealEstateData realEstateData = RealEstateData(
+            id: widget.dataToEdit!.id,
+            ownerName: ownerNameTextController.text,
+            ownerPhoneNumber: ownerPhoneNumberTextController.text,
+            responsibleName: responsibleNameTextController.text,
+            responsiblePhone: responsiblePhoneNumberTextController.text,
+            apartementStatusId: apartementStatusID ?? 1,
+            apartementPostionInFloorId: floorID ?? 1,
+            apartementPostionInBuildingId: buildingID ?? 1,
+            apartementLink: apartementLinkTextController.text,
+            isApartementHasEnoughData: true,
+            apartementName: apartementID.toString());
+        state == 'Add'
+            ? await insertData(realEstateData)
+            : await editData(realEstateData);
+        Get.closeAllSnackbars();
+        NavigationProperties.selectedTabVaueNotifier(
+            NavigationProperties.realEstateSummaryPageRoute);
+        Get.showSnackbar(GetSnackBar(
+          animationDuration: const Duration(seconds: 1),
+          duration: const Duration(seconds: 2),
+          message: state == 'Add' ? 'تم الحفظ بنجاح' : 'تم التعديل بنجاح',
+        ));
+      } else if (buildingID == null ||
+          floorID == null ||
+          apartementID == null ||
+          apartementStateTextController.text.isEmpty ||
+          apartementNumberTextController.text.isEmpty) {
+        Get.closeAllSnackbars();
+        Get.showSnackbar(const GetSnackBar(
+          animationDuration: Duration(seconds: 1),
+          duration: Duration(seconds: 2),
+          message:
+              '(رقم العمارة \\ رقم الدور \\ حالة الوحدة \\ رقم الوحدة) قم باملاء البيانات الوحدة ',
+        ));
+      } else if (ownerNameTextController.text.isEmpty ||
+          ownerPhoneNumberTextController.text.isEmpty ||
+          responsibleNameTextController.text.isEmpty ||
+          responsiblePhoneNumberTextController.text.isEmpty) {
+        Get.closeAllSnackbars();
+        Get.showSnackbar(const GetSnackBar(
+          animationDuration: Duration(seconds: 1),
+          duration: Duration(seconds: 2),
+          message:
+              'قم باملاء بيانات المالك ( اسم المالك \\ رقم تليفون المالك \\ اسم المسئول \\ رقم المسئول)',
+        ));
+      }
+    }
+  }
+
   /* *!SECTION */
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    List<String> errorsofTextController = [];
     /* *SECTION - Dialog */
     return Column(
       children: [
@@ -244,59 +312,29 @@ class _AddRealEstateState extends State<AddRealEstate> {
           children: [
             /* *SECTION - Routes  */
             widget.windowState == 'AddOwner'
-                ? Row(
-                    textDirection: TextDirection.rtl,
-                    children: [
-                      RouteTextWIthHover(
-                        routeName: 'الوحدات',
-                        onTap: () {
-                          NavigationProperties.selectedTabVaueNotifier(
-                              NavigationProperties.realEstateSummaryPageRoute);
-                        },
-                      ),
-                      Text(
-                        ' / ',
-                        style: GoogleFonts.notoSansArabic(
-                            color: Colors.black, fontSize: 28),
-                      ),
-                      const RouteTextWIthHover(routeName: 'اضافة وحدة'),
-                    ],
+                ? SizedBox(
+                    height: 50,
+                    child: RoutesBuilder(routeLabels: const [
+                      'الوحدات',
+                      'اضافة وحدة',
+                    ], routeScreen: [
+                      NavigationProperties.realEstateSummaryPageRoute,
+                      NavigationProperties.nonePageRoute
+                    ]),
                   )
                 : widget.windowState == 'EditOwner'
-                    ? SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          textDirection: TextDirection.rtl,
-                          children: [
-                            RouteTextWIthHover(
-                              routeName: 'الوحدات',
-                              onTap: () {
-                                NavigationProperties.selectedTabVaueNotifier(
-                                    NavigationProperties
-                                        .realEstateSummaryPageRoute);
-                              },
-                            ),
-                            Text(
-                              ' / ',
-                              style: GoogleFonts.notoSansArabic(
-                                  color: Colors.black, fontSize: 28),
-                            ),
-                            RouteTextWIthHover(
-                              routeName: 'عرض جميع الوحدات',
-                              onTap: () {
-                                NavigationProperties.selectedTabVaueNotifier(
-                                    NavigationProperties
-                                        .showAllRealEstatePageRoute);
-                              },
-                            ),
-                            Text(
-                              ' / ',
-                              style: GoogleFonts.notoSansArabic(
-                                  color: Colors.black, fontSize: 28),
-                            ),
-                            const RouteTextWIthHover(routeName: ' تعديل وحدة'),
-                          ],
-                        ),
+                    ? SizedBox(
+                        height: 50,
+                        child: RoutesBuilder(routeLabels: const [
+                          'الوحدات',
+                          'عرض جميع الوحدات',
+                          ' تعديل وحدة'
+                        ], routeScreen: [
+                          NavigationProperties.realEstateSummaryPageRoute,
+                          NavigationProperties.selectedTabVaueNotifier(
+                              NavigationProperties.dataTableOfApartements),
+                          NavigationProperties.nonePageRoute
+                        ]),
                       )
                     : const SizedBox(),
             /* *!SECTION */
@@ -306,143 +344,11 @@ class _AddRealEstateState extends State<AddRealEstate> {
               children: [
                 /* *SECTION -  Add Apartement button */
                 widget.windowState == 'AddOwner'
-                    ? Obx(() {
-                        return GestureDetector(
-                          onTap: () async {
-                            /* *SECTION - If There Is an Error */
-                            if (errorsofTextController.isEmpty) {
-                              if (buildingID != null &&
-                                  floorID != null &&
-                                  apartementID != null &&
-                                  apartementStateTextController
-                                      .text.isNotEmpty &&
-                                  apartementNumberTextController
-                                      .text.isNotEmpty &&
-                                  !Validators.isAllElementsInListNotEmpty([
-                                    ownerNameTextController.text,
-                                    ownerPhoneNumberTextController.text,
-                                    responsibleNameTextController.text,
-                                    responsiblePhoneNumberTextController.text,
-                                  ])) {
-                                RealEstateData realEstateData = RealEstateData(
-                                    id: 1,
-                                    apartementStatusId: apartementStatusID ?? 1,
-                                    apartementPostionInFloorId: floorID ?? 1,
-                                    apartementPostionInBuildingId:
-                                        buildingID ?? 1,
-                                    apartementLink:
-                                        apartementLinkTextController.text,
-                                    isApartementHasEnoughData: false,
-                                    apartementName: apartementID.toString());
-                                await insertData(realEstateData);
-                                Get.closeAllSnackbars();
-                                NavigationProperties.selectedTabVaueNotifier(
-                                    NavigationProperties
-                                        .realEstateSummaryPageRoute);
-                                Get.showSnackbar(const GetSnackBar(
-                                  animationDuration: Duration(seconds: 1),
-                                  duration: Duration(seconds: 2),
-                                  message: 'تم الحفظ بنجاح',
-                                ));
-                              } else if (buildingID != null &&
-                                  floorID != null &&
-                                  apartementID != null &&
-                                  apartementStateTextController
-                                      .text.isNotEmpty &&
-                                  apartementNumberTextController
-                                      .text.isNotEmpty &&
-                                  ownerNameTextController.text.isNotEmpty &&
-                                  ownerPhoneNumberTextController
-                                      .text.isNotEmpty &&
-                                  responsibleNameTextController
-                                      .text.isNotEmpty &&
-                                  responsiblePhoneNumberTextController
-                                      .text.isNotEmpty) {
-                                RealEstateData realEstateData = RealEstateData(
-                                    id: 1,
-                                    ownerName: ownerNameTextController.text,
-                                    ownerPhoneNumber:
-                                        ownerPhoneNumberTextController.text,
-                                    responsibleName:
-                                        responsibleNameTextController.text,
-                                    responsiblePhone:
-                                        responsiblePhoneNumberTextController
-                                            .text,
-                                    apartementStatusId: apartementStatusID ?? 1,
-                                    apartementPostionInFloorId: floorID ?? 1,
-                                    apartementPostionInBuildingId:
-                                        buildingID ?? 1,
-                                    apartementLink:
-                                        apartementLinkTextController.text,
-                                    isApartementHasEnoughData: true,
-                                    apartementName: apartementID.toString());
-                                await insertData(realEstateData);
-                                Get.closeAllSnackbars();
-                                NavigationProperties.selectedTabVaueNotifier(
-                                    NavigationProperties
-                                        .realEstateSummaryPageRoute);
-                                Get.showSnackbar(const GetSnackBar(
-                                  animationDuration: Duration(seconds: 1),
-                                  duration: Duration(seconds: 2),
-                                  message: 'تم الحفظ بنجاح',
-                                ));
-                              } else if (buildingID == null ||
-                                  floorID == null ||
-                                  apartementID == null ||
-                                  apartementStateTextController.text.isEmpty ||
-                                  apartementNumberTextController.text.isEmpty) {
-                                Get.closeAllSnackbars();
-                                Get.showSnackbar(const GetSnackBar(
-                                  animationDuration: Duration(seconds: 1),
-                                  duration: Duration(seconds: 2),
-                                  message:
-                                      '(رقم العمارة \\ رقم الدور \\ حالة الوحدة \\ رقم الوحدة) قم باملاء البيانات الوحدة ',
-                                ));
-                              } else if (ownerNameTextController.text.isEmpty ||
-                                  ownerPhoneNumberTextController.text.isEmpty ||
-                                  responsibleNameTextController.text.isEmpty ||
-                                  responsiblePhoneNumberTextController
-                                      .text.isEmpty) {
-                                Get.closeAllSnackbars();
-                                Get.showSnackbar(const GetSnackBar(
-                                  animationDuration: Duration(seconds: 1),
-                                  duration: Duration(seconds: 2),
-                                  message:
-                                      'قم باملاء بيانات المالك ( اسم المالك \\ رقم تليفون المالك \\ اسم المسئول \\ رقم المسئول)',
-                                ));
-                              }
-                            }
-
-                            /* *!SECTION */
-                          },
-                          child: MouseRegion(
-                              onEnter: (details) {
-                                onSaveButtonHover(true);
-                              },
-                              onExit: (details) {
-                                onSaveButtonHover(false);
-                              },
-                              child: Container(
-                                width: 150,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                    color: onSaveButtonHover.value
-                                        ? Colors.grey[500]
-                                        : Colors.white,
-                                    border: Border.all(
-                                        color:
-                                            Colors.grey[500] ?? Colors.white),
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Center(
-                                  child: Text(
-                                    'حفظ الوحدة',
-                                    style: GoogleFonts.notoSansArabic(
-                                        fontSize: 18),
-                                  ),
-                                ),
-                              )),
-                        );
-                      })
+                    ? ButtonTile(
+                        onTap: () async {
+                          validateAndSendData('Add');
+                        },
+                        buttonText: 'حفظ الوحدة')
                     : const SizedBox(),
                 const SizedBox(
                   width: 20,
@@ -451,179 +357,23 @@ class _AddRealEstateState extends State<AddRealEstate> {
 
                 /* *SECTION - Edit Apartement Button */
                 widget.windowState == 'EditOwner'
-                    ? Obx(() {
-                        return GestureDetector(
-                          onTap: () async {
-                            if (errorsofTextController.isEmpty) {
-                              if (buildingID != null &&
-                                  floorID != null &&
-                                  apartementID != null &&
-                                  apartementStateTextController
-                                      .text.isNotEmpty &&
-                                  apartementNumberTextController
-                                      .text.isNotEmpty &&
-                                  !Validators.isAllElementsInListNotEmpty([
-                                    ownerNameTextController.text,
-                                    ownerPhoneNumberTextController.text,
-                                    responsibleNameTextController.text,
-                                    responsiblePhoneNumberTextController.text,
-                                  ])) {
-                                RealEstateData realEstateData = RealEstateData(
-                                    id: widget.dataToEdit!.id,
-                                    apartementStatusId: apartementStatusID ?? 1,
-                                    apartementPostionInFloorId: floorID ?? 1,
-                                    apartementPostionInBuildingId:
-                                        buildingID ?? 1,
-                                    apartementLink:
-                                        apartementLinkTextController.text,
-                                    isApartementHasEnoughData: false,
-                                    apartementName: apartementID.toString());
-                                await editData(realEstateData);
-                                Get.closeAllSnackbars();
-                                NavigationProperties.selectedTabVaueNotifier(
-                                    NavigationProperties
-                                        .realEstateSummaryPageRoute);
-                                Get.showSnackbar(const GetSnackBar(
-                                  animationDuration: Duration(seconds: 1),
-                                  duration: Duration(seconds: 2),
-                                  message: 'تم الحفظ بنجاح',
-                                ));
-                              } else if (buildingID != null &&
-                                  floorID != null &&
-                                  apartementID != null &&
-                                  apartementStateTextController
-                                      .text.isNotEmpty &&
-                                  apartementNumberTextController
-                                      .text.isNotEmpty &&
-                                  ownerNameTextController.text.isNotEmpty &&
-                                  ownerPhoneNumberTextController
-                                      .text.isNotEmpty &&
-                                  responsibleNameTextController
-                                      .text.isNotEmpty &&
-                                  responsiblePhoneNumberTextController
-                                      .text.isNotEmpty) {
-                                RealEstateData realEstateData = RealEstateData(
-                                    id: widget.dataToEdit!.id,
-                                    ownerName: ownerNameTextController.text,
-                                    ownerPhoneNumber:
-                                        ownerPhoneNumberTextController.text,
-                                    responsibleName:
-                                        responsibleNameTextController.text,
-                                    responsiblePhone:
-                                        responsiblePhoneNumberTextController
-                                            .text,
-                                    apartementStatusId: apartementStatusID ?? 1,
-                                    apartementPostionInFloorId: floorID ?? 1,
-                                    apartementPostionInBuildingId:
-                                        buildingID ?? 1,
-                                    apartementLink:
-                                        apartementLinkTextController.text,
-                                    isApartementHasEnoughData: true,
-                                    apartementName: apartementID.toString());
-                                await editData(realEstateData);
-                                Get.closeAllSnackbars();
-                                NavigationProperties.selectedTabVaueNotifier(
-                                    NavigationProperties
-                                        .realEstateSummaryPageRoute);
-                                Get.showSnackbar(const GetSnackBar(
-                                  animationDuration: Duration(seconds: 1),
-                                  duration: Duration(seconds: 2),
-                                  message: 'تم الحفظ بنجاح',
-                                ));
-                              } else if (buildingID == null ||
-                                  floorID == null ||
-                                  apartementID == null ||
-                                  apartementStateTextController.text.isEmpty ||
-                                  apartementNumberTextController.text.isEmpty) {
-                                Get.closeAllSnackbars();
-                                Get.showSnackbar(const GetSnackBar(
-                                  animationDuration: Duration(seconds: 1),
-                                  duration: Duration(seconds: 2),
-                                  message:
-                                      '(رقم العمارة \\ رقم الدور \\ حالة الوحدة \\ رقم الوحدة) قم باملاء البيانات الوحدة ',
-                                ));
-                              } else if (ownerNameTextController.text.isEmpty ||
-                                  ownerPhoneNumberTextController.text.isEmpty ||
-                                  responsibleNameTextController.text.isEmpty ||
-                                  responsiblePhoneNumberTextController
-                                      .text.isEmpty) {
-                                Get.closeAllSnackbars();
-                                Get.showSnackbar(const GetSnackBar(
-                                  animationDuration: Duration(seconds: 1),
-                                  duration: Duration(seconds: 2),
-                                  message:
-                                      'قم باملاء بيانات المالك ( اسم المالك \\ رقم تليفون المالك \\ اسم المسئول \\ رقم المسئول)',
-                                ));
-                              }
-                            }
-                          },
-                          child: MouseRegion(
-                            onEnter: (details) {
-                              onEditButtonHover(true);
-                            },
-                            onExit: (details) {
-                              onEditButtonHover(false);
-                            },
-                            child: Container(
-                              width: 150,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                  color: onEditButtonHover.value
-                                      ? Colors.grey[500]
-                                      : Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey[500] ?? Colors.white),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Center(
-                                child: Text(
-                                  'تعديل الوحدة',
-                                  style:
-                                      GoogleFonts.notoSansArabic(fontSize: 18),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      })
+                    ? ButtonTile(
+                        onTap: () async {
+                          validateAndSendData('Edit');
+                        },
+                        buttonText: 'تعديل الوحدة')
                     : const SizedBox(),
                 const SizedBox(
                   width: 20,
                 ),
                 /* *!SECTION */
                 /* *SECTION - Cancel Button */
-                Obx(() {
-                  return GestureDetector(
+                ButtonTile(
                     onTap: () {
                       NavigationProperties.selectedTabVaueNotifier(
                           NavigationProperties.realEstateSummaryPageRoute);
                     },
-                    child: MouseRegion(
-                      onEnter: (details) {
-                        onCancelButtonHover(true);
-                      },
-                      onExit: (details) {
-                        onCancelButtonHover(false);
-                      },
-                      child: Container(
-                        width: 150,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            color: onCancelButtonHover.value
-                                ? Colors.grey[500]
-                                : Colors.transparent,
-                            border: Border.all(
-                                color: Colors.grey[500] ?? Colors.white),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Center(
-                          child: Text(
-                            'الغاء',
-                            style: GoogleFonts.notoSansArabic(fontSize: 18),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
+                    buttonText: 'الغاء')
                 /* *!SECTION */
               ],
             )
@@ -657,383 +407,169 @@ class _AddRealEstateState extends State<AddRealEstate> {
                   ),
 
                   /* *SECTION - Owner Phone And Owner Name*/
-                  Row(
-                    textDirection: TextDirection.rtl,
-                    children: [
-                      /* *SECTION - Owner Name */
-                      TextTile(
-                        width: width > 1350 ? width * 0.25 : width * 0.33,
-                        onChange: (text, errorText) {
-                          if (!Validators.isArabicOnly(text)) {
-                            errorText('ادخل حروف فقط');
-                            errorsofTextController.addIf(
-                                !errorsofTextController.contains('ownerName'),
-                                'ownerName');
-                          } else {
-                            errorText('');
-                            errorsofTextController.remove('ownerName');
-                          }
-                        },
-                        textController: ownerNameTextController,
-                        hintText: 'ادخل اسم الماك',
-                        icon: Icons.person_outlined,
-                        title: 'اسم المالك',
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-
-                      /* *!SECTION */
-                      /* *SECTION - Owner Phone */
-                      TextTile(
-                        width: width > 1350 ? width * 0.17 : width * 0.23,
-                        onChange: (text, errorText) {
-                          if (!Validators.isNumericOrEmptyOnly(text)) {
-                            errorText('ادخل ارقام فقط');
-                            errorsofTextController.addIf(
-                                !errorsofTextController.contains('ownerName'),
-                                'ownerPhone');
-                          } else {
-                            errorText('');
-                            errorsofTextController.remove('ownerPhone');
-                          }
-                        },
-                        textController: ownerPhoneNumberTextController,
-                        hintText: 'ادخل رقم تلفون',
-                        icon: Icons.phone_outlined,
-                        title: 'رقم تليفون المالك',
-                      ),
-                      /* *!SECTION */
-                    ],
-                  ),
+                  OwnerDataFields(
+                      width: width,
+                      errorsofTextController: errorsofTextController,
+                      ownerNameTextController: ownerNameTextController,
+                      ownerPhoneNumberTextController:
+                          ownerPhoneNumberTextController),
                   /* *!SECTION */
                   /* *SECTION - Responsible Phone And Resopnsible Name*/
-                  Row(
-                    textDirection: TextDirection.rtl,
+                  ResponsibleDataFields(
+                      width: width,
+                      errorsofTextController: errorsofTextController,
+                      responsibleNameTextController:
+                          responsibleNameTextController,
+                      responsiblePhoneNumberTextController:
+                          responsiblePhoneNumberTextController),
+                  /* *!SECTION */
+                  //LINK - Apartement Data
+                  Column(
                     children: [
-                      /* *SECTION - Responsible Name */
-                      TextTile(
-                        width: width > 1350 ? width * 0.25 : width * 0.33,
-                        onChange: (text, errorText) {
-                          if (!Validators.isArabicOnly(text)) {
-                            errorText('ادخل حروف فقط');
-                            errorsofTextController.addIf(
-                                !errorsofTextController
-                                    .contains('responsibleName'),
-                                'responsibleName');
-                          } else {
-                            errorText('');
-                            errorsofTextController.remove('responsibleName');
-                          }
-                        },
-                        textController: responsibleNameTextController,
-                        hintText: 'ادخل اسم المسئول عن الوحدة',
-                        icon: Icons.handshake_outlined,
-                        title: 'اسم المسئول',
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
+                      /* *SECTION - apartement buiding Position */
 
-                      /* *!SECTION */
-                      /* *SECTION - responsible Phone */
-                      TextTile(
-                        width: width > 1350 ? width * 0.17 : width * 0.23,
-                        onChange: (text, errorText) {
-                          if (!Validators.isNumericOrEmptyOnly(text)) {
-                            errorText('ادخل ارقام فقط');
-                            errorsofTextController.addIf(
-                                !errorsofTextController
-                                    .contains('responsiblePhone'),
-                                'responsiblePhone');
-                          } else {
-                            errorText('');
-                            errorsofTextController.remove('responsiblePhone');
-                          }
-                        },
-                        textController: responsiblePhoneNumberTextController,
-                        hintText: 'ادخل رقم تليفون',
-                        icon: Icons.mobile_friendly_outlined,
-                        title: 'رقم تليفون المسئول',
+                      Row(
+                        textDirection: TextDirection.rtl,
+                        children: [
+                          TextTile(
+                            width: width > 1350 ? width * 0.17 : width * 0.23,
+                            onChange: (text, errorText) {},
+                            onTap: () {
+                              List<String> realEstateNames = [];
+                              for (var element in realEstates) {
+                                realEstateNames.add(element.buildingName);
+                              }
+                              DialogOfTile.dialogMenuTile(
+                                  context: context,
+                                  width: width,
+                                  height: height,
+                                  menuStrings: realEstateNames,
+                                  onMenuButtonTap: (index) {
+                                    Building building = realEstates.firstWhere(
+                                        (element) => element.id == index + 1);
+                                    buildingID = building.id;
+                                    apartementBuildingPositionTextController
+                                        .text = building.buildingName;
+
+                                    onApartementLinkUpdated(
+                                        'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                                    apartementLinkTextController.text =
+                                        onApartementLinkUpdated.value;
+                                    Navigator.of(context).pop();
+                                  });
+                            },
+                            textController:
+                                apartementBuildingPositionTextController,
+                            hintText: 'ادخل رقم العمارة',
+                            icon: Icons.home_filled,
+                            title: 'رقم العمارة',
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          /* *SECTION - Floor Tile */
+                          TextTile(
+                            width: width > 1350 ? width * 0.17 : width * 0.23,
+                            textController:
+                                apartementBuildingFloorPositionTextController,
+                            hintText: 'ادخل رقم الدور',
+                            icon: Icons.file_upload_outlined,
+                            onTap: () {
+                              /* *SECTION - Show Floor Selection */
+                              List<String> realEstateFloorsNames = [];
+                              for (var element in realEstateFloors) {
+                                realEstateFloorsNames.add(element.floorName);
+                              }
+                              DialogOfTile.dialogMenuTile(
+                                  context: context,
+                                  width: width,
+                                  height: height,
+                                  menuStrings: realEstateFloorsNames,
+                                  onMenuButtonTap: (index) {
+                                    Floor floor = realEstateFloors.firstWhere(
+                                        (element) => element.id == index + 1);
+                                    floorID = floor.id;
+                                    apartementBuildingFloorPositionTextController
+                                        .text = floor.floorName;
+
+                                    onApartementLinkUpdated(
+                                        'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                                    apartementLinkTextController.text =
+                                        onApartementLinkUpdated.value;
+                                    Navigator.of(context).pop();
+                                  });
+                              /* *!SECTION */
+                            },
+                            title: 'رقم الدور',
+                          ),
+                          /* *!SECTION */
+                        ],
                       ),
                       /* *!SECTION */
-                      const SizedBox(
-                        width: 20,
-                      ),
+                      /* *SECTION - apartement number with apartement State  */
+                      Row(
+                        textDirection: TextDirection.rtl,
+                        children: [
+                          /* *SECTION - Apartement State */
+                          TextTile(
+                            width: width > 1350 ? width * 0.17 : width * 0.23,
+                            onTap: () {
+                              List<String> stateNames = [];
+                              for (var element in apartementState) {
+                                stateNames.add(element.state);
+                              }
+                              DialogOfTile.dialogMenuTile(
+                                  context: context,
+                                  width: width,
+                                  height: height,
+                                  menuStrings: stateNames,
+                                  onMenuButtonTap: (index) {
+                                    apartementStateTextController.text =
+                                        apartementState
+                                            .firstWhere((element) =>
+                                                element.id == index + 1)
+                                            .state;
+                                    apartementStatusID = apartementState
+                                        .firstWhere((element) =>
+                                            element.id == index + 1)
+                                        .id;
+                                    Navigator.of(context).pop();
+                                  });
+                            },
+                            textController: apartementStateTextController,
+                            hintText: 'اختر حالة الوحدة',
+                            icon: Icons.build_outlined,
+                            title: 'حالة الوحدة',
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          /* *!SECTION */
+                          /* *SECTION - Apartement Number */
+                          TextTile(
+                            width: width > 1350 ? width * 0.17 : width * 0.23,
+                            onChange: (text, errorText) {
+                              if (!Validators.isNumericOrEmptyOnly(text)) {
+                                errorText('ادخل ارقام فقط');
+                              } else {
+                                apartementID = int.parse(text);
+                                onApartementLinkUpdated(
+                                    'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                                apartementLinkTextController.text =
+                                    onApartementLinkUpdated.value;
+                              }
+                            },
+                            textController: apartementNumberTextController,
+                            hintText: 'ادخل رقم الوحدة',
+                            icon: Icons.numbers_outlined,
+                            title: 'رقم الوحدة',
+                          ),
+                          /* *!SECTION */
+                        ],
+                      )
+                      /* *!SECTION */
                     ],
                   ),
-                  /* *!SECTION */
-
-                  /* *SECTION - apartement buiding Position */
-                  Row(
-                    textDirection: TextDirection.rtl,
-                    children: [
-                      TextTile(
-                        width: width > 1350 ? width * 0.17 : width * 0.23,
-                        onChange: (text, errorText) {},
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => FluidDialog(
-                              alignmentDuration: const Duration(seconds: 1),
-                              alignmentCurve: Curves.bounceInOut,
-                              // Set the first page of the dialog.
-                              rootPage: FluidDialogPage(
-                                  alignment: Alignment.bottomCenter,
-                                  //Aligns the dialog to the bottom left.
-                                  builder: (context) {
-                                    /* *SECTION - Building Selection */
-                                    return Container(
-                                      padding: const EdgeInsets.all(10),
-                                      width: width * 0.3,
-                                      height: height * 0.4,
-                                      child: ListView.builder(
-                                        itemCount: realEstates.length,
-                                        itemBuilder: (context, index) {
-                                          /* *SECTION - Building Item With Hover */
-                                          RxBool onHoverOfBuildingItem =
-                                              false.obs;
-                                          return Obx(() {
-                                            return MenuButtonCard(
-                                                backgroundColor:
-                                                    onHoverOfBuildingItem.value
-                                                        ? Colors.grey[500]
-                                                        : Colors.white,
-                                                icon: Icons.abc,
-                                                hasIcon: false,
-                                                onHover: (isHovering) {
-                                                  onHoverOfBuildingItem(
-                                                      isHovering);
-                                                },
-                                                onTap: () {
-                                                  Building building =
-                                                      realEstates.firstWhere(
-                                                          (element) =>
-                                                              element.id ==
-                                                              index + 1);
-                                                  buildingID = building.id;
-                                                  apartementBuildingPositionTextController
-                                                          .text =
-                                                      building.buildingName;
-
-                                                  onApartementLinkUpdated(
-                                                      'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
-                                                  apartementLinkTextController
-                                                          .text =
-                                                      onApartementLinkUpdated
-                                                          .value;
-                                                  Navigator.of(context).pop();
-                                                },
-                                                title: realEstates
-                                                    .firstWhere((element) =>
-                                                        element.id == index + 1)
-                                                    .buildingName);
-                                          });
-                                          /* *!SECTION */
-                                        },
-                                      ),
-                                    );
-                                    /* *!SECTION */
-                                  }),
-                            ),
-                          );
-                        },
-                        textController:
-                            apartementBuildingPositionTextController,
-                        hintText: 'ادخل رقم العمارة',
-                        icon: Icons.home_filled,
-                        title: 'رقم العمارة',
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      /* *SECTION - Floor Tile */
-                      TextTile(
-                        width: width > 1350 ? width * 0.17 : width * 0.23,
-                        textController:
-                            apartementBuildingFloorPositionTextController,
-                        hintText: 'ادخل رقم الدور',
-                        icon: Icons.file_upload_outlined,
-                        onTap: () {
-                          /* *SECTION - Show Floor Selection */
-
-                          showDialog(
-                            context: context,
-                            builder: (context) => FluidDialog(
-                              alignmentDuration: const Duration(seconds: 1),
-                              alignmentCurve: Curves.bounceInOut,
-                              // Set the first page of the dialog.
-                              rootPage: FluidDialogPage(
-                                  alignment: Alignment.bottomCenter,
-                                  //Aligns the dialog to the bottom left.
-                                  builder: (context) {
-                                    /* *SECTION - Floors Selection */
-                                    return Container(
-                                      padding: const EdgeInsets.all(10),
-                                      width: width * 0.3,
-                                      height: height * 0.4,
-                                      child: ListView.builder(
-                                        itemCount: realEstateFloors.length,
-                                        itemBuilder: (context, index) {
-                                          /* *SECTION - Floor Item With Hover */
-                                          RxBool onHoverOfFloorItem = false.obs;
-                                          return Obx(() {
-                                            return MenuButtonCard(
-                                                backgroundColor:
-                                                    onHoverOfFloorItem.value
-                                                        ? Colors.grey[500]
-                                                        : Colors.white,
-                                                icon: Icons.abc,
-                                                hasIcon: false,
-                                                onHover: (isHovering) {
-                                                  onHoverOfFloorItem(
-                                                      isHovering);
-                                                },
-                                                onTap: () {
-                                                  Floor floor = realEstateFloors
-                                                      .firstWhere((element) =>
-                                                          element.id ==
-                                                          index + 1);
-                                                  floorID = floor.id;
-                                                  apartementBuildingFloorPositionTextController
-                                                      .text = floor.floorName;
-
-                                                  onApartementLinkUpdated(
-                                                      'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
-                                                  apartementLinkTextController
-                                                          .text =
-                                                      onApartementLinkUpdated
-                                                          .value;
-                                                  Navigator.of(context).pop();
-                                                },
-                                                title: realEstateFloors
-                                                    .firstWhere((element) =>
-                                                        element.id == index + 1)
-                                                    .floorName);
-                                          });
-                                          /* *!SECTION */
-                                        },
-                                      ),
-                                    );
-                                    /* *!SECTION */
-                                  }),
-                            ),
-                          );
-                          /* *!SECTION */
-                        },
-                        title: 'رقم الدور',
-                      ),
-                      /* *!SECTION */
-                    ],
-                  )
-                  /* *!SECTION */
-                  ,
-                  /* *SECTION - apartement number with apartement State  */
-                  Row(
-                    textDirection: TextDirection.rtl,
-                    children: [
-                      /* *SECTION - Apartement State */
-                      TextTile(
-                        width: width > 1350 ? width * 0.17 : width * 0.23,
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => FluidDialog(
-                              alignmentDuration: const Duration(seconds: 1),
-                              alignmentCurve: Curves.bounceInOut,
-                              // Set the first page of the dialog.
-                              rootPage: FluidDialogPage(
-                                  alignment: Alignment.bottomCenter,
-                                  //Aligns the dialog to the bottom left.
-                                  builder: (context) {
-                                    /* *SECTION - States Selection */
-                                    return Container(
-                                      padding: const EdgeInsets.all(10),
-                                      width: width * 0.3,
-                                      height: height * 0.3,
-                                      child: ListView.builder(
-                                        itemCount: apartementState.length,
-                                        itemBuilder: (context, index) {
-                                          /* *SECTION - States Item With Hover */
-                                          RxBool onHoverOfStatesItem =
-                                              false.obs;
-                                          return Obx(() {
-                                            return MenuButtonCard(
-                                                backgroundColor:
-                                                    onHoverOfStatesItem.value
-                                                        ? Colors.grey[500]
-                                                        : Colors.white,
-                                                icon: Icons.abc,
-                                                hasIcon: false,
-                                                onHover: (isHovering) {
-                                                  onHoverOfStatesItem(
-                                                      isHovering);
-                                                },
-                                                onTap: () {
-                                                  apartementStateTextController
-                                                          .text =
-                                                      apartementState
-                                                          .firstWhere(
-                                                              (element) =>
-                                                                  element.id ==
-                                                                  index + 1)
-                                                          .state;
-                                                  apartementStatusID =
-                                                      apartementState
-                                                          .firstWhere(
-                                                              (element) =>
-                                                                  element.id ==
-                                                                  index + 1)
-                                                          .id;
-                                                  Navigator.of(context).pop();
-                                                },
-                                                title: apartementState
-                                                    .firstWhere((element) =>
-                                                        element.id == index + 1)
-                                                    .state);
-                                          });
-                                          /* *!SECTION */
-                                        },
-                                      ),
-                                    );
-                                    /* *!SECTION */
-                                  }),
-                            ),
-                          );
-                        },
-                        textController: apartementStateTextController,
-                        hintText: 'اختر حالة الوحدة',
-                        icon: Icons.build_outlined,
-                        title: 'حالة الوحدة',
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      /* *!SECTION */
-                      /* *SECTION - Apartement Number */
-                      TextTile(
-                        width: width > 1350 ? width * 0.17 : width * 0.23,
-                        onChange: (text, errorText) {
-                          if (!Validators.isNumericOrEmptyOnly(text)) {
-                            errorText('ادخل ارقام فقط');
-                          } else {
-                            apartementID = int.parse(text);
-                            onApartementLinkUpdated(
-                                'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
-                            apartementLinkTextController.text =
-                                onApartementLinkUpdated.value;
-                          }
-                        },
-                        textController: apartementNumberTextController,
-                        hintText: 'ادخل رقم الوحدة',
-                        icon: Icons.numbers_outlined,
-                        title: 'رقم الوحدة',
-                      ),
-                      /* *!SECTION */
-                    ],
-                  )
-
-                  /* *!SECTION */
                 ]),
                 const SizedBox(
                   height: 20,
@@ -1055,198 +591,32 @@ class _AddRealEstateState extends State<AddRealEstate> {
                       height: 20,
                     ),
                     /* *SECTION - Owner Email with owner Role    */
-                    Row(
-                      textDirection: TextDirection.rtl,
-                      children: [
-                        TextTile(
-                          width: width > 1350 ? width * 0.25 : width * 0.33,
-                          onChange: (text, errorText) {
-                            if (!GetUtils.isEmail(text)) {
-                              errorText('ادخل البريد صحيحا');
-                              errorsofTextController.addIf(
-                                  !errorsofTextController.contains('email'),
-                                  'email');
-                            } else {
-                              errorText('');
-                              errorsofTextController.remove('email');
-                            }
-                          },
-                          textController: ownerEmailTextController,
-                          hintText: 'ادخل البريد الالكتروني الماك',
-                          icon: Icons.email_outlined,
-                          title: 'البريد الالكتروني',
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        TextTile(
-                          width: width > 1350 ? width * 0.17 : width * 0.23,
-                          textController: ownerRoleTextController,
-                          hintText: 'اختر الصلاحيات ',
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => FluidDialog(
-                                alignmentDuration: const Duration(seconds: 1),
-                                alignmentCurve: Curves.bounceInOut,
-                                // Set the first page of the dialog.
-                                rootPage: FluidDialogPage(
-                                    alignment: Alignment.bottomCenter,
-                                    //Aligns the dialog to the bottom left.
-                                    builder: (context) {
-                                      /* *SECTION - Role Selection */
-                                      return Container(
-                                        padding: const EdgeInsets.all(10),
-                                        width: width * 0.3,
-                                        height: height * 0.2,
-                                        child: ListView.builder(
-                                          itemCount: ownerRole.length,
-                                          itemBuilder: (context, index) {
-                                            /* *SECTION - Roles Item With Hover */
-                                            RxBool onHoverOfFloorItem =
-                                                false.obs;
-                                            return Obx(() {
-                                              return MenuButtonCard(
-                                                  backgroundColor:
-                                                      onHoverOfFloorItem.value
-                                                          ? Colors.grey[500]
-                                                          : Colors.white,
-                                                  icon: Icons.abc,
-                                                  hasIcon: false,
-                                                  onHover: (isHovering) {
-                                                    onHoverOfFloorItem(
-                                                        isHovering);
-                                                  },
-                                                  onTap: () {
-                                                    ownerRoleTextController
-                                                            .text =
-                                                        ownerRole
-                                                            .firstWhere(
-                                                                (element) =>
-                                                                    element
-                                                                        .id ==
-                                                                    index + 1)
-                                                            .ownerRole;
-                                                    //NOTE - Change this if it doesn;t work
-                                                    Get.back();
-                                                  },
-                                                  title: ownerRole
-                                                      .firstWhere((element) =>
-                                                          element.id ==
-                                                          index + 1)
-                                                      .ownerRole);
-                                            });
-                                            /* *!SECTION */
-                                          },
-                                        ),
-                                      );
-                                      /* *!SECTION */
-                                    }),
-                              ),
-                            );
-                          },
-                          icon: Icons.manage_accounts_outlined,
-                          title: 'صلاحيات المالك',
-                        ),
-                      ],
-                    ),
+                    OwnerMailAndRoleFields(
+                        width: width,
+                        errorsofTextController: errorsofTextController,
+                        ownerEmailTextController: ownerEmailTextController,
+                        ownerRoleTextController: ownerRoleTextController,
+                        ownerRole: ownerRole,
+                        height: height),
                     /* *!SECTION */
 
                     /* *SECTION - Owner Password And Owner Confrim Password*/
-                    Row(
-                      textDirection: TextDirection.rtl,
-                      children: [
-                        TextTile(
-                          width: width > 1350 ? width * 0.17 : width * 0.23,
-                          textController: ownerPasswordTextController,
-                          hintText: 'ادخل الكلمة السرية',
-                          isPassword: true,
-                          onChange: (text, errorText) {
-                            if (text != confirmPasswordTextController.text) {
-                              errorText('ادخل كلمة سرية مطابقة للخانة الاولة');
-                              errorsofTextController.addIf(
-                                  !errorsofTextController.contains('password'),
-                                  'password');
-                            } else {
-                              errorText('');
-                              errorsofTextController.remove('password');
-                            }
-                          },
-                          icon: Icons.password_outlined,
-                          title: 'الكلمة السرية',
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        TextTile(
-                          width: width > 1350 ? width * 0.17 : width * 0.23,
-                          textController: confirmPasswordTextController,
-                          hintText: 'كلمة السرية',
-                          onChange: (text, errorText) {
-                            if (text != ownerPasswordTextController.text) {
-                              errorText('ادخل كلمة سرية مطابقة للخانة الاولة');
-                              errorsofTextController.addIf(
-                                  !errorsofTextController
-                                      .contains('confirmpassword'),
-                                  'confirmpassword');
-                            } else {
-                              errorText('');
-                              errorsofTextController.remove('confirmpassword');
-                            }
-                          },
-                          isPassword: true,
-                          icon: Icons.password_sharp,
-                          title: 'تاكيد كلمة السرية',
-                        ),
-                      ],
-                    ),
+                    PasswordAndConfirmationFields(
+                        width: width,
+                        ownerPasswordTextController:
+                            ownerPasswordTextController,
+                        confirmPasswordTextController:
+                            confirmPasswordTextController,
+                        errorsofTextController: errorsofTextController),
                     /* *!SECTION */
                   ],
                 ),
 
                 /* *SECTION - Link And Qrcode */
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  textDirection: TextDirection.rtl,
-                  children: [
-                    /* *SECTION - Link  */
-                    TextTile(
-                      width: 200,
-                      height: 100,
-                      textController: apartementLinkTextController,
-                      hintText: 'انتظهر ظهور الرابط',
-                      icon: Icons.link,
-                      onTap: () {},
-                      title: 'رابط الدخول',
-                    ),
-                    /* *!SECTION */
-                    /* *SECTION - Qr Code */
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        clipBehavior: Clip.hardEdge,
-                        height: 200,
-                        alignment: Alignment.topRight,
-                        decoration: BoxDecoration(
-                            color: Colors.grey[200] ?? Colors.white,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20))),
-                        width: width > 1350
-                            ? width * 0.14
-                            : width > 1000
-                                ? width * 0.19
-                                : width * 0.24,
-                        child: Obx(() {
-                          return BarcodeWidget(
-                            barcode: Barcode.qrCode(),
-                            data: onApartementLinkUpdated.value,
-                          );
-                        }),
-                      ),
-                    ),
-                    /* *!SECTION */
-                  ],
-                ),
+                EntryDataQrcodeAndLink(
+                    apartementLinkTextController: apartementLinkTextController,
+                    width: width,
+                    onApartementLinkUpdated: onApartementLinkUpdated),
                 /* *!SECTION */
               ],
             ),
@@ -1260,5 +630,336 @@ class _AddRealEstateState extends State<AddRealEstate> {
     );
 
     /* *!SECTION */
+  }
+}
+
+class OwnerMailAndRoleFields extends StatelessWidget {
+  const OwnerMailAndRoleFields({
+    super.key,
+    required this.width,
+    required this.errorsofTextController,
+    required this.ownerEmailTextController,
+    required this.ownerRoleTextController,
+    required this.ownerRole,
+    required this.height,
+  });
+
+  final double width;
+  final List<String> errorsofTextController;
+  final TextEditingController ownerEmailTextController;
+  final TextEditingController ownerRoleTextController;
+  final List<OwnerRole> ownerRole;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      textDirection: TextDirection.rtl,
+      children: [
+        TextTile(
+          width: width > 1350 ? width * 0.25 : width * 0.33,
+          onChange: (text, errorText) {
+            if (!GetUtils.isEmail(text)) {
+              errorText('ادخل البريد صحيحا');
+              errorsofTextController.addIf(
+                  !errorsofTextController.contains('email'), 'email');
+            } else {
+              errorText('');
+              errorsofTextController.remove('email');
+            }
+          },
+          textController: ownerEmailTextController,
+          hintText: 'ادخل البريد الالكتروني الماك',
+          icon: Icons.email_outlined,
+          title: 'البريد الالكتروني',
+        ),
+        const SizedBox(
+          width: 20,
+        ),
+        TextTile(
+          width: width > 1350 ? width * 0.17 : width * 0.23,
+          textController: ownerRoleTextController,
+          hintText: 'اختر الصلاحيات ',
+          onTap: () {
+            List<String> ownerRoleNames = [];
+            for (var element in ownerRole) {
+              ownerRoleNames.add(element.ownerRole);
+            }
+            DialogOfTile.dialogMenuTile(
+                context: context,
+                width: width,
+                height: height,
+                menuStrings: ownerRoleNames,
+                onMenuButtonTap: (index) {
+                  ownerRoleTextController.text = ownerRole
+                      .firstWhere((element) => element.id == index + 1)
+                      .ownerRole;
+                  Navigator.of(context).pop();
+                });
+          },
+          icon: Icons.manage_accounts_outlined,
+          title: 'صلاحيات المالك',
+        ),
+      ],
+    );
+  }
+}
+
+class PasswordAndConfirmationFields extends StatelessWidget {
+  const PasswordAndConfirmationFields({
+    super.key,
+    required this.width,
+    required this.ownerPasswordTextController,
+    required this.confirmPasswordTextController,
+    required this.errorsofTextController,
+  });
+
+  final double width;
+  final TextEditingController ownerPasswordTextController;
+  final TextEditingController confirmPasswordTextController;
+  final List<String> errorsofTextController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      textDirection: TextDirection.rtl,
+      children: [
+        TextTile(
+          width: width > 1350 ? width * 0.17 : width * 0.23,
+          textController: ownerPasswordTextController,
+          hintText: 'ادخل الكلمة السرية',
+          isPassword: true,
+          onChange: (text, errorText) {
+            if (text != confirmPasswordTextController.text) {
+              errorText('ادخل كلمة سرية مطابقة للخانة الاولة');
+              errorsofTextController.addIf(
+                  !errorsofTextController.contains('password'), 'password');
+            } else {
+              errorText('');
+              errorsofTextController.remove('password');
+            }
+          },
+          icon: Icons.password_outlined,
+          title: 'الكلمة السرية',
+        ),
+        const SizedBox(
+          width: 20,
+        ),
+        TextTile(
+          width: width > 1350 ? width * 0.17 : width * 0.23,
+          textController: confirmPasswordTextController,
+          hintText: 'كلمة السرية',
+          onChange: (text, errorText) {
+            if (text != ownerPasswordTextController.text) {
+              errorText('ادخل كلمة سرية مطابقة للخانة الاولة');
+              errorsofTextController.addIf(
+                  !errorsofTextController.contains('confirmpassword'),
+                  'confirmpassword');
+            } else {
+              errorText('');
+              errorsofTextController.remove('confirmpassword');
+            }
+          },
+          isPassword: true,
+          icon: Icons.password_sharp,
+          title: 'تاكيد كلمة السرية',
+        ),
+      ],
+    );
+  }
+}
+
+class EntryDataQrcodeAndLink extends StatelessWidget {
+  const EntryDataQrcodeAndLink({
+    super.key,
+    required this.apartementLinkTextController,
+    required this.width,
+    required this.onApartementLinkUpdated,
+  });
+
+  final TextEditingController apartementLinkTextController;
+  final double width;
+  final RxString onApartementLinkUpdated;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      textDirection: TextDirection.rtl,
+      children: [
+        /* *SECTION - Link  */
+        TextTile(
+          width: 200,
+          height: 100,
+          textController: apartementLinkTextController,
+          hintText: 'انتظهر ظهور الرابط',
+          icon: Icons.link,
+          onTap: () {},
+          title: 'رابط الدخول',
+        ),
+        /* *!SECTION */
+        /* *SECTION - Qr Code */
+        GestureDetector(
+          onTap: () {},
+          child: Container(
+            clipBehavior: Clip.hardEdge,
+            height: 200,
+            alignment: Alignment.topRight,
+            decoration: BoxDecoration(
+                color: Colors.grey[200] ?? Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(20))),
+            width: width > 1350
+                ? width * 0.14
+                : width > 1000
+                    ? width * 0.19
+                    : width * 0.24,
+            child: Obx(() {
+              return BarcodeWidget(
+                barcode: Barcode.qrCode(),
+                data: onApartementLinkUpdated.value,
+              );
+            }),
+          ),
+        ),
+        /* *!SECTION */
+      ],
+    );
+  }
+}
+
+class ResponsibleDataFields extends StatelessWidget {
+  const ResponsibleDataFields({
+    super.key,
+    required this.width,
+    required this.errorsofTextController,
+    required this.responsibleNameTextController,
+    required this.responsiblePhoneNumberTextController,
+  });
+
+  final double width;
+  final List<String> errorsofTextController;
+  final TextEditingController responsibleNameTextController;
+  final TextEditingController responsiblePhoneNumberTextController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      textDirection: TextDirection.rtl,
+      children: [
+        /* *SECTION - Responsible Name */
+        TextTile(
+          width: width > 1350 ? width * 0.25 : width * 0.33,
+          onChange: (text, errorText) {
+            if (!Validators.isArabicOnly(text)) {
+              errorText('ادخل حروف فقط');
+              errorsofTextController.addIf(
+                  !errorsofTextController.contains('responsibleName'),
+                  'responsibleName');
+            } else {
+              errorText('');
+              errorsofTextController.remove('responsibleName');
+            }
+          },
+          textController: responsibleNameTextController,
+          hintText: 'ادخل اسم المسئول عن الوحدة',
+          icon: Icons.handshake_outlined,
+          title: 'اسم المسئول',
+        ),
+        const SizedBox(
+          width: 20,
+        ),
+
+        /* *!SECTION */
+        /* *SECTION - responsible Phone */
+        TextTile(
+          width: width > 1350 ? width * 0.17 : width * 0.23,
+          onChange: (text, errorText) {
+            if (!Validators.isNumericOrEmptyOnly(text)) {
+              errorText('ادخل ارقام فقط');
+              errorsofTextController.addIf(
+                  !errorsofTextController.contains('responsiblePhone'),
+                  'responsiblePhone');
+            } else {
+              errorText('');
+              errorsofTextController.remove('responsiblePhone');
+            }
+          },
+          textController: responsiblePhoneNumberTextController,
+          hintText: 'ادخل رقم تليفون',
+          icon: Icons.mobile_friendly_outlined,
+          title: 'رقم تليفون المسئول',
+        ),
+        /* *!SECTION */
+        const SizedBox(
+          width: 20,
+        ),
+      ],
+    );
+  }
+}
+
+class OwnerDataFields extends StatelessWidget {
+  const OwnerDataFields({
+    super.key,
+    required this.width,
+    required this.errorsofTextController,
+    required this.ownerNameTextController,
+    required this.ownerPhoneNumberTextController,
+  });
+
+  final double width;
+  final List<String> errorsofTextController;
+  final TextEditingController ownerNameTextController;
+  final TextEditingController ownerPhoneNumberTextController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      textDirection: TextDirection.rtl,
+      children: [
+        /* *SECTION - Owner Name */
+        TextTile(
+          width: width > 1350 ? width * 0.25 : width * 0.33,
+          onChange: (text, errorText) {
+            if (!Validators.isArabicOnly(text)) {
+              errorText('ادخل حروف فقط');
+              errorsofTextController.addIf(
+                  !errorsofTextController.contains('ownerName'), 'ownerName');
+            } else {
+              errorText('');
+              errorsofTextController.remove('ownerName');
+            }
+          },
+          textController: ownerNameTextController,
+          hintText: 'ادخل اسم الماك',
+          icon: Icons.person_outlined,
+          title: 'اسم المالك',
+        ),
+        const SizedBox(
+          width: 20,
+        ),
+
+        /* *!SECTION */
+        /* *SECTION - Owner Phone */
+        TextTile(
+          width: width > 1350 ? width * 0.17 : width * 0.23,
+          onChange: (text, errorText) {
+            if (!Validators.isNumericOrEmptyOnly(text)) {
+              errorText('ادخل ارقام فقط');
+              errorsofTextController.addIf(
+                  !errorsofTextController.contains('ownerName'), 'ownerPhone');
+            } else {
+              errorText('');
+              errorsofTextController.remove('ownerPhone');
+            }
+          },
+          textController: ownerPhoneNumberTextController,
+          hintText: 'ادخل رقم تلفون',
+          icon: Icons.phone_outlined,
+          title: 'رقم تليفون المالك',
+        ),
+        /* *!SECTION */
+      ],
+    );
   }
 }

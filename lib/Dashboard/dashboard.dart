@@ -1,7 +1,8 @@
 import 'package:aspania_city_group/Add_RealEstate/add_real_estate.dart';
 import 'package:aspania_city_group/Dashboard/real_estate_summary.dart';
 import 'package:aspania_city_group/DataTableForApartements/ShowAllApartements.dart';
-import 'package:aspania_city_group/class/navigation.dart';
+import 'package:aspania_city_group/Common_Used/navigation.dart';
+import 'package:aspania_city_group/Sign_InPage/SignIn_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -81,7 +82,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                               : NavigationProperties.selectedTabVaueNotifier
                                           .toString() ==
                                       NavigationProperties
-                                          .showAllRealEstatePageRoute
+                                          .dataTableOfApartements
                                   ? const ShowwAllAprtementsPage()
                                   : const SizedBox(),
                     ),
@@ -103,108 +104,65 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   width: width > 1250 ? width * 0.17 : width * 0.25,
                   padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      /* *SECTION - Aspania City Image */
-                      Container(
-                        width: 100,
-                        height: 100,
-                        margin: const EdgeInsets.only(left: 20),
-                        decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                            image: DecorationImage(
-                              image: AssetImage(
-                                  'assets/images/Boudy-Elhegaz-real-estate-logo-10.jpg'),
-                            )),
-                      ),
-                      /* *!SECTION */
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      /* *SECTION - Profile Button */
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 10, 0),
-                        width: width * 0.14,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            /* *SECTION - ProfileName */
-                            Text(
-                              'الاسم',
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.gulzar(fontSize: 20),
-                            ),
-                            /* *!SECTION */
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            /* *SECTION - Profile Image */
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: const BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(60)),
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                        'assets/images/Boudy-Elhegaz-real-estate-logo-10.jpg'),
-                                  )),
-                            ),
-                            /* *!SECTION */
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      /* *SECTION - Menu Buttons */
-                      /* *SECTION - Real Estates Item */
-                      MenuButtonCard(
-                        title: 'الوحدات',
-                        icon: Icons.category_outlined,
-                        onTap: () {
-                          NavigationProperties.selectedTabVaueNotifier(
-                              NavigationProperties.realEstateSummaryPageRoute);
-                        },
-                      ),
-                      /* *!SECTION */
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      /* *SECTION - Owners Item */
-                      MenuButtonCard(
-                        title: 'الملاك',
-                        icon: Icons.people_alt_outlined,
-                        onTap: () {
-                          NavigationProperties.selectedTabVaueNotifier(
-                              NavigationProperties.ownerPageRoute);
-                        },
-                      ),
-                      /* *!SECTION */
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      /* *SECTION - Log In Item */
-                      MenuButtonCard(
-                        title: width > 1250 ? 'تسجيل الدخول' : 'الدخول',
-                        icon: Icons.login_outlined,
-                      ),
-                      /* *!SECTION */
-                      const SizedBox(
-                        height: 10,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          /* *SECTION - Menu Buttons */
+                          /* *SECTION - Real Estates Item */
+                          MenuButtonCard(
+                            title: 'الوحدات',
+                            icon: Icons.category_outlined,
+                            onTap: () {
+                              NavigationProperties.selectedTabVaueNotifier(
+                                  NavigationProperties
+                                      .realEstateSummaryPageRoute);
+                            },
+                          ),
+                          /* *!SECTION */
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          /* *SECTION - Owners Item */
+                          MenuButtonCard(
+                            title: 'الملاك',
+                            icon: Icons.people_alt_outlined,
+                            onTap: () {
+                              NavigationProperties.selectedTabNeededParamters =
+                                  [-1, 'All_Owners'];
+                              NavigationProperties.selectedTabVaueNotifier(
+                                  NavigationProperties.dataTableOfApartements);
+                            },
+                          ),
+                          /* *!SECTION */
+                          const SizedBox(
+                            height: 10,
+                          ),
+
+                          /* *!SECTION */
+                        ],
                       ),
                       /* *SECTION - Log Out Item */
-                      MenuButtonCard(
-                        title: width > 1250 ? 'تسجيل الخروج' : 'الخروج',
-                        icon: Icons.logout_outlined,
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 50),
+                        child: MenuButtonCard(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SigninScreen()),
+                            );
+                          },
+                          hasIcon: false,
+                          title: width > 1250 ? 'تسجيل الخروج' : 'الخروج',
+                          icon: Icons.logout_outlined,
+                        ),
                       ),
-                      /* *!SECTION */
                       /* *!SECTION */
                     ],
                   ),
