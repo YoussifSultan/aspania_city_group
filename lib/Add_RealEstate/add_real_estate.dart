@@ -2,12 +2,10 @@ import 'dart:convert';
 
 import 'package:aspania_city_group/Common_Used/button_tile.dart';
 import 'package:aspania_city_group/Common_Used/text_tile.dart';
-import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
 import 'package:aspania_city_group/class/buidlingproperties.dart';
 import 'package:aspania_city_group/class/realestate.dart';
 import 'package:aspania_city_group/class/validators.dart';
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import "package:get/get.dart";
 import 'package:google_fonts/google_fonts.dart';
