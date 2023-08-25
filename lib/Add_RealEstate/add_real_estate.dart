@@ -131,7 +131,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
         apartementID = int.parse(realEstateDataToEdit.apartementName);
         apartementStatusID = realEstateDataToEdit.apartementStatusId;
         onApartementLinkUpdated(
-            'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+            'www.spain-city.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
         apartementLinkTextController.text = realEstateDataToEdit.apartementLink;
         if (realEstateDataToEdit.isApartementHasEnoughData) {
           ownerNameTextController.text = realEstateDataToEdit.ownerName;
@@ -156,7 +156,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
           .firstWhere((element) => element.id == widget.buildingNumber)
           .buildingName;
       onApartementLinkUpdated(
-          'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+          'www.spain-city.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
       apartementLinkTextController.text = onApartementLinkUpdated.value;
     }
     super.initState();
@@ -226,8 +226,39 @@ class _AddRealEstateState extends State<AddRealEstate> {
             ? await insertData(realEstateData)
             : await editData(realEstateData);
         Get.closeAllSnackbars();
-        NavigationProperties.selectedTabVaueNotifier(
-            NavigationProperties.realEstateSummaryPageRoute);
+        if (state == 'Edit') {
+          NavigationProperties.selectedTabVaueNotifier(
+              NavigationProperties.realEstateSummaryPageRoute);
+        } else {
+          apartementBuildingPositionTextController.text = "";
+          apartementBuildingFloorPositionTextController.text = "";
+          apartementStateTextController.text = "";
+          apartementNumberTextController.text = "";
+          ownerNameTextController.text = "";
+          responsibleNameTextController.text = "";
+          responsiblePhoneNumberTextController.text = "";
+          apartementLinkTextController.text = "";
+          ownerEmailTextController.text = "";
+          ownerPhoneNumberTextController.text = "";
+          ownerRoleTextController.text = "";
+          ownerPasswordTextController.text = "";
+          confirmPasswordTextController.text = "";
+          /* *!SECTION */
+          NavigationProperties.selectedTabNeededParamters = [
+            buildingID,
+            'AddOwner',
+            RealEstateData(
+                id: 0,
+                apartementStatusId: 0,
+                apartementPostionInFloorId: 0,
+                apartementPostionInBuildingId: 0,
+                apartementLink: 'None',
+                isApartementHasEnoughData: false,
+                apartementName: 'None')
+          ];
+          NavigationProperties.selectedTabVaueNotifier(
+              NavigationProperties.addNewRealEstatePageRoute);
+        }
         Get.showSnackbar(GetSnackBar(
           animationDuration: const Duration(seconds: 1),
           duration: const Duration(seconds: 2),
@@ -258,8 +289,25 @@ class _AddRealEstateState extends State<AddRealEstate> {
             ? await insertData(realEstateData)
             : await editData(realEstateData);
         Get.closeAllSnackbars();
-        NavigationProperties.selectedTabVaueNotifier(
-            NavigationProperties.realEstateSummaryPageRoute);
+        if (state == 'Edit') {
+          NavigationProperties.selectedTabVaueNotifier(
+              NavigationProperties.realEstateSummaryPageRoute);
+        } else {
+          NavigationProperties.selectedTabNeededParamters = [
+            buildingID,
+            'AddOwner',
+            RealEstateData(
+                id: 0,
+                apartementStatusId: 0,
+                apartementPostionInFloorId: 0,
+                apartementPostionInBuildingId: 0,
+                apartementLink: 'None',
+                isApartementHasEnoughData: false,
+                apartementName: 'None')
+          ];
+          NavigationProperties.selectedTabVaueNotifier(
+              NavigationProperties.addNewRealEstatePageRoute);
+        }
         Get.showSnackbar(GetSnackBar(
           animationDuration: const Duration(seconds: 1),
           duration: const Duration(seconds: 2),
@@ -329,8 +377,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                           ' تعديل وحدة'
                         ], routeScreen: [
                           NavigationProperties.realEstateSummaryPageRoute,
-                          NavigationProperties.selectedTabVaueNotifier(
-                              NavigationProperties.dataTableOfApartements),
+                          NavigationProperties.realEstateSummaryPageRoute,
                           NavigationProperties.nonePageRoute
                         ]),
                       )
@@ -450,7 +497,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                         .text = building.buildingName;
 
                                     onApartementLinkUpdated(
-                                        'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                                        'www.www.spain-city.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
                                     apartementLinkTextController.text =
                                         onApartementLinkUpdated.value;
                                     Navigator.of(context).pop();
@@ -491,7 +538,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                         .text = floor.floorName;
 
                                     onApartementLinkUpdated(
-                                        'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                                        'www.spain-city.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
                                     apartementLinkTextController.text =
                                         onApartementLinkUpdated.value;
                                     Navigator.of(context).pop();
@@ -552,7 +599,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                               } else {
                                 apartementID = int.parse(text);
                                 onApartementLinkUpdated(
-                                    'www.aspaniacity.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                                    'www.spain-city.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
                                 apartementLinkTextController.text =
                                     onApartementLinkUpdated.value;
                               }

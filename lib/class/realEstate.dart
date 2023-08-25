@@ -19,8 +19,8 @@ class RealEstateData {
       responsiblePhone = 'None';
       ownerName = 'None';
       ownerMail = 'None';
-      ownerPassword = '12345678910';
-      ownerPhoneNumber = '01020314813';
+      ownerPassword = 'None';
+      ownerPhoneNumber = 'None';
       ownerRole = 0;
     }
   }

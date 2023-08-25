@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
 import 'package:aspania_city_group/class/realestate.dart';
 import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:davi/davi.dart';
+import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -159,42 +161,6 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
         // Set the name of the column
 
         DaviColumn(
-            stringValue: (row) => row.apartementName,
-            name: 'رقم الوحدة',
-            width: 100,
-            sortable: true),
-        DaviColumn(
-            stringValue: (row) => realEstateFloors
-                .firstWhere(
-                    (element) => element.id == row.apartementPostionInFloorId)
-                .floorName,
-            name: 'الدور',
-            width: 150,
-            sortable: true),
-        DaviColumn(
-            width: 200,
-            stringValue: (row) => buildings
-                .firstWhere((element) =>
-                    element.id == row.apartementPostionInBuildingId)
-                .buildingName,
-            name: 'العمارة',
-            sortable: true),
-        DaviColumn(
-            width: 200,
-            name: 'رقم التليفون المسئول',
-            stringValue: (row) => row.responsiblePhone,
-            sortable: true),
-        DaviColumn(
-            width: 300,
-            name: 'اسم المسئول',
-            stringValue: (row) => row.responsibleName,
-            sortable: true),
-        DaviColumn(
-            width: 300,
-            name: 'اسم المالك',
-            stringValue: (row) => row.ownerName,
-            sortable: true),
-        DaviColumn(
           width: 150,
           name: 'حالة الوحدة',
           cellBuilder: (context, row) {
@@ -245,9 +211,54 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
           intValue: (row) => row.apartementStatusId,
         ),
         DaviColumn(
-            name: 'التسلسل',
-            width: 75,
-            intValue: (row) => row.id,
+            width: 300,
+            name: 'اسم المسئول',
+            stringValue: (row) => row.responsibleName,
+            sortable: true),
+        DaviColumn(
+            width: 200,
+            name: 'رقم التليفون المالك',
+            stringValue: (row) => row.ownerPhoneNumber,
+            sortable: true),
+        DaviColumn(
+            width: 300,
+            name: 'اسم المالك',
+            stringValue: (row) => row.ownerName,
+            sortable: true),
+        DaviColumn(
+            stringValue: (row) => row.apartementName,
+            name: 'رقم الوحدة',
+            width: 100,
+            sortable: true),
+        DaviColumn(
+            intValue: (row) => realEstateFloors
+                .firstWhere(
+                    (element) => element.id == row.apartementPostionInFloorId)
+                .id,
+            cellBuilder: (context, row) {
+              return Text(realEstateFloors
+                  .firstWhere((element) =>
+                      element.id == row.data.apartementPostionInFloorId)
+                  .floorName);
+            },
+            name: 'الدور',
+            width: 150,
+            sortable: true),
+        DaviColumn(
+            width: 200,
+            intValue: (row) => buildings
+                .firstWhere((element) =>
+                    element.id == row.apartementPostionInBuildingId)
+                .id,
+            cellBuilder: (context, row) {
+              return Text(
+                buildings
+                    .firstWhere((element) =>
+                        element.id == row.data.apartementPostionInBuildingId)
+                    .buildingName,
+              );
+            },
+            name: 'العمارة',
             sortable: true),
       ],
     );
@@ -323,6 +334,31 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                         } else {}
                       },
                     ),
+                    /* *!SECTION */
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    /* *SECTION - Add Button */
+                    ButtonTile(
+                      buttonText: 'اضافة الوحدة',
+                      onTap: () async {
+                        NavigationProperties.selectedTabNeededParamters = [
+                          buildingId,
+                          'AddOwner',
+                          RealEstateData(
+                              id: 0,
+                              apartementStatusId: 0,
+                              apartementPostionInFloorId: 0,
+                              apartementPostionInBuildingId: 0,
+                              apartementLink: 'None',
+                              isApartementHasEnoughData: false,
+                              apartementName: 'None')
+                        ];
+                        NavigationProperties.selectedTabVaueNotifier(
+                            NavigationProperties.addNewRealEstatePageRoute);
+                      },
+                    ),
+                    /* *!SECTION */
                   ],
                 ),
 
@@ -382,23 +418,72 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                               color: Colors.black, strokeWidth: 1),
                         ),
                       )
-                    : Center(
-                        child: Text(
-                          'تم تحميل الوحدات',
-                          style: GoogleFonts.notoSansArabic(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w600,
+                    : _realEstates.isEmpty
+                        ? Center(
+                            child: Text(
+                              'لا يوجد بيانات مسجلة',
+                              style: GoogleFonts.notoSansArabic(
+                                fontSize: 25,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              'تم تحميل البيانات',
+                              style: GoogleFonts.notoSansArabic(
+                                fontSize: 25,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
                 visibleRowsCount: int.parse((height / 50).toStringAsFixed(0)),
                 columnWidthBehavior: ColumnWidthBehavior.scrollable,
                 onRowTap: (data) {
                   selectedRow = data.id;
                 },
+                onRowDoubleTap: (data) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => FluidDialog(
+                        // Set the first page of the dialog.
+                        rootPage: FluidDialogPage(builder: (context) {
+                      RxBool onDeleteHover = false.obs;
+                      RxBool onEditHover = false.obs;
+                      return SizedBox(
+                        width: 250,
+                        height: 100,
+                        child: Column(
+                          children: [
+                            MenuButtonCard(
+                              icon: Icons.delete_forever_outlined,
+                              title: 'حذف الوحدة',
+                              onHover: (ishovered) {
+                                onDeleteHover(ishovered);
+                              },
+                              backgroundColor: onDeleteHover.value
+                                  ? Colors.grey[500]
+                                  : Colors.white,
+                            ),
+                            MenuButtonCard(
+                              icon: Icons.miscellaneous_services_outlined,
+                              title: 'تعديل الوحدة',
+                              onHover: (ishovered) {
+                                onEditHover(ishovered);
+                              },
+                              backgroundColor: onEditHover.value
+                                  ? Colors.grey[500]
+                                  : Colors.white,
+                            )
+                          ],
+                        ),
+                      );
+                    })),
+                  );
+                },
               ),
             ),
-          )
+          ),
         ]);
   }
 }
