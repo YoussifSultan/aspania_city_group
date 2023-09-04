@@ -5,6 +5,7 @@ import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
 import 'package:aspania_city_group/class/realestate.dart';
 import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:davi/davi.dart';
+import 'package:excel/excel.dart' as xlsx;
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -128,6 +129,135 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
     _model = returnTheTableUX();
   }
 
+/* *SECTION - Export Excel */
+  void exportXLSXOfData() {
+    final List<Building> buildings = [
+      Building(buildingName: 'عمارة رقم ۱', id: 1),
+      Building(buildingName: 'عمارة رقم ۲', id: 2),
+      Building(buildingName: 'عمارة رقم ۳', id: 3),
+      Building(buildingName: 'عمارة رقم ٤', id: 4),
+      Building(buildingName: 'عمارة رقم ٥', id: 5),
+      Building(buildingName: 'عمارة رقم ٦', id: 6),
+      Building(buildingName: 'عمارة رقم ۷', id: 7),
+    ];
+    final List<Floor> realEstateFloors = [
+      Floor(floorName: 'الارضي المنخفض', id: 1),
+      Floor(floorName: 'الارضي مرتفع', id: 2),
+      Floor(floorName: 'الاول', id: 3),
+      Floor(floorName: 'الثاني', id: 4),
+      Floor(floorName: 'الثالث', id: 5),
+      Floor(floorName: 'الرابع', id: 6),
+    ];
+    final List<ApartementStatus> apartementState = [
+      ApartementStatus(state: 'مقيم', id: 1),
+      ApartementStatus(state: 'تحت التشطيب', id: 2),
+      ApartementStatus(state: 'مباعة \\ مغلق', id: 3),
+      ApartementStatus(state: 'طرف الشركة', id: 4),
+    ];
+    var aprtartementExcel =
+        xlsx.Excel.createExcel(); // automatically creates 1 empty sheet: Sheet1
+    xlsx.Sheet aprtartementsExcelSheet =
+        aprtartementExcel['وحدات العمارة رقم $buildingId'];
+    xlsx.CellStyle headerStyle = xlsx.CellStyle(
+        bottomBorder: xlsx.Border(borderStyle: xlsx.BorderStyle.Thick),
+        fontSize: 14,
+        fontFamily: xlsx.getFontFamily(xlsx.FontFamily.Al_Nile));
+    /* *SECTION - Initiate Column Names */
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('O7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('O7')).value =
+        'العمارة';
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('N7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('N7')).value =
+        'الدور';
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('M7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('M7')).value =
+        'رقم الوحدة';
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('L7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('L7')).value =
+        'اسم المالك';
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('K7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('K7')).value =
+        'رقم تليفون المالك';
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('J7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('J7')).value =
+        'اسم المسئول';
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('I7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('I7')).value =
+        'رقم تليفون المسئول';
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H7')).value =
+        'حالة الوحدة';
+/* *!SECTION */
+/* *SECTION - Set Values */
+    for (var i = 0; i < _realEstates.length; i++) {
+      //العمارة _realEstates[i].apartementPostionInBuildingId
+      aprtartementsExcelSheet
+              .cell(xlsx.CellIndex.indexByString('O${i + 8}'))
+              .value =
+          buildings
+              .firstWhere((element) =>
+                  element.id == _realEstates[i].apartementPostionInBuildingId)
+              .buildingName;
+      // الدور
+      aprtartementsExcelSheet
+              .cell(xlsx.CellIndex.indexByString('N${i + 8}'))
+              .value =
+          realEstateFloors
+              .firstWhere((element) =>
+                  element.id == _realEstates[i].apartementPostionInFloorId)
+              .floorName;
+      //  رقم الدور
+      aprtartementsExcelSheet
+          .cell(xlsx.CellIndex.indexByString('M${i + 8}'))
+          .value = _realEstates[i].apartementName;
+      // اسم المالك
+      aprtartementsExcelSheet
+          .cell(xlsx.CellIndex.indexByString('L${i + 8}'))
+          .value = _realEstates[i].ownerName;
+      // رقم التليفون المالك
+      aprtartementsExcelSheet
+          .cell(xlsx.CellIndex.indexByString('K${i + 8}'))
+          .value = _realEstates[i].ownerPhoneNumber;
+      // اسم المسئول
+      aprtartementsExcelSheet
+          .cell(xlsx.CellIndex.indexByString('J${i + 8}'))
+          .value = _realEstates[i].responsibleName;
+      // رقم التليفون المسئول
+      aprtartementsExcelSheet
+          .cell(xlsx.CellIndex.indexByString('I${i + 8}'))
+          .value = _realEstates[i].responsiblePhone;
+      // حالة وحدة
+      int stateOfRealEstate = _realEstates[i].apartementStatusId;
+      aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H${i + 8}')).cellStyle =
+          xlsx.CellStyle(
+              backgroundColorHex: stateOfRealEstate == 1
+                  ? '#c6e0b4'
+                  : stateOfRealEstate == 2
+                      ? '#ffe699'
+                      : stateOfRealEstate == 3
+                          ? '#b4c6e7'
+                          : '#f8cbad');
+      aprtartementsExcelSheet
+              .cell(xlsx.CellIndex.indexByString('H${i + 8}'))
+              .value =
+          apartementState
+              .firstWhere((element) => element.id == stateOfRealEstate)
+              .state;
+    }
+    var fileBytes = aprtartementExcel.save(
+        fileName: 'Spain City وحدات العمارة رقم $buildingId.xlsx');
+/* *!SECTION */
+  }
+
+/* *!SECTION */
   DaviModel<RealEstateData> returnTheTableUX() {
     /* *SECTION - Important Lists */
     final List<Building> buildings = [
@@ -285,6 +415,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+    final RxBool onMoreButtonHover = false.obs;
     return Column(
         /* *SECTION - Dialog */
         children: [
@@ -344,24 +475,72 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                       width: 20,
                     ),
                     /* *SECTION - Add Button */
-                    ButtonTile(
-                      buttonText: 'اضافة الوحدة',
-                      onTap: () async {
-                        NavigationProperties.selectedTabNeededParamters = [
-                          buildingId,
-                          'AddOwner',
-                          RealEstateData(
-                              id: 0,
-                              apartementStatusId: 0,
-                              apartementPostionInFloorId: 0,
-                              apartementPostionInBuildingId: 0,
-                              apartementLink: 'None',
-                              isApartementHasEnoughData: false,
-                              apartementName: 'None')
-                        ];
-                        NavigationProperties.selectedTabVaueNotifier(
-                            NavigationProperties.addNewRealEstatePageRoute);
-                      },
+                    Obx(
+                      () => GestureDetector(
+                          onTap: () {
+                            showMenu(
+                                context: context,
+                                color: Colors.white,
+                                position: const RelativeRect.fromLTRB(
+                                    400, 110, 400, 0),
+                                items: [
+                                  PopupMenuItem<int>(
+                                    value: 0,
+                                    child: ButtonTile(
+                                      buttonText: 'اضافة الوحدة',
+                                      onTap: () async {
+                                        NavigationProperties
+                                            .selectedTabNeededParamters = [
+                                          buildingId,
+                                          'AddOwner',
+                                          RealEstateData(
+                                              id: 0,
+                                              apartementStatusId: 0,
+                                              apartementPostionInFloorId: 0,
+                                              apartementPostionInBuildingId: 0,
+                                              apartementLink: 'None',
+                                              isApartementHasEnoughData: false,
+                                              apartementName: 'None')
+                                        ];
+                                        NavigationProperties
+                                            .selectedTabVaueNotifier(
+                                                NavigationProperties
+                                                    .addNewRealEstatePageRoute);
+                                      },
+                                    ),
+                                  ),
+                                  PopupMenuItem<int>(
+                                      value: 1,
+                                      child: ButtonTile(
+                                        buttonText: 'اصدار تقرير',
+                                        onTap: () {
+                                          exportXLSXOfData();
+                                        },
+                                      )),
+                                ]);
+                          },
+                          child: MouseRegion(
+                            onEnter: (details) {
+                              onMoreButtonHover(true);
+                            },
+                            onExit: (details) {
+                              onMoreButtonHover(false);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Colors.grey[500] ?? Colors.white),
+                                  borderRadius: BorderRadius.circular(60),
+                                  color: onMoreButtonHover.value
+                                      ? Colors.grey[500]
+                                      : Colors.transparent),
+                              child: const Icon(
+                                Icons.more_horiz_outlined,
+                                size: 35,
+                                color: Colors.black,
+                              ),
+                            ),
+                          )),
                     ),
                     /* *!SECTION */
                   ],
@@ -452,7 +631,9 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                 onRowSecondaryTap: (data) {
                   RxBool onDeleteHover = false.obs;
                   RxBool onEditHover = false.obs;
-
+                  setState(() {
+                    selectedRow = data.id;
+                  });
                   showMenu(
                       context: context,
                       color: Colors.white,
