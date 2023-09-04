@@ -67,7 +67,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
 
   int? buildingID;
   int? floorID;
-  int? apartementID;
+  String? apartementID;
   int? apartementStatusID;
 
   /* *!SECTION */
@@ -128,7 +128,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
             realEstateDataToEdit.apartementName;
         buildingID = realEstateDataToEdit.apartementPostionInBuildingId;
         floorID = realEstateDataToEdit.apartementPostionInFloorId;
-        apartementID = int.parse(realEstateDataToEdit.apartementName);
+        apartementID = realEstateDataToEdit.apartementName;
         apartementStatusID = realEstateDataToEdit.apartementStatusId;
         onApartementLinkUpdated(
             'www.spain-city.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
@@ -201,6 +201,26 @@ class _AddRealEstateState extends State<AddRealEstate> {
     }
   }
 
+  Future<bool> getApartementLinksToRepeat() async {
+    var getDataResponse;
+    getDataResponse = await SQLFunctions.sendQuery(
+        query:
+            "SELECT * FROM SpainCity.RealEstates Where apartementPostionInBuildingId =$buildingID and apartementPostionInFloorId =$floorID and apartementName =$apartementID");
+    bool isThereADuplicateApartement = false;
+
+    if (getDataResponse.statusCode == 200) {
+      var data = json.decode(getDataResponse.body);
+      if (data == [] || data.isEmpty) {
+        isThereADuplicateApartement = false;
+      } else {
+        isThereADuplicateApartement = true;
+      }
+    } else {
+      isThereADuplicateApartement = false;
+    }
+    return isThereADuplicateApartement;
+  }
+
   void validateAndSendData(String state) async {
     if (errorsofTextController.isEmpty) {
       if (buildingID != null &&
@@ -214,6 +234,14 @@ class _AddRealEstateState extends State<AddRealEstate> {
             responsibleNameTextController.text,
             responsiblePhoneNumberTextController.text,
           ])) {
+        if (await getApartementLinksToRepeat() && state == 'Add') {
+          Get.showSnackbar(const GetSnackBar(
+            animationDuration: Duration(seconds: 1),
+            duration: Duration(seconds: 2),
+            message: 'هذة الوحدة مسجلة من قبل',
+          ));
+          return;
+        }
         RealEstateData realEstateData = RealEstateData(
             id: widget.dataToEdit!.id,
             apartementStatusId: apartementStatusID ?? 1,
@@ -270,15 +298,25 @@ class _AddRealEstateState extends State<AddRealEstate> {
           apartementStateTextController.text.isNotEmpty &&
           apartementNumberTextController.text.isNotEmpty &&
           ownerNameTextController.text.isNotEmpty &&
-          ownerPhoneNumberTextController.text.isNotEmpty &&
-          responsibleNameTextController.text.isNotEmpty &&
-          responsiblePhoneNumberTextController.text.isNotEmpty) {
+          ownerPhoneNumberTextController.text.isNotEmpty) {
+        if (await getApartementLinksToRepeat() && state == 'Add') {
+          Get.showSnackbar(const GetSnackBar(
+            animationDuration: Duration(seconds: 1),
+            duration: Duration(seconds: 2),
+            message: 'هذة الوحدة مسجلة من قبل',
+          ));
+          return;
+        }
         RealEstateData realEstateData = RealEstateData(
             id: widget.dataToEdit!.id,
             ownerName: ownerNameTextController.text,
             ownerPhoneNumber: ownerPhoneNumberTextController.text,
-            responsibleName: responsibleNameTextController.text,
-            responsiblePhone: responsiblePhoneNumberTextController.text,
+            responsibleName: responsibleNameTextController.text.isEmpty
+                ? ownerNameTextController.text
+                : responsibleNameTextController.text,
+            responsiblePhone: responsiblePhoneNumberTextController.text.isEmpty
+                ? ownerPhoneNumberTextController.text
+                : responsiblePhoneNumberTextController.text,
             apartementStatusId: apartementStatusID ?? 1,
             apartementPostionInFloorId: floorID ?? 1,
             apartementPostionInBuildingId: buildingID ?? 1,
@@ -307,6 +345,19 @@ class _AddRealEstateState extends State<AddRealEstate> {
           ];
           NavigationProperties.selectedTabVaueNotifier(
               NavigationProperties.addNewRealEstatePageRoute);
+          apartementBuildingPositionTextController.text = "";
+          apartementBuildingFloorPositionTextController.text = "";
+          apartementStateTextController.text = "";
+          apartementNumberTextController.text = "";
+          ownerNameTextController.text = "";
+          responsibleNameTextController.text = "";
+          responsiblePhoneNumberTextController.text = "";
+          apartementLinkTextController.text = "";
+          ownerEmailTextController.text = "";
+          ownerPhoneNumberTextController.text = "";
+          ownerRoleTextController.text = "";
+          ownerPasswordTextController.text = "";
+          confirmPasswordTextController.text = "";
         }
         Get.showSnackbar(GetSnackBar(
           animationDuration: const Duration(seconds: 1),
@@ -594,15 +645,11 @@ class _AddRealEstateState extends State<AddRealEstate> {
                           TextTile(
                             width: width > 1350 ? width * 0.17 : width * 0.23,
                             onChange: (text, errorText) {
-                              if (!Validators.isNumericOrEmptyOnly(text)) {
-                                errorText('ادخل ارقام فقط');
-                              } else {
-                                apartementID = int.parse(text);
-                                onApartementLinkUpdated(
-                                    'www.spain-city.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
-                                apartementLinkTextController.text =
-                                    onApartementLinkUpdated.value;
-                              }
+                              apartementID = text;
+                              onApartementLinkUpdated(
+                                  'www.spain-city.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
+                              apartementLinkTextController.text =
+                                  onApartementLinkUpdated.value;
                             },
                             textController: apartementNumberTextController,
                             hintText: 'ادخل رقم الوحدة',

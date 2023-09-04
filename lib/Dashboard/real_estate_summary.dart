@@ -217,7 +217,7 @@ class RealEstateActionsWidget extends StatelessWidget {
                         topLeft: Radius.circular(20)),
                     backgroundColor:
                         onAddingNewApartementButtonHoverValueNotifier.value
-                            ? Colors.grey[300]
+                            ? Colors.yellowAccent[100]
                             : Colors.grey[50],
                     onTap: () {
                       onAddingNewApartementButtonTap();
@@ -238,7 +238,7 @@ class RealEstateActionsWidget extends StatelessWidget {
                     menuCardRadius: const BorderRadius.only(),
                     backgroundColor:
                         onShowAllOwnersInRealEstateValueNotifier.value
-                            ? Colors.grey[300]
+                            ? Colors.yellowAccent[100]
                             : Colors.grey[50],
                     onTap: () {
                       onShowAllOwnersInRealEstateButtonTap();
@@ -260,7 +260,7 @@ class RealEstateActionsWidget extends StatelessWidget {
                         bottomLeft: Radius.circular(20)),
                     backgroundColor:
                         onShowAllApartementsInRealEstateValueNotifier.value
-                            ? Colors.grey[300]
+                            ? Colors.yellowAccent[100]
                             : Colors.grey[50],
                     onTap: () {
                       onShowAllApartementsInRealEstateButtonTap();

@@ -39,6 +39,7 @@ dependencies:
   davi: ^3.4.0
   google_fonts: ^5.1.0
   barcode_widget: ^2.0.4
+  excel: ^2.1.0
   fluid_dialog: ^2.0.0
   http: ^1.1.0
   mouse_parallax: ^1.1.0

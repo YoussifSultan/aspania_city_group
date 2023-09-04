@@ -3,8 +3,11 @@ import 'package:aspania_city_group/Sign_InPage/SignIn_Page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:html' as html;
 
 void main() {
+  html.document.body!
+      .addEventListener('contextmenu', (event) => event.preventDefault());
   runApp(const MyApp());
 }
 

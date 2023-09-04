@@ -47,4 +47,13 @@ class Validators {
     }
     return false;
   }
+
+  static bool isElementReapated(String text, List<String> list) {
+    for (var element in list) {
+      if (text == element) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
