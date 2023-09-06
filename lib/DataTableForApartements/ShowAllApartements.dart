@@ -198,13 +198,14 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
 /* *!SECTION */
 /* *SECTION - Set Values */
     for (var i = 0; i < _realEstates.length; i++) {
+      RealEstateData realEstateData = _realEstates[i];
       //العمارة _realEstates[i].apartementPostionInBuildingId
       aprtartementsExcelSheet
               .cell(xlsx.CellIndex.indexByString('O${i + 8}'))
               .value =
           buildings
               .firstWhere((element) =>
-                  element.id == _realEstates[i].apartementPostionInBuildingId)
+                  element.id == realEstateData.apartementPostionInBuildingId)
               .buildingName;
       // الدور
       aprtartementsExcelSheet
@@ -212,30 +213,30 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
               .value =
           realEstateFloors
               .firstWhere((element) =>
-                  element.id == _realEstates[i].apartementPostionInFloorId)
+                  element.id == realEstateData.apartementPostionInFloorId)
               .floorName;
       //  رقم الدور
       aprtartementsExcelSheet
           .cell(xlsx.CellIndex.indexByString('M${i + 8}'))
-          .value = _realEstates[i].apartementName;
+          .value = realEstateData.apartementName;
       // اسم المالك
       aprtartementsExcelSheet
           .cell(xlsx.CellIndex.indexByString('L${i + 8}'))
-          .value = _realEstates[i].ownerName;
+          .value = realEstateData.ownerName;
       // رقم التليفون المالك
       aprtartementsExcelSheet
           .cell(xlsx.CellIndex.indexByString('K${i + 8}'))
-          .value = _realEstates[i].ownerPhoneNumber;
+          .value = realEstateData.ownerPhoneNumber;
       // اسم المسئول
       aprtartementsExcelSheet
           .cell(xlsx.CellIndex.indexByString('J${i + 8}'))
-          .value = _realEstates[i].responsibleName;
+          .value = realEstateData.responsibleName;
       // رقم التليفون المسئول
       aprtartementsExcelSheet
           .cell(xlsx.CellIndex.indexByString('I${i + 8}'))
-          .value = _realEstates[i].responsiblePhone;
+          .value = realEstateData.responsiblePhone;
       // حالة وحدة
-      int stateOfRealEstate = _realEstates[i].apartementStatusId;
+      int stateOfRealEstate = realEstateData.apartementStatusId;
       aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H${i + 8}')).cellStyle =
           xlsx.CellStyle(
               backgroundColorHex: stateOfRealEstate == 1
@@ -252,7 +253,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
               .firstWhere((element) => element.id == stateOfRealEstate)
               .state;
     }
-    var fileBytes = aprtartementExcel.save(
+    aprtartementExcel.save(
         fileName: 'Spain City وحدات العمارة رقم $buildingId.xlsx');
 /* *!SECTION */
   }
@@ -675,6 +676,26 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                             },
                             icon: Icons.miscellaneous_services_outlined,
                             title: 'تعديل الوحدة',
+                            onHover: (ishovered) {
+                              onEditHover(ishovered);
+                            },
+                            backgroundColor: onEditHover.value
+                                ? Colors.grey[500]
+                                : Colors.white,
+                          ),
+                        ),
+                        PopupMenuItem<int>(
+                          value: 2,
+                          child: MenuButtonCard(
+                            onTap: () {
+                              NavigationProperties.selectedTabNeededParamters =
+                                  [data];
+                              NavigationProperties.selectedTabVaueNotifier(
+                                  NavigationProperties.paymentsPageRoute);
+                              Navigator.of(context).pop();
+                            },
+                            icon: Icons.miscellaneous_services_outlined,
+                            title: 'السداد',
                             onHover: (ishovered) {
                               onEditHover(ishovered);
                             },

@@ -14,10 +14,14 @@ buildingNumber , window State (Edit_Owner, Add_Owner), realestate data
 4. Show AllRealEstate (
   index of building , All_Apartements ORRR Recorded_Apartements ORRR All_Owners
 )
+5.Payment Page(
+  RealEstate ID ,
+)
  */
 class NavigationProperties {
   static String realEstateSummaryPageRoute = 'realEstateSummary';
   static String ownerPageRoute = 'Owners';
+  static String paymentsPageRoute = 'PaymentPage';
   static String nonePageRoute = 'None';
   static String addNewRealEstatePageRoute = 'AddNewApartement';
   static String dataTableOfApartements = 'showAllApartements';

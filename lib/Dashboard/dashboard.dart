@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
+import '../PaymentsPage/PaymentsPerMonth.dart';
 import 'menu_card_button.dart';
 
 class Dashboard extends StatefulWidget {
@@ -83,7 +84,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                       NavigationProperties
                                           .dataTableOfApartements
                                   ? const ShowwAllAprtementsPage()
-                                  : const SizedBox(),
+                                  : NavigationProperties.selectedTabVaueNotifier
+                                              .toString() ==
+                                          NavigationProperties.paymentsPageRoute
+                                      ? const PaymentsPageOfApartement()
+                                      : const SizedBox(),
                     ),
                   );
                 }),
@@ -142,7 +147,21 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           const SizedBox(
                             height: 10,
                           ),
-
+                          /* *SECTION - Payments Item */
+                          MenuButtonCard(
+                            title: 'سداد',
+                            icon: Icons.payments_rounded,
+                            onTap: () {
+                              NavigationProperties.selectedTabNeededParamters =
+                                  [];
+                              NavigationProperties.selectedTabVaueNotifier(
+                                  NavigationProperties.paymentsPageRoute);
+                            },
+                          ),
+                          /* *!SECTION */
+                          const SizedBox(
+                            height: 10,
+                          ),
                           /* *!SECTION */
                         ],
                       ),
