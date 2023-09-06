@@ -1,8 +1,10 @@
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Common_Used/text_tile.dart';
+import 'package:aspania_city_group/PaymentsPage/AddPaymentDialog.dart';
 import 'package:aspania_city_group/class/payment.dart';
 import 'package:aspania_city_group/class/realestate.dart';
 import 'package:davi/davi.dart';
+import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -243,19 +245,19 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
       PaymentData(
           id: 0,
           apartementId: 201,
-          paymentDate: DateTime.now().subtract(Duration(days: 20)),
+          paymentDate: DateTime.now().subtract(const Duration(days: 20)),
           paymentAmount: 400,
           paymentNote: 'عبيط جاي يدفع'),
       PaymentData(
           id: 0,
           apartementId: 658,
-          paymentDate: DateTime.now().subtract(Duration(days: 42)),
+          paymentDate: DateTime.now().subtract(const Duration(days: 42)),
           paymentAmount: 300,
           paymentNote: 'عبيط جاي يدفع'),
       PaymentData(
           id: 0,
           apartementId: 342,
-          paymentDate: DateTime.now().subtract(Duration(days: 125)),
+          paymentDate: DateTime.now().subtract(const Duration(days: 125)),
           paymentAmount: 200,
           paymentNote: 'عبيط جاي يدفع'),
     ];
@@ -325,7 +327,20 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                     value: 0,
                                     child: ButtonTile(
                                       buttonText: 'تسجيل فاتورة',
-                                      onTap: () async {},
+                                      onTap: () async {
+                                        Navigator.of(context).pop();
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return FluidDialog(
+                                                rootPage: FluidDialogPage(
+                                              builder: (context) {
+                                                return const AddPaymentDialog();
+                                              },
+                                            ));
+                                          },
+                                        );
+                                      },
                                     ),
                                   ),
                                   PopupMenuItem<int>(
@@ -333,6 +348,7 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                       child: ButtonTile(
                                         buttonText: 'اصدار تقرير',
                                         onTap: () {
+                                          Navigator.of(context).pop();
                                           exportXLSXOfData();
                                         },
                                       )),

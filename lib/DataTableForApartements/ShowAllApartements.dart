@@ -475,7 +475,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                     const SizedBox(
                       width: 20,
                     ),
-                    /* *SECTION - Add Button */
+                    /* *SECTION - More Button */
                     Obx(
                       () => GestureDetector(
                           onTap: () {
@@ -490,6 +490,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                                     child: ButtonTile(
                                       buttonText: 'اضافة الوحدة',
                                       onTap: () async {
+                                        Navigator.of(context).pop();
                                         NavigationProperties
                                             .selectedTabNeededParamters = [
                                           buildingId,
@@ -515,6 +516,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                                       child: ButtonTile(
                                         buttonText: 'اصدار تقرير',
                                         onTap: () {
+                                          Navigator.of(context).pop();
                                           exportXLSXOfData();
                                         },
                                       )),
