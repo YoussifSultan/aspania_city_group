@@ -19,12 +19,16 @@ buildingNumber , window State (Edit_Owner, Add_Owner), realestate data
 )
  */
 class NavigationProperties {
-  static String realEstateSummaryPageRoute = 'realEstateSummary';
   static String ownerPageRoute = 'Owners';
+  /* *SECTION - Payments */
   static String paymentsPageRoute = 'PaymentPage';
+  /* *!SECTION */
   static String nonePageRoute = 'None';
+  /* *SECTION - Apartements */
+  static String realEstateSummaryPageRoute = 'realEstateSummary';
   static String addNewRealEstatePageRoute = 'AddNewApartement';
   static String dataTableOfApartements = 'showAllApartements';
+  /* *!SECTION */
   static List selectedTabNeededParamters = [];
   static RxString selectedTabVaueNotifier = 'Apartemnts'.obs;
 }

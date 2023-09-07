@@ -3,8 +3,8 @@ import 'package:aspania_city_group/Common_Used/text_tile.dart';
 import 'package:flutter/material.dart';
 
 class AddPaymentDialog extends StatefulWidget {
-  const AddPaymentDialog({super.key});
-
+  const AddPaymentDialog({super.key, required this.state});
+  final String state;
   @override
   State<AddPaymentDialog> createState() => _AddPaymentDialogState();
 }
@@ -59,7 +59,9 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ButtonTile(onTap: () {}, buttonText: 'حفظ'),
+              widget.state == 'Add'
+                  ? ButtonTile(onTap: () {}, buttonText: 'حفظ')
+                  : ButtonTile(onTap: () {}, buttonText: 'تعديل'),
               const SizedBox(
                 width: 20,
               ),

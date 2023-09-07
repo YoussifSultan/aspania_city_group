@@ -1,5 +1,6 @@
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Common_Used/text_tile.dart';
+import 'package:aspania_city_group/DataTableForApartements/ApartementSelector.dart';
 import 'package:aspania_city_group/PaymentsPage/AddPaymentDialog.dart';
 import 'package:aspania_city_group/class/payment.dart';
 import 'package:aspania_city_group/class/realestate.dart';
@@ -22,6 +23,11 @@ class PaymentsPageOfApartement extends StatefulWidget {
 }
 
 class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
+  /* *SECTION - Filters Variables */
+  DateTime fromDatePaymentFilter =
+      DateTime(DateTime.now().year, DateTime.now().month, 1);
+  DateTime toDatePaymentFilter =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   /* *SECTION - Required to be a Pararmeter */
   RealEstateData selectedRealEstateData = RealEstateData(
       id: 1,
@@ -37,11 +43,12 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
       responsiblePhone: '81256711155');
 
   /* *!SECTION */
+  /* *!SECTION */
+
   /* *SECTION - TextControllers */
-  TextEditingController apartementToGetThePaymentDataOfIt =
-      TextEditingController();
-  TextEditingController fromDateOfPaymentsFilter = TextEditingController();
-  TextEditingController toDateOfPaymentsFilter = TextEditingController();
+  late TextEditingController selectedApartementTextController;
+  late TextEditingController fromDateOfPaymentsFilterTextController;
+  late TextEditingController toDateOfPaymentsFilterTextController;
   /* *!SECTION */
   /* *SECTION - Table Data */
   DaviModel<PaymentData>? _model;
@@ -234,6 +241,14 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
   /* *!SECTION */
   @override
   void initState() {
+    fromDateOfPaymentsFilterTextController = TextEditingController(
+        text:
+            '${fromDatePaymentFilter.year} / ${fromDatePaymentFilter.month} / ${fromDatePaymentFilter.day}');
+    toDateOfPaymentsFilterTextController = TextEditingController(
+        text:
+            '${toDatePaymentFilter.year} / ${toDatePaymentFilter.month} / ${toDatePaymentFilter.day}');
+    selectedApartementTextController =
+        TextEditingController(text: selectedRealEstateData.ownerName);
     _model = returnTheTableUX();
     _payments = [
       PaymentData(
@@ -335,7 +350,9 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                             return FluidDialog(
                                                 rootPage: FluidDialogPage(
                                               builder: (context) {
-                                                return const AddPaymentDialog();
+                                                return const AddPaymentDialog(
+                                                  state: 'Add',
+                                                );
                                               },
                                             ));
                                           },
@@ -400,21 +417,55 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                       children: [
                         TextTile(
                             width: 435,
-                            textController: apartementToGetThePaymentDataOfIt,
+                            textController: selectedApartementTextController,
                             title: "مالك الوحدة",
                             hintText: "اختر المالك الوحدة",
-                            onTap: () {},
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: ((context) => FluidDialog(
+                                        rootPage: FluidDialogPage(
+                                          builder: (context) {
+                                            return const ApartementSelector();
+                                          },
+                                        ),
+                                      )));
+                            },
                             icon: Icons.person_search_outlined),
                         Row(
                           textDirection: TextDirection.rtl,
                           children: [
                             TextTile(
                                 width: 200,
-                                textController: fromDateOfPaymentsFilter,
+                                textController:
+                                    fromDateOfPaymentsFilterTextController,
                                 title: "عرض السدادات من تاريخ",
                                 hintText: "اختر التاريخ",
-                                onTap: () {},
-                                icon: Icons.person_search_outlined),
+                                onTap: () {
+                                  showDatePicker(
+                                          textDirection: TextDirection.rtl,
+                                          cancelText: "الغاء",
+                                          confirmText: "تأكيد",
+                                          context: context,
+                                          initialDate: fromDatePaymentFilter,
+                                          firstDate: DateTime(2020),
+                                          lastDate: DateTime.now())
+                                      .then((value) {
+                                    if (!value!.isAfter(toDatePaymentFilter)) {
+                                      fromDatePaymentFilter = value;
+                                      fromDateOfPaymentsFilterTextController
+                                              .text =
+                                          '${fromDatePaymentFilter.year} / ${fromDatePaymentFilter.month} / ${fromDatePaymentFilter.day}';
+                                    } else {
+                                      Get.showSnackbar(const GetSnackBar(
+                                        duration: Duration(seconds: 2),
+                                        message:
+                                            'لا يمكن ادخال تاريخ بعد خانة (الى تاريخ)',
+                                      ));
+                                    }
+                                  });
+                                },
+                                icon: Icons.calendar_today_outlined),
                             const SizedBox(
                               width: 10,
                             ),
@@ -427,11 +478,36 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                             ),
                             TextTile(
                                 width: 200,
-                                textController: toDateOfPaymentsFilter,
+                                textController:
+                                    toDateOfPaymentsFilterTextController,
                                 title: "عرض السدادات الى تاريخ",
                                 hintText: "اختر التاريخ",
-                                onTap: () {},
-                                icon: Icons.person_search_outlined),
+                                onTap: () {
+                                  showDatePicker(
+                                          textDirection: TextDirection.rtl,
+                                          cancelText: "الغاء",
+                                          confirmText: "تأكيد",
+                                          context: context,
+                                          initialDate: toDatePaymentFilter,
+                                          firstDate: DateTime(2020),
+                                          lastDate: DateTime.now())
+                                      .then((value) {
+                                    if (!value!
+                                        .isBefore(fromDatePaymentFilter)) {
+                                      toDatePaymentFilter = value;
+                                      toDateOfPaymentsFilterTextController
+                                              .text =
+                                          '${toDatePaymentFilter.year} / ${toDatePaymentFilter.month} / ${toDatePaymentFilter.day}';
+                                    } else {
+                                      Get.showSnackbar(const GetSnackBar(
+                                        duration: Duration(seconds: 2),
+                                        message:
+                                            'لا يمكن ادخال تاريخ قبل خانة (من تاريخ)',
+                                      ));
+                                    }
+                                  });
+                                },
+                                icon: Icons.calendar_today_outlined),
                           ],
                         )
                       ],
@@ -583,12 +659,41 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                               ),
                             ),
                           )
-                        : Center(
-                            child: Text(
-                              'تم تحميل البيانات',
-                              style: GoogleFonts.notoSansArabic(
-                                fontSize: 25,
-                                fontWeight: FontWeight.w600,
+                        : GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return FluidDialog(rootPage: FluidDialogPage(
+                                    builder: (context) {
+                                      return const AddPaymentDialog(
+                                        state: 'Add',
+                                      );
+                                    },
+                                  ));
+                                },
+                              );
+                            },
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                textDirection: TextDirection.rtl,
+                                children: [
+                                  const Icon(
+                                    Icons.add,
+                                    size: 25,
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    'اضف سداد جديد',
+                                    style: GoogleFonts.notoSansArabic(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
