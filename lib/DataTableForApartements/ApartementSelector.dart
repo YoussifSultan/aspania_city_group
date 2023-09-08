@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:animated_tree_view/animated_tree_view.dart';
-import 'package:animated_tree_view/helpers/collection_utils.dart';
 import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:aspania_city_group/class/realestate.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/src/response.dart';
 
 import '../class/buidlingproperties.dart';
 
@@ -91,20 +91,25 @@ class _ApartementSelectorState extends State<ApartementSelector> {
                       /* *!SECTION */
                     } else if (item.level == 3) {
                       /* *SECTION - Apartements Tile */
-                      return Row(
-                        children: [
-                          const Icon(
-                            Icons.maps_home_work_rounded,
-                            size: 20,
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            item.data.ownerName,
-                            style: GoogleFonts.notoSansArabic(fontSize: 18),
-                          )
-                        ],
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop(item.data);
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.maps_home_work_rounded,
+                              size: 20,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              item.data.ownerName,
+                              style: GoogleFonts.notoSansArabic(fontSize: 18),
+                            )
+                          ],
+                        ),
                       );
                       /* *!SECTION */
                     } else {
@@ -124,10 +129,10 @@ class _ApartementSelectorState extends State<ApartementSelector> {
     );
   }
 
-  List<RealEstateData> _realEstates = [];
+  final List<RealEstateData> _realEstates = [];
 
   Future<TreeNode<dynamic>> getRealEstateTree() async {
-    var getDataResponse;
+    Response getDataResponse;
 
     getDataResponse = await SQLFunctions.sendQuery(
         query: "SELECT * FROM SpainCity.RealEstates");

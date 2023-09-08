@@ -21,7 +21,9 @@ buildingNumber , window State (Edit_Owner, Add_Owner), realestate data
 class NavigationProperties {
   static String ownerPageRoute = 'Owners';
   /* *SECTION - Payments */
-  static String paymentsPageRoute = 'PaymentPage';
+  static String paymentsDetailedPageRoute = 'PaymentDetailsInApartementPage';
+  static String overallPaymentsThroughPeriodPageRoute =
+      'OverallPaymentPeriodPage';
   /* *!SECTION */
   static String nonePageRoute = 'None';
   /* *SECTION - Apartements */

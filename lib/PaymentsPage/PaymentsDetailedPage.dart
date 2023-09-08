@@ -14,33 +14,36 @@ import 'package:excel/excel.dart' as xlsx;
 import '../Common_Used/button_tile.dart';
 import '../class/buidlingproperties.dart';
 
-class PaymentsPageOfApartement extends StatefulWidget {
-  const PaymentsPageOfApartement({super.key});
+class PaymentsPageOfSpecifiedApartement extends StatefulWidget {
+  const PaymentsPageOfSpecifiedApartement({super.key});
 
   @override
-  State<PaymentsPageOfApartement> createState() =>
-      _PaymentsPageOfApartementState();
+  State<PaymentsPageOfSpecifiedApartement> createState() =>
+      _PaymentsPageOfSpecifiedApartementState();
 }
 
-class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
+class _PaymentsPageOfSpecifiedApartementState
+    extends State<PaymentsPageOfSpecifiedApartement> {
   /* *SECTION - Filters Variables */
-  DateTime fromDatePaymentFilter =
-      DateTime(DateTime.now().year, DateTime.now().month, 1);
-  DateTime toDatePaymentFilter =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  Rx<DateTime> fromDatePaymentFilter =
+      DateTime(DateTime.now().year, DateTime.now().month, 1).obs;
+  Rx<DateTime> toDatePaymentFilter =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
+          .obs;
   /* *SECTION - Required to be a Pararmeter */
-  RealEstateData selectedRealEstateData = RealEstateData(
-      id: 1,
-      apartementStatusId: 2,
-      apartementPostionInFloorId: 4,
-      apartementPostionInBuildingId: 7,
-      apartementLink: 'www.spain',
-      isApartementHasEnoughData: true,
-      apartementName: '503',
-      ownerName: 'يوسف اسامة',
-      ownerPhoneNumber: '01020314813',
-      responsibleName: 'محمد منير',
-      responsiblePhone: '81256711155');
+  Rx<RealEstateData> selectedRealEstateData = RealEstateData(
+          id: -1,
+          apartementStatusId: -1,
+          apartementPostionInFloorId: -1,
+          apartementPostionInBuildingId: -1,
+          apartementLink: '',
+          isApartementHasEnoughData: true,
+          apartementName: '',
+          ownerName: '',
+          ownerPhoneNumber: '',
+          responsibleName: '',
+          responsiblePhone: '')
+      .obs;
 
   /* *!SECTION */
   /* *!SECTION */
@@ -155,7 +158,7 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
         xlsx.Excel.createExcel(); // automatically creates 1 empty sheet: Sheet1
     /* *SECTION - Title */
     xlsx.Sheet aprtartementsExcelSheet = aprtartementExcel[
-        'فواتير سداد المالك (${selectedRealEstateData.ownerName})'];
+        'فواتير سداد المالك (${selectedRealEstateData.value.ownerName})'];
     xlsx.CellStyle headerStyle = xlsx.CellStyle(
         bottomBorder: xlsx.Border(borderStyle: xlsx.BorderStyle.Thick),
         fontSize: 14,
@@ -181,39 +184,39 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H7')).cellStyle =
         apartementDetailsStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H7')).value =
-        ' : اسم المالك ${selectedRealEstateData.ownerName}';
+        ' : اسم المالك ${selectedRealEstateData.value.ownerName}';
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H9')).cellStyle =
         apartementDetailsStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H9')).value =
-        ' : رقم تليفون المالك ${selectedRealEstateData.ownerPhoneNumber}';
+        ' : رقم تليفون المالك ${selectedRealEstateData.value.ownerPhoneNumber}';
     aprtartementsExcelSheet
         .cell(xlsx.CellIndex.indexByString('H11'))
         .cellStyle = apartementDetailsStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H11')).value =
-        ' : اسم المسئول ${selectedRealEstateData.responsibleName}';
+        ' : اسم المسئول ${selectedRealEstateData.value.responsibleName}';
     aprtartementsExcelSheet
         .cell(xlsx.CellIndex.indexByString('H13'))
         .cellStyle = apartementDetailsStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H13')).value =
-        ' : رقم تليفون المسئول ${selectedRealEstateData.responsiblePhone}';
+        ' : رقم تليفون المسئول ${selectedRealEstateData.value.responsiblePhone}';
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('E7')).cellStyle =
         apartementDetailsStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('E7')).value =
-        ' : العمارة ${buildings.firstWhere((element) => element.id == selectedRealEstateData.apartementPostionInBuildingId).buildingName}';
+        ' : العمارة ${buildings.firstWhere((element) => element.id == selectedRealEstateData.value.apartementPostionInBuildingId).buildingName}';
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('E9')).cellStyle =
         apartementDetailsStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('E9')).value =
-        "${realEstateFloors.firstWhere((element) => element.id == selectedRealEstateData.apartementPostionInFloorId).floorName} الدور : ";
+        "${realEstateFloors.firstWhere((element) => element.id == selectedRealEstateData.value.apartementPostionInFloorId).floorName} الدور : ";
     aprtartementsExcelSheet
         .cell(xlsx.CellIndex.indexByString('E11'))
         .cellStyle = apartementDetailsStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H11')).value =
-        ' : رقم الوحدة ${selectedRealEstateData.apartementName}';
+        ' : رقم الوحدة ${selectedRealEstateData.value.apartementName}';
     aprtartementsExcelSheet
         .cell(xlsx.CellIndex.indexByString('H13'))
         .cellStyle = apartementDetailsStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H13')).value =
-        ' : حالة الوحدة ${apartementState.firstWhere((element) => element.id == selectedRealEstateData.apartementStatusId).state}';
+        ' : حالة الوحدة ${apartementState.firstWhere((element) => element.id == selectedRealEstateData.value.apartementStatusId).state}';
 /* *!SECTION */
 /* *SECTION - Set Payment Values */
     for (var i = 0; i < _payments.length; i++) {
@@ -234,21 +237,27 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
     }
     aprtartementExcel.save(
         fileName:
-            'فواتير سداد المالك (${selectedRealEstateData.ownerName}).xlsx');
+            'فواتير سداد المالك (${selectedRealEstateData.value.ownerName}).xlsx');
 /* *!SECTION */
   }
 
   /* *!SECTION */
   @override
   void initState() {
+    try {
+      selectedRealEstateData(
+          NavigationProperties.selectedTabNeededParamters[0]);
+    } catch (e) {
+      selectedRealEstateData = selectedRealEstateData;
+    }
     fromDateOfPaymentsFilterTextController = TextEditingController(
         text:
-            '${fromDatePaymentFilter.year} / ${fromDatePaymentFilter.month} / ${fromDatePaymentFilter.day}');
+            '${fromDatePaymentFilter.value.year} / ${fromDatePaymentFilter.value.month} / ${fromDatePaymentFilter.value.day}');
     toDateOfPaymentsFilterTextController = TextEditingController(
         text:
-            '${toDatePaymentFilter.year} / ${toDatePaymentFilter.month} / ${toDatePaymentFilter.day}');
+            '${toDatePaymentFilter.value.year} / ${toDatePaymentFilter.value.month} / ${toDatePaymentFilter.value.day}');
     selectedApartementTextController =
-        TextEditingController(text: selectedRealEstateData.ownerName);
+        TextEditingController(text: selectedRealEstateData.value.ownerName);
     _model = returnTheTableUX();
     _payments = [
       PaymentData(
@@ -320,7 +329,7 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                 /* *SECTION - Routes */
                 RoutesBuilder(routeLabels: [
                   'الوحدات',
-                  'سداد المالك (${selectedRealEstateData.ownerName})'
+                  'سداد المالك (${selectedRealEstateData.value.ownerName})'
                 ], routeScreen: [
                   NavigationProperties.realEstateSummaryPageRoute,
                   NavigationProperties.nonePageRoute
@@ -350,8 +359,11 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                             return FluidDialog(
                                                 rootPage: FluidDialogPage(
                                               builder: (context) {
-                                                return const AddPaymentDialog(
+                                                return AddPaymentDialog(
                                                   state: 'Add',
+                                                  selectedOwner:
+                                                      selectedRealEstateData
+                                                          .value,
                                                 );
                                               },
                                             ));
@@ -429,7 +441,13 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                             return const ApartementSelector();
                                           },
                                         ),
-                                      )));
+                                      ))).then((value) {
+                                setState(() {
+                                  selectedRealEstateData = value;
+                                });
+                                selectedApartementTextController.text =
+                                    value.ownerName;
+                              });
                             },
                             icon: Icons.person_search_outlined),
                         Row(
@@ -447,15 +465,28 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                           cancelText: "الغاء",
                                           confirmText: "تأكيد",
                                           context: context,
-                                          initialDate: fromDatePaymentFilter,
+                                          initialDate:
+                                              fromDatePaymentFilter.value,
                                           firstDate: DateTime(2020),
                                           lastDate: DateTime.now())
                                       .then((value) {
-                                    if (!value!.isAfter(toDatePaymentFilter)) {
-                                      fromDatePaymentFilter = value;
+                                    if (!value!
+                                        .isAfter(toDatePaymentFilter.value)) {
+                                      fromDatePaymentFilter(value);
+                                      _model!.removeRows();
+
+                                      for (var element in _payments) {
+                                        if (element.paymentDate.isAfter(
+                                                fromDatePaymentFilter.value) &&
+                                            element.paymentDate.isBefore(
+                                                toDatePaymentFilter.value)) {
+                                          _model!.addRow(element);
+                                          _model!.notifyUpdate();
+                                        }
+                                      }
                                       fromDateOfPaymentsFilterTextController
                                               .text =
-                                          '${fromDatePaymentFilter.year} / ${fromDatePaymentFilter.month} / ${fromDatePaymentFilter.day}';
+                                          '${fromDatePaymentFilter.value.year} / ${fromDatePaymentFilter.value.month} / ${fromDatePaymentFilter.value.day}';
                                     } else {
                                       Get.showSnackbar(const GetSnackBar(
                                         duration: Duration(seconds: 2),
@@ -488,16 +519,28 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                           cancelText: "الغاء",
                                           confirmText: "تأكيد",
                                           context: context,
-                                          initialDate: toDatePaymentFilter,
+                                          initialDate:
+                                              toDatePaymentFilter.value,
                                           firstDate: DateTime(2020),
                                           lastDate: DateTime.now())
                                       .then((value) {
-                                    if (!value!
-                                        .isBefore(fromDatePaymentFilter)) {
-                                      toDatePaymentFilter = value;
+                                    if (!value!.isBefore(
+                                        fromDatePaymentFilter.value)) {
+                                      toDatePaymentFilter(value);
+                                      _model!.removeRows();
+
+                                      for (var element in _payments) {
+                                        if (element.paymentDate.isAfter(
+                                                fromDatePaymentFilter.value) &&
+                                            element.paymentDate.isBefore(
+                                                toDatePaymentFilter.value)) {
+                                          _model!.addRow(element);
+                                          _model!.notifyUpdate();
+                                        }
+                                      }
                                       toDateOfPaymentsFilterTextController
                                               .text =
-                                          '${toDatePaymentFilter.year} / ${toDatePaymentFilter.month} / ${toDatePaymentFilter.day}';
+                                          '${toDatePaymentFilter.value.year} / ${toDatePaymentFilter.value.month} / ${toDatePaymentFilter.value.day}';
                                     } else {
                                       Get.showSnackbar(const GetSnackBar(
                                         duration: Duration(seconds: 2),
@@ -514,7 +557,7 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                     ),
                     /* *SECTION - Data */
                     SizedBox(
-                      width: 400,
+                      width: 450,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         textDirection: TextDirection.rtl,
@@ -532,7 +575,9 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                 height: 10,
                               ),
                               Text(
-                                "عمارة : ${buildings.firstWhere((element) => element.id == selectedRealEstateData.apartementPostionInBuildingId).buildingName}",
+                                selectedRealEstateData.value.id == -1
+                                    ? ''
+                                    : "عمارة : ${buildings.firstWhere((element) => element.id == selectedRealEstateData.value.apartementPostionInBuildingId).buildingName}",
                                 style: GoogleFonts.notoSansArabic(
                                   fontSize: 18,
                                   color: Colors.grey[500],
@@ -542,7 +587,9 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                 height: 10,
                               ),
                               Text(
-                                "الدور : ${realEstateFloors.firstWhere((element) => element.id == selectedRealEstateData.apartementPostionInFloorId).floorName}",
+                                selectedRealEstateData.value.id == -1
+                                    ? ''
+                                    : "الدور : ${realEstateFloors.firstWhere((element) => element.id == selectedRealEstateData.value.apartementPostionInFloorId).floorName}",
                                 style: GoogleFonts.notoSansArabic(
                                     color: Colors.grey[500], fontSize: 18),
                               ),
@@ -550,7 +597,9 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                 height: 10,
                               ),
                               Text(
-                                "رقم الوحدة : ${selectedRealEstateData.apartementName}",
+                                selectedRealEstateData.value.id == -1
+                                    ? ''
+                                    : "رقم الوحدة : ${selectedRealEstateData.value.apartementName}",
                                 style: GoogleFonts.notoSansArabic(
                                     color: Colors.grey[500], fontSize: 18),
                               ),
@@ -570,7 +619,10 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                 height: 10,
                               ),
                               Text(
-                                'رقم المالك : ${selectedRealEstateData.ownerPhoneNumber}',
+                                selectedRealEstateData.value.id == -1
+                                    ? ''
+                                    : 'رقم المالك : ${selectedRealEstateData.value.ownerPhoneNumber}',
+                                overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.notoSansArabic(
                                   fontSize: 18,
                                   color: Colors.grey[500],
@@ -580,7 +632,10 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                 height: 10,
                               ),
                               Text(
-                                'اسم المسئول : ${selectedRealEstateData.responsibleName}',
+                                selectedRealEstateData.value.id == -1
+                                    ? ''
+                                    : 'اسم المسئول : ${selectedRealEstateData.value.responsibleName}',
+                                overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.notoSansArabic(
                                     color: Colors.grey[500], fontSize: 18),
                               ),
@@ -588,7 +643,10 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                 height: 10,
                               ),
                               Text(
-                                'رقم المسئول : ${selectedRealEstateData.responsiblePhone}',
+                                selectedRealEstateData.value.id == -1
+                                    ? ''
+                                    : 'رقم المسئول : ${selectedRealEstateData.value.responsiblePhone}',
+                                overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.notoSansArabic(
                                     color: Colors.grey[500], fontSize: 18),
                               ),
@@ -666,8 +724,10 @@ class _PaymentsPageOfApartementState extends State<PaymentsPageOfApartement> {
                                 builder: (context) {
                                   return FluidDialog(rootPage: FluidDialogPage(
                                     builder: (context) {
-                                      return const AddPaymentDialog(
+                                      return AddPaymentDialog(
                                         state: 'Add',
+                                        selectedOwner:
+                                            selectedRealEstateData.value,
                                       );
                                     },
                                   ));

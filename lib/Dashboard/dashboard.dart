@@ -2,12 +2,13 @@ import 'package:aspania_city_group/Add_RealEstate/add_real_estate.dart';
 import 'package:aspania_city_group/Dashboard/real_estate_summary.dart';
 import 'package:aspania_city_group/DataTableForApartements/ShowAllApartements.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
+import 'package:aspania_city_group/PaymentsPage/overallPayments.dart';
 import 'package:aspania_city_group/Sign_InPage/SignIn_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
-import '../PaymentsPage/PaymentsPerMonth.dart';
+import '../PaymentsPage/PaymentsDetailedPage.dart';
 import 'menu_card_button.dart';
 
 class Dashboard extends StatefulWidget {
@@ -86,9 +87,16 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                   ? const ShowwAllAprtementsPage()
                                   : NavigationProperties.selectedTabVaueNotifier
                                               .toString() ==
-                                          NavigationProperties.paymentsPageRoute
-                                      ? const PaymentsPageOfApartement()
-                                      : const SizedBox(),
+                                          NavigationProperties
+                                              .paymentsDetailedPageRoute
+                                      ? const PaymentsPageOfSpecifiedApartement()
+                                      : NavigationProperties
+                                                  .selectedTabVaueNotifier
+                                                  .toString() ==
+                                              NavigationProperties
+                                                  .overallPaymentsThroughPeriodPageRoute
+                                          ? const OverallPaymentsThroughPeriod()
+                                          : const SizedBox(),
                     ),
                   );
                 }),
@@ -155,7 +163,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                               NavigationProperties.selectedTabNeededParamters =
                                   [];
                               NavigationProperties.selectedTabVaueNotifier(
-                                  NavigationProperties.paymentsPageRoute);
+                                  NavigationProperties
+                                      .overallPaymentsThroughPeriodPageRoute);
                             },
                           ),
                           /* *!SECTION */

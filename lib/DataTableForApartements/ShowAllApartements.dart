@@ -6,7 +6,6 @@ import 'package:aspania_city_group/class/realestate.dart';
 import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:davi/davi.dart';
 import 'package:excel/excel.dart' as xlsx;
-import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -693,10 +692,11 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                               NavigationProperties.selectedTabNeededParamters =
                                   [data];
                               NavigationProperties.selectedTabVaueNotifier(
-                                  NavigationProperties.paymentsPageRoute);
+                                  NavigationProperties
+                                      .paymentsDetailedPageRoute);
                               Navigator.of(context).pop();
                             },
-                            icon: Icons.miscellaneous_services_outlined,
+                            icon: Icons.table_view_rounded,
                             title: 'السداد',
                             onHover: (ishovered) {
                               onEditHover(ishovered);
