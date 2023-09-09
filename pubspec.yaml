@@ -43,6 +43,7 @@ dependencies:
   animated_tree_view: ^2.1.0
   fluid_dialog: ^2.0.0
   http: ^1.1.0
+  intl: ^0.18.1
   mouse_parallax: ^1.1.0
   get: ^4.6.5
 dev_dependencies:

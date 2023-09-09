@@ -142,7 +142,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           ),
                           /* *SECTION - Owners Item */
                           MenuButtonCard(
-                            title: 'الملاك',
+                            title: 'المقيمين',
                             icon: Icons.people_alt_outlined,
                             onTap: () {
                               NavigationProperties.selectedTabNeededParamters =

@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:aspania_city_group/Common_Used/navigation.dart';
+import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:aspania_city_group/Common_Used/text_tile.dart';
 import 'package:aspania_city_group/DataTableForApartements/ApartementSelector.dart';
 import 'package:aspania_city_group/PaymentsPage/AddPaymentDialog.dart';
@@ -10,9 +13,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:excel/excel.dart' as xlsx;
+import 'package:intl/date_symbol_data_local.dart';
 
 import '../Common_Used/button_tile.dart';
+import '../Dashboard/menu_card_button.dart';
 import '../class/buidlingproperties.dart';
+import 'package:intl/intl.dart' as intl;
 
 class PaymentsPageOfSpecifiedApartement extends StatefulWidget {
   const PaymentsPageOfSpecifiedApartement({super.key});
@@ -26,10 +32,8 @@ class _PaymentsPageOfSpecifiedApartementState
     extends State<PaymentsPageOfSpecifiedApartement> {
   /* *SECTION - Filters Variables */
   Rx<DateTime> fromDatePaymentFilter =
-      DateTime(DateTime.now().year, DateTime.now().month, 1).obs;
-  Rx<DateTime> toDatePaymentFilter =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
-          .obs;
+      DateTime.now().subtract(const Duration(days: 32)).obs;
+  Rx<DateTime> toDatePaymentFilter = DateTime.now().obs;
   /* *SECTION - Required to be a Pararmeter */
   Rx<RealEstateData> selectedRealEstateData = RealEstateData(
           id: -1,
@@ -242,8 +246,61 @@ class _PaymentsPageOfSpecifiedApartementState
   }
 
   /* *!SECTION */
+/* *SECTION - SQL Backend */
+  /* *SECTION - get Payment Payments Of Selected Owner */
+  Future<void> getPaymentsOfOwner() async {
+    var getDataResponse = await SQLFunctions.sendQuery(
+        query:
+            'SELECT * FROM SpainCity.PaymentsOfRealEsate where realEstateId = ${selectedRealEstateData.value.id};');
+    List<PaymentData> payments = [];
+
+    if (getDataResponse.statusCode == 200) {
+      var data = json.decode(getDataResponse.body);
+      for (var element in data) {
+        DateTime date = intl.DateFormat("E, d MMM yyyy hh:mm:ss")
+            .parse(element[5].toString().replaceAll(' GMT', ''));
+        payments.add(PaymentData(
+            id: element[0],
+            apartementId: element[1],
+            paymentDate: date,
+            paymentAmount: element[6],
+            paymentNote: element[7],
+            ownerName: element[2],
+            apartementName: element[4],
+            ownerPhoneNumber: element[3]));
+      }
+    } else {
+      payments.add(PaymentData(
+          id: getDataResponse.statusCode,
+          apartementId: getDataResponse.statusCode,
+          paymentDate: DateTime.now(),
+          paymentAmount: double.parse(getDataResponse.body),
+          paymentNote: getDataResponse.body));
+    }
+    if (_model != null && payments.isNotEmpty) {
+      _payments = payments;
+      _model!.notifyUpdate();
+    } else if (payments.isEmpty) {
+      _payments = payments;
+    }
+  }
+
+/* *SECTION - Delete Payment */
+  Future<int> deletePaymentData(int id) async {
+    var deleteResponse = await SQLFunctions.sendQuery(
+        query:
+            "DELETE FROM `SpainCity`.`PaymentsOfRealEsate` WHERE (`id` = $id);");
+
+    return deleteResponse.statusCode;
+  }
+
+/* *!SECTION */
+/* *!SECTION */
+
+/* *!SECTION */
   @override
   void initState() {
+    initializeDateFormatting();
     try {
       selectedRealEstateData(
           NavigationProperties.selectedTabNeededParamters[0]);
@@ -251,40 +308,15 @@ class _PaymentsPageOfSpecifiedApartementState
       selectedRealEstateData = selectedRealEstateData;
     }
     fromDateOfPaymentsFilterTextController = TextEditingController(
-        text:
-            '${fromDatePaymentFilter.value.year} / ${fromDatePaymentFilter.value.month} / ${fromDatePaymentFilter.value.day}');
+        text: intl.DateFormat.yMMMMEEEEd('ar')
+            .format(fromDatePaymentFilter.value));
     toDateOfPaymentsFilterTextController = TextEditingController(
         text:
-            '${toDatePaymentFilter.value.year} / ${toDatePaymentFilter.value.month} / ${toDatePaymentFilter.value.day}');
+            intl.DateFormat.yMMMMEEEEd('ar').format(toDatePaymentFilter.value));
     selectedApartementTextController =
         TextEditingController(text: selectedRealEstateData.value.ownerName);
     _model = returnTheTableUX();
-    _payments = [
-      PaymentData(
-          id: 0,
-          apartementId: 512,
-          paymentDate: DateTime.now(),
-          paymentAmount: 562,
-          paymentNote: 'عبيط جاي يدفع'),
-      PaymentData(
-          id: 0,
-          apartementId: 201,
-          paymentDate: DateTime.now().subtract(const Duration(days: 20)),
-          paymentAmount: 400,
-          paymentNote: 'عبيط جاي يدفع'),
-      PaymentData(
-          id: 0,
-          apartementId: 658,
-          paymentDate: DateTime.now().subtract(const Duration(days: 42)),
-          paymentAmount: 300,
-          paymentNote: 'عبيط جاي يدفع'),
-      PaymentData(
-          id: 0,
-          apartementId: 342,
-          paymentDate: DateTime.now().subtract(const Duration(days: 125)),
-          paymentAmount: 200,
-          paymentNote: 'عبيط جاي يدفع'),
-    ];
+    getPaymentsOfOwner();
     super.initState();
   }
 
@@ -327,13 +359,15 @@ class _PaymentsPageOfSpecifiedApartementState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 /* *SECTION - Routes */
-                RoutesBuilder(routeLabels: [
-                  'الوحدات',
-                  'سداد المالك (${selectedRealEstateData.value.ownerName})'
-                ], routeScreen: [
-                  NavigationProperties.realEstateSummaryPageRoute,
-                  NavigationProperties.nonePageRoute
-                ]),
+                Obx(
+                  () => RoutesBuilder(routeLabels: [
+                    'الوحدات',
+                    'سداد المالك (${selectedRealEstateData.value.ownerName})'
+                  ], routeScreen: [
+                    NavigationProperties.realEstateSummaryPageRoute,
+                    NavigationProperties.nonePageRoute
+                  ]),
+                ),
                 /* *!SECTION */
                 /* *SECTION - Action Button */
                 Row(
@@ -432,7 +466,7 @@ class _PaymentsPageOfSpecifiedApartementState
                             textController: selectedApartementTextController,
                             title: "مالك الوحدة",
                             hintText: "اختر المالك الوحدة",
-                            onTap: () {
+                            onTap: () async {
                               showDialog(
                                   context: context,
                                   builder: ((context) => FluidDialog(
@@ -441,12 +475,15 @@ class _PaymentsPageOfSpecifiedApartementState
                                             return const ApartementSelector();
                                           },
                                         ),
-                                      ))).then((value) {
-                                setState(() {
-                                  selectedRealEstateData = value;
-                                });
+                                      ))).then((value) async {
                                 selectedApartementTextController.text =
-                                    value.ownerName;
+                                    value == null
+                                        ? selectedRealEstateData.value.ownerName
+                                        : value.ownerName;
+                                selectedRealEstateData(value);
+                                _model!.removeRows();
+                                await getPaymentsOfOwner();
+                                _model!.addRow(_payments.first);
                               });
                             },
                             icon: Icons.person_search_outlined),
@@ -454,7 +491,7 @@ class _PaymentsPageOfSpecifiedApartementState
                           textDirection: TextDirection.rtl,
                           children: [
                             TextTile(
-                                width: 200,
+                                width: 250,
                                 textController:
                                     fromDateOfPaymentsFilterTextController,
                                 title: "عرض السدادات من تاريخ",
@@ -477,18 +514,23 @@ class _PaymentsPageOfSpecifiedApartementState
 
                                       for (var element in _payments) {
                                         if (element.paymentDate.isAfter(
-                                                fromDatePaymentFilter.value) &&
+                                                fromDatePaymentFilter.value
+                                                    .subtract(const Duration(
+                                                        days: 1))) &&
                                             element.paymentDate.isBefore(
-                                                toDatePaymentFilter.value)) {
+                                                toDatePaymentFilter.value.add(
+                                                    const Duration(days: 1)))) {
                                           _model!.addRow(element);
                                           _model!.notifyUpdate();
                                         }
                                       }
                                       fromDateOfPaymentsFilterTextController
-                                              .text =
-                                          '${fromDatePaymentFilter.value.year} / ${fromDatePaymentFilter.value.month} / ${fromDatePaymentFilter.value.day}';
+                                          .text = intl.DateFormat.yMMMMEEEEd(
+                                              'ar')
+                                          .format(fromDatePaymentFilter.value);
                                     } else {
                                       Get.showSnackbar(const GetSnackBar(
+                                        animationDuration: Duration(seconds: 1),
                                         duration: Duration(seconds: 2),
                                         message:
                                             'لا يمكن ادخال تاريخ بعد خانة (الى تاريخ)',
@@ -508,7 +550,7 @@ class _PaymentsPageOfSpecifiedApartementState
                               width: 10,
                             ),
                             TextTile(
-                                width: 200,
+                                width: 250,
                                 textController:
                                     toDateOfPaymentsFilterTextController,
                                 title: "عرض السدادات الى تاريخ",
@@ -531,18 +573,23 @@ class _PaymentsPageOfSpecifiedApartementState
 
                                       for (var element in _payments) {
                                         if (element.paymentDate.isAfter(
-                                                fromDatePaymentFilter.value) &&
+                                                fromDatePaymentFilter.value
+                                                    .subtract(const Duration(
+                                                        days: 1))) &&
                                             element.paymentDate.isBefore(
-                                                toDatePaymentFilter.value)) {
+                                                toDatePaymentFilter.value.add(
+                                                    const Duration(days: 1)))) {
                                           _model!.addRow(element);
                                           _model!.notifyUpdate();
                                         }
                                       }
                                       toDateOfPaymentsFilterTextController
-                                              .text =
-                                          '${toDatePaymentFilter.value.year} / ${toDatePaymentFilter.value.month} / ${toDatePaymentFilter.value.day}';
+                                          .text = intl.DateFormat.yMMMMEEEEd(
+                                              'ar')
+                                          .format(toDatePaymentFilter.value);
                                     } else {
                                       Get.showSnackbar(const GetSnackBar(
+                                        animationDuration: Duration(seconds: 1),
                                         duration: Duration(seconds: 2),
                                         message:
                                             'لا يمكن ادخال تاريخ قبل خانة (من تاريخ)',
@@ -556,104 +603,108 @@ class _PaymentsPageOfSpecifiedApartementState
                       ],
                     ),
                     /* *SECTION - Data */
-                    SizedBox(
-                      width: 450,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        textDirection: TextDirection.rtl,
-                        children: [
-                          /* *SECTION - Apartement Data */
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                'تفاصيل الشقة',
-                                style: GoogleFonts.notoSansArabic(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                selectedRealEstateData.value.id == -1
-                                    ? ''
-                                    : "عمارة : ${buildings.firstWhere((element) => element.id == selectedRealEstateData.value.apartementPostionInBuildingId).buildingName}",
-                                style: GoogleFonts.notoSansArabic(
-                                  fontSize: 18,
-                                  color: Colors.grey[500],
+                    Obx(
+                      () => SizedBox(
+                        width: 500,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          textDirection: TextDirection.rtl,
+                          children: [
+                            /* *SECTION - Apartement Data */
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'تفاصيل الشقة',
+                                  style: GoogleFonts.notoSansArabic(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                selectedRealEstateData.value.id == -1
-                                    ? ''
-                                    : "الدور : ${realEstateFloors.firstWhere((element) => element.id == selectedRealEstateData.value.apartementPostionInFloorId).floorName}",
-                                style: GoogleFonts.notoSansArabic(
-                                    color: Colors.grey[500], fontSize: 18),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                selectedRealEstateData.value.id == -1
-                                    ? ''
-                                    : "رقم الوحدة : ${selectedRealEstateData.value.apartementName}",
-                                style: GoogleFonts.notoSansArabic(
-                                    color: Colors.grey[500], fontSize: 18),
-                              ),
-                            ],
-                          ),
-                          /* *!SECTION */
-                          /* *SECTION - Owner Data */
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                'تفاصيل المالك',
-                                style: GoogleFonts.notoSansArabic(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                selectedRealEstateData.value.id == -1
-                                    ? ''
-                                    : 'رقم المالك : ${selectedRealEstateData.value.ownerPhoneNumber}',
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.notoSansArabic(
-                                  fontSize: 18,
-                                  color: Colors.grey[500],
+                                const SizedBox(
+                                  height: 10,
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                selectedRealEstateData.value.id == -1
-                                    ? ''
-                                    : 'اسم المسئول : ${selectedRealEstateData.value.responsibleName}',
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.notoSansArabic(
-                                    color: Colors.grey[500], fontSize: 18),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                selectedRealEstateData.value.id == -1
-                                    ? ''
-                                    : 'رقم المسئول : ${selectedRealEstateData.value.responsiblePhone}',
-                                overflow: TextOverflow.ellipsis,
-                                style: GoogleFonts.notoSansArabic(
-                                    color: Colors.grey[500], fontSize: 18),
-                              ),
-                            ],
-                          )
-                          /* *!SECTION */
-                        ],
+                                Text(
+                                  selectedRealEstateData.value.id == -1
+                                      ? ''
+                                      : "عمارة : ${buildings.firstWhere((element) => element.id == selectedRealEstateData.value.apartementPostionInBuildingId).buildingName}",
+                                  style: GoogleFonts.notoSansArabic(
+                                    fontSize: 18,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  selectedRealEstateData.value.id == -1
+                                      ? ''
+                                      : "الدور : ${realEstateFloors.firstWhere((element) => element.id == selectedRealEstateData.value.apartementPostionInFloorId).floorName}",
+                                  style: GoogleFonts.notoSansArabic(
+                                      color: Colors.grey[500], fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  selectedRealEstateData.value.id == -1
+                                      ? ''
+                                      : "رقم الوحدة : ${selectedRealEstateData.value.apartementName}",
+                                  style: GoogleFonts.notoSansArabic(
+                                      color: Colors.grey[500], fontSize: 18),
+                                ),
+                              ],
+                            ),
+                            /* *!SECTION */
+                            /* *SECTION - Owner Data */
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'تفاصيل المالك',
+                                  style: GoogleFonts.notoSansArabic(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  selectedRealEstateData.value.id == -1
+                                      ? ''
+                                      : 'رقم المالك : ${selectedRealEstateData.value.ownerPhoneNumber}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.notoSansArabic(
+                                    fontSize: 18,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  selectedRealEstateData.value.id == -1
+                                      ? ''
+                                      : 'اسم المسئول : ${selectedRealEstateData.value.responsibleName}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.notoSansArabic(
+                                      color: Colors.grey[500], fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  selectedRealEstateData.value.id == -1
+                                      ? ''
+                                      : 'رقم المسئول : ${selectedRealEstateData.value.responsiblePhone}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.notoSansArabic(
+                                      color: Colors.grey[500], fontSize: 18),
+                                ),
+                              ],
+                            )
+                            /* *!SECTION */
+                          ],
+                        ),
                       ),
                     )
                     /* *!SECTION */
@@ -760,7 +811,72 @@ class _PaymentsPageOfSpecifiedApartementState
                 visibleRowsCount: int.parse((height / 50).toStringAsFixed(0)),
                 columnWidthBehavior: ColumnWidthBehavior.scrollable,
                 onRowTap: (data) {},
-                onRowSecondaryTap: (data) {},
+                onRowSecondaryTap: (data) {
+                  RxBool onDeleteHover = false.obs;
+                  RxBool onEditHover = false.obs;
+                  showMenu(
+                      context: context,
+                      color: Colors.white,
+                      position: RelativeRect.fromLTRB(
+                          width / 2, height / 2, width / 2, height / 2),
+                      items: [
+                        PopupMenuItem<int>(
+                          value: 0,
+                          child: MenuButtonCard(
+                            onTap: () async {
+                              Navigator.of(context).pop();
+                              await deletePaymentData(data.id);
+                              _model!.removeRow(data);
+                              _model!.notifyUpdate();
+                              Get.showSnackbar(const GetSnackBar(
+                                animationDuration: Duration(seconds: 1),
+                                duration: Duration(seconds: 2),
+                                message: 'تم الحذف بنجاح',
+                              ));
+                            },
+                            icon: Icons.delete_forever_outlined,
+                            title: 'حذف الفاتورة',
+                            onHover: (ishovered) {
+                              onDeleteHover(ishovered);
+                            },
+                            backgroundColor: onDeleteHover.value
+                                ? Colors.grey[500]
+                                : Colors.white,
+                          ),
+                        ),
+                        PopupMenuItem<int>(
+                          value: 1,
+                          child: MenuButtonCard(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return FluidDialog(rootPage: FluidDialogPage(
+                                    builder: (context) {
+                                      return AddPaymentDialog(
+                                        state: 'Edit',
+                                        paymentData: data,
+                                        selectedOwner:
+                                            selectedRealEstateData.value,
+                                      );
+                                    },
+                                  ));
+                                },
+                              );
+                            },
+                            icon: Icons.miscellaneous_services_outlined,
+                            title: 'تعديل الفاتورة',
+                            onHover: (ishovered) {
+                              onEditHover(ishovered);
+                            },
+                            backgroundColor: onEditHover.value
+                                ? Colors.grey[500]
+                                : Colors.white,
+                          ),
+                        ),
+                      ]);
+                },
               ),
             ),
           ),

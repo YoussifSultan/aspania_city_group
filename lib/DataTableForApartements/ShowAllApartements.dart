@@ -33,6 +33,8 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
   bool _loading = false;
   bool reahedTheEndOfTable = false;
   int selectedRow = 0;
+  /* *SECTION - SQL Backend */
+  /* *SECTION - Get All Real Estates */
   Future<void> getData() async {
     var getDataResponse;
     if (allApartementsOrFullyRecordedOnly == 'All_Apartements') {
@@ -46,7 +48,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
     } else if (allApartementsOrFullyRecordedOnly == 'All_Owners') {
       getDataResponse = await SQLFunctions.sendQuery(
           query:
-              "SELECT * FROM SpainCity.RealEstates where isApartementHasEnoughData = 1");
+              "SELECT * FROM SpainCity.RealEstates where apartementStatusId =1;");
     }
     List<RealEstateData> apartements = [];
 
@@ -83,6 +85,8 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
     }
   }
 
+/* *!SECTION */
+  /* *!SECTION */
   void _onLastRowWidget(bool visible) {
     if (visible && !_loading) {
       setState(() {
@@ -406,6 +410,8 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
       });
 
       Get.showSnackbar(const GetSnackBar(
+        animationDuration: Duration(seconds: 1),
+        duration: Duration(seconds: 2),
         message: 'تم الحذف بنجاح',
       ));
     } else {}
@@ -416,301 +422,324 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     final RxBool onMoreButtonHover = false.obs;
-    return Column(
-        /* *SECTION - Dialog */
-        children: [
-          const SizedBox(
-            height: 20,
-          ),
-          /* *SECTION - Top Part */
-          Row(
-              textDirection: TextDirection.rtl,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  height: 50,
-                  child: RoutesBuilder(
-                    routeLabels: [
-                      'الوحدات',
-                      buildingId != -1
-                          ? 'عرض وحدات العمارة $buildingId'
-                          : 'عرض جميع الملاك',
-                    ],
-                    routeScreen: [
-                      NavigationProperties.realEstateSummaryPageRoute,
-                      NavigationProperties.nonePageRoute
+    return Scaffold(
+        body: Container(
+      padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
+      color: Colors.white,
+      child: ListView(
+          shrinkWrap: true,
+          /* *SECTION - Dialog */
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            /* *SECTION - Top Part */
+            Row(
+                textDirection: TextDirection.rtl,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    height: 50,
+                    child: RoutesBuilder(
+                      routeLabels: [
+                        'الوحدات',
+                        buildingId != -1
+                            ? 'عرض وحدات العمارة $buildingId'
+                            : 'عرض جميع المقيمين',
+                      ],
+                      routeScreen: [
+                        NavigationProperties.realEstateSummaryPageRoute,
+                        NavigationProperties.nonePageRoute
+                      ],
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      Text(
+                        '(${_realEstates.length})',
+                        style: GoogleFonts.notoSansArabic(
+                            fontSize: 32, color: Colors.red),
+                      ),
+                      Text(
+                        'عدد السكان المقيمين',
+                        style: GoogleFonts.notoSansArabic(
+                            fontSize: 20, color: Colors.grey[700]),
+                      ),
                     ],
                   ),
-                ),
-                Row(
-                  children: [
-                    /* *SECTION - edit Button */
+                  Row(
+                    children: [
+                      /* *SECTION - edit Button */
 
-                    ButtonTile(
-                      buttonText: 'تعديل الوحدة',
-                      onTap: () {
-                        NavigationProperties.selectedTabNeededParamters = [
-                          -1,
-                          'EditOwner',
-                          _realEstates.firstWhere(
-                              (element) => element.id == selectedRow)
-                        ];
-                        NavigationProperties.selectedTabVaueNotifier(
-                            NavigationProperties.addNewRealEstatePageRoute);
-                      },
-                    ),
-                    /* *!SECTION */
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    /* *SECTION - Delete Button */
-                    ButtonTile(
-                      buttonText: 'حذف الوحدة',
-                      onTap: () async {
-                        await deleteData(selectedRow);
-                      },
-                    ),
-                    /* *!SECTION */
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    /* *SECTION - More Button */
-                    Obx(
-                      () => GestureDetector(
-                          onTap: () {
-                            showMenu(
-                                context: context,
-                                color: Colors.white,
-                                position: const RelativeRect.fromLTRB(
-                                    400, 110, 400, 0),
-                                items: [
-                                  PopupMenuItem<int>(
-                                    value: 0,
-                                    child: ButtonTile(
-                                      buttonText: 'اضافة الوحدة',
-                                      onTap: () async {
-                                        Navigator.of(context).pop();
-                                        NavigationProperties
-                                            .selectedTabNeededParamters = [
-                                          buildingId,
-                                          'AddOwner',
-                                          RealEstateData(
-                                              id: 0,
-                                              apartementStatusId: 0,
-                                              apartementPostionInFloorId: 0,
-                                              apartementPostionInBuildingId: 0,
-                                              apartementLink: 'None',
-                                              isApartementHasEnoughData: false,
-                                              apartementName: 'None')
-                                        ];
-                                        NavigationProperties
-                                            .selectedTabVaueNotifier(
-                                                NavigationProperties
-                                                    .addNewRealEstatePageRoute);
-                                      },
-                                    ),
-                                  ),
-                                  PopupMenuItem<int>(
-                                      value: 1,
+                      ButtonTile(
+                        buttonText: 'تعديل الوحدة',
+                        onTap: () {
+                          NavigationProperties.selectedTabNeededParamters = [
+                            -1,
+                            'EditOwner',
+                            _realEstates.firstWhere(
+                                (element) => element.id == selectedRow)
+                          ];
+                          NavigationProperties.selectedTabVaueNotifier(
+                              NavigationProperties.addNewRealEstatePageRoute);
+                        },
+                      ),
+                      /* *!SECTION */
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      /* *SECTION - Delete Button */
+                      ButtonTile(
+                        buttonText: 'حذف الوحدة',
+                        onTap: () async {
+                          await deleteData(selectedRow);
+                        },
+                      ),
+                      /* *!SECTION */
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      /* *SECTION - More Button */
+                      Obx(
+                        () => GestureDetector(
+                            onTap: () {
+                              showMenu(
+                                  context: context,
+                                  color: Colors.white,
+                                  position: const RelativeRect.fromLTRB(
+                                      400, 110, 400, 0),
+                                  items: [
+                                    PopupMenuItem<int>(
+                                      value: 0,
                                       child: ButtonTile(
-                                        buttonText: 'اصدار تقرير',
-                                        onTap: () {
+                                        buttonText: 'اضافة الوحدة',
+                                        onTap: () async {
                                           Navigator.of(context).pop();
-                                          exportXLSXOfData();
+                                          NavigationProperties
+                                              .selectedTabNeededParamters = [
+                                            buildingId,
+                                            'AddOwner',
+                                            RealEstateData(
+                                                id: 0,
+                                                apartementStatusId: 0,
+                                                apartementPostionInFloorId: 0,
+                                                apartementPostionInBuildingId:
+                                                    0,
+                                                apartementLink: 'None',
+                                                isApartementHasEnoughData:
+                                                    false,
+                                                apartementName: 'None')
+                                          ];
+                                          NavigationProperties
+                                              .selectedTabVaueNotifier(
+                                                  NavigationProperties
+                                                      .addNewRealEstatePageRoute);
                                         },
-                                      )),
-                                ]);
-                          },
-                          child: MouseRegion(
-                            onEnter: (details) {
-                              onMoreButtonHover(true);
+                                      ),
+                                    ),
+                                    PopupMenuItem<int>(
+                                        value: 1,
+                                        child: ButtonTile(
+                                          buttonText: 'اصدار تقرير',
+                                          onTap: () {
+                                            Navigator.of(context).pop();
+                                            exportXLSXOfData();
+                                          },
+                                        )),
+                                  ]);
                             },
-                            onExit: (details) {
-                              onMoreButtonHover(false);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.grey[500] ?? Colors.white),
-                                  borderRadius: BorderRadius.circular(60),
-                                  color: onMoreButtonHover.value
-                                      ? Colors.grey[500]
-                                      : Colors.transparent),
-                              child: const Icon(
-                                Icons.more_horiz_outlined,
-                                size: 35,
-                                color: Colors.black,
+                            child: MouseRegion(
+                              onEnter: (details) {
+                                onMoreButtonHover(true);
+                              },
+                              onExit: (details) {
+                                onMoreButtonHover(false);
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color:
+                                            Colors.grey[500] ?? Colors.white),
+                                    borderRadius: BorderRadius.circular(60),
+                                    color: onMoreButtonHover.value
+                                        ? Colors.grey[500]
+                                        : Colors.transparent),
+                                child: const Icon(
+                                  Icons.more_horiz_outlined,
+                                  size: 35,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                          )),
-                    ),
-                    /* *!SECTION */
-                  ],
-                ),
+                            )),
+                      ),
+                      /* *!SECTION */
+                    ],
+                  ),
 
-                /* *!SECTION */
-              ]),
-          const SizedBox(
-            height: 30,
-          ),
-          DaviTheme(
-            data: DaviThemeData(
-                columnDividerThickness: 0,
-                scrollbar: const TableScrollbarThemeData(
-                    horizontalOnlyWhenNeeded: false,
-                    verticalOnlyWhenNeeded: true),
-                header: const HeaderThemeData(
-                    color: Colors.grey,
-                    bottomBorderHeight: 4,
-                    bottomBorderColor: Colors.white),
-                headerCell: HeaderCellThemeData(
-                    height: 40,
-                    alignment: Alignment.center,
-                    textStyle: const TextStyle(
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                    resizeAreaWidth: 10,
-                    resizeAreaHoverColor: Colors.blue.withOpacity(.5),
-                    sortPriorityGap: 20,
-                    sortIconColors: SortIconColors.all(Colors.white),
-                    expandableName: false)),
-            child: Container(
-              clipBehavior: Clip.hardEdge,
-              decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(10)),
-              child: Davi<RealEstateData>(
-                _model,
-                unpinnedHorizontalScrollController:
-                    horizontalScrollControllerOfDataTable,
-                onLastRowWidget: _onLastRowWidget,
-                tapToSortEnabled: true,
-                rowColor: (row) {
-                  if (row.data.id == selectedRow) {
-                    return Colors.yellowAccent[100];
-                  }
-                  if (row.index.isEven) {
-                    return Colors.grey.withOpacity(0.2);
-                  } else {
-                    return Colors.white;
-                  }
-                },
-                lastRowWidget: !reahedTheEndOfTable
-                    ? const Center(
-                        child: SizedBox(
-                          height: 100,
-                          width: 50,
-                          child: CircularProgressIndicator(
-                              color: Colors.black, strokeWidth: 1),
-                        ),
-                      )
-                    : _realEstates.isEmpty
-                        ? Center(
-                            child: Text(
-                              'لا يوجد بيانات مسجلة',
-                              style: GoogleFonts.notoSansArabic(
-                                fontSize: 25,
-                                fontWeight: FontWeight.w600,
+                  /* *!SECTION */
+                ]),
+            const SizedBox(
+              height: 30,
+            ),
+            DaviTheme(
+              data: DaviThemeData(
+                  columnDividerThickness: 0,
+                  scrollbar: const TableScrollbarThemeData(
+                      horizontalOnlyWhenNeeded: false,
+                      verticalOnlyWhenNeeded: true),
+                  header: const HeaderThemeData(
+                      color: Colors.grey,
+                      bottomBorderHeight: 4,
+                      bottomBorderColor: Colors.white),
+                  headerCell: HeaderCellThemeData(
+                      height: 40,
+                      alignment: Alignment.center,
+                      textStyle: const TextStyle(
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                      resizeAreaWidth: 10,
+                      resizeAreaHoverColor: Colors.blue.withOpacity(.5),
+                      sortPriorityGap: 20,
+                      sortIconColors: SortIconColors.all(Colors.white),
+                      expandableName: false)),
+              child: Container(
+                clipBehavior: Clip.hardEdge,
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                child: Davi<RealEstateData>(
+                  _model,
+                  unpinnedHorizontalScrollController:
+                      horizontalScrollControllerOfDataTable,
+                  onLastRowWidget: _onLastRowWidget,
+                  tapToSortEnabled: true,
+                  rowColor: (row) {
+                    if (row.data.id == selectedRow) {
+                      return Colors.yellowAccent[100];
+                    }
+                    if (row.index.isEven) {
+                      return Colors.grey.withOpacity(0.2);
+                    } else {
+                      return Colors.white;
+                    }
+                  },
+                  lastRowWidget: !reahedTheEndOfTable
+                      ? const Center(
+                          child: SizedBox(
+                            height: 100,
+                            width: 50,
+                            child: CircularProgressIndicator(
+                                color: Colors.black, strokeWidth: 1),
+                          ),
+                        )
+                      : _realEstates.isEmpty
+                          ? Center(
+                              child: Text(
+                                'لا يوجد بيانات مسجلة',
+                                style: GoogleFonts.notoSansArabic(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            )
+                          : Center(
+                              child: Text(
+                                'تم تحميل البيانات',
+                                style: GoogleFonts.notoSansArabic(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          )
-                        : Center(
-                            child: Text(
-                              'تم تحميل البيانات',
-                              style: GoogleFonts.notoSansArabic(
-                                fontSize: 25,
-                                fontWeight: FontWeight.w600,
-                              ),
+                  visibleRowsCount: int.parse((height / 50).toStringAsFixed(0)),
+                  columnWidthBehavior: ColumnWidthBehavior.scrollable,
+                  onRowTap: (data) {
+                    setState(() {
+                      selectedRow = data.id;
+                    });
+                  },
+                  onRowSecondaryTap: (data) {
+                    RxBool onDeleteHover = false.obs;
+                    RxBool onEditHover = false.obs;
+                    setState(() {
+                      selectedRow = data.id;
+                    });
+                    showMenu(
+                        context: context,
+                        color: Colors.white,
+                        position: RelativeRect.fromLTRB(
+                            width / 2, height / 2, width / 2, height / 2),
+                        items: [
+                          PopupMenuItem<int>(
+                            value: 0,
+                            child: MenuButtonCard(
+                              onTap: () {
+                                deleteData(data.id);
+                                Navigator.of(context).pop();
+                              },
+                              icon: Icons.delete_forever_outlined,
+                              title: 'حذف الوحدة',
+                              onHover: (ishovered) {
+                                onDeleteHover(ishovered);
+                              },
+                              backgroundColor: onDeleteHover.value
+                                  ? Colors.grey[500]
+                                  : Colors.white,
                             ),
                           ),
-                visibleRowsCount: int.parse((height / 50).toStringAsFixed(0)),
-                columnWidthBehavior: ColumnWidthBehavior.scrollable,
-                onRowTap: (data) {
-                  setState(() {
-                    selectedRow = data.id;
-                  });
-                },
-                onRowSecondaryTap: (data) {
-                  RxBool onDeleteHover = false.obs;
-                  RxBool onEditHover = false.obs;
-                  setState(() {
-                    selectedRow = data.id;
-                  });
-                  showMenu(
-                      context: context,
-                      color: Colors.white,
-                      position: RelativeRect.fromLTRB(
-                          width / 2, height / 2, width / 2, height / 2),
-                      items: [
-                        PopupMenuItem<int>(
-                          value: 0,
-                          child: MenuButtonCard(
-                            onTap: () {
-                              deleteData(data.id);
-                              Navigator.of(context).pop();
-                            },
-                            icon: Icons.delete_forever_outlined,
-                            title: 'حذف الوحدة',
-                            onHover: (ishovered) {
-                              onDeleteHover(ishovered);
-                            },
-                            backgroundColor: onDeleteHover.value
-                                ? Colors.grey[500]
-                                : Colors.white,
+                          PopupMenuItem<int>(
+                            value: 1,
+                            child: MenuButtonCard(
+                              onTap: () {
+                                NavigationProperties
+                                    .selectedTabNeededParamters = [
+                                  -1,
+                                  'EditOwner',
+                                  _realEstates.firstWhere(
+                                      (element) => element.id == data.id)
+                                ];
+                                NavigationProperties.selectedTabVaueNotifier(
+                                    NavigationProperties
+                                        .addNewRealEstatePageRoute);
+                                Navigator.of(context).pop();
+                              },
+                              icon: Icons.miscellaneous_services_outlined,
+                              title: 'تعديل الوحدة',
+                              onHover: (ishovered) {
+                                onEditHover(ishovered);
+                              },
+                              backgroundColor: onEditHover.value
+                                  ? Colors.grey[500]
+                                  : Colors.white,
+                            ),
                           ),
-                        ),
-                        PopupMenuItem<int>(
-                          value: 1,
-                          child: MenuButtonCard(
-                            onTap: () {
-                              NavigationProperties.selectedTabNeededParamters =
-                                  [
-                                -1,
-                                'EditOwner',
-                                _realEstates.firstWhere(
-                                    (element) => element.id == data.id)
-                              ];
-                              NavigationProperties.selectedTabVaueNotifier(
-                                  NavigationProperties
-                                      .addNewRealEstatePageRoute);
-                              Navigator.of(context).pop();
-                            },
-                            icon: Icons.miscellaneous_services_outlined,
-                            title: 'تعديل الوحدة',
-                            onHover: (ishovered) {
-                              onEditHover(ishovered);
-                            },
-                            backgroundColor: onEditHover.value
-                                ? Colors.grey[500]
-                                : Colors.white,
+                          PopupMenuItem<int>(
+                            value: 2,
+                            child: MenuButtonCard(
+                              onTap: () {
+                                NavigationProperties
+                                    .selectedTabNeededParamters = [data];
+                                NavigationProperties.selectedTabVaueNotifier(
+                                    NavigationProperties
+                                        .paymentsDetailedPageRoute);
+                                Navigator.of(context).pop();
+                              },
+                              icon: Icons.table_view_rounded,
+                              title: 'السداد',
+                              onHover: (ishovered) {
+                                onEditHover(ishovered);
+                              },
+                              backgroundColor: onEditHover.value
+                                  ? Colors.grey[500]
+                                  : Colors.white,
+                            ),
                           ),
-                        ),
-                        PopupMenuItem<int>(
-                          value: 2,
-                          child: MenuButtonCard(
-                            onTap: () {
-                              NavigationProperties.selectedTabNeededParamters =
-                                  [data];
-                              NavigationProperties.selectedTabVaueNotifier(
-                                  NavigationProperties
-                                      .paymentsDetailedPageRoute);
-                              Navigator.of(context).pop();
-                            },
-                            icon: Icons.table_view_rounded,
-                            title: 'السداد',
-                            onHover: (ishovered) {
-                              onEditHover(ishovered);
-                            },
-                            backgroundColor: onEditHover.value
-                                ? Colors.grey[500]
-                                : Colors.white,
-                          ),
-                        ),
-                      ]);
-                },
+                        ]);
+                  },
+                ),
               ),
             ),
-          ),
-        ]);
+          ]),
+    ));
   }
 }

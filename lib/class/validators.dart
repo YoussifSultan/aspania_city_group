@@ -22,6 +22,14 @@ class Validators {
     }
   }
 
+  static bool isNumeric(String text) {
+    if (double.tryParse(text) == null) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   static bool isListEmpty(List<String> text) {
     for (var element in text) {
       String sampleText = element.trim();
@@ -56,4 +64,11 @@ class Validators {
     }
     return false;
   }
+
+  final String errorText;
+  final String errorID;
+  const Validators({
+    this.errorText = '',
+    required this.errorID,
+  });
 }

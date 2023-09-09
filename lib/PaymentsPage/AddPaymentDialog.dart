@@ -1,15 +1,22 @@
+import 'dart:convert';
+
 import 'package:aspania_city_group/Common_Used/button_tile.dart';
+import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:aspania_city_group/Common_Used/text_tile.dart';
 import 'package:aspania_city_group/DataTableForApartements/ApartementSelector.dart';
+import 'package:aspania_city_group/class/payment.dart';
 import 'package:aspania_city_group/class/realestate.dart';
 import 'package:aspania_city_group/class/validators.dart';
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AddPaymentDialog extends StatefulWidget {
-  const AddPaymentDialog({super.key, required this.state, this.selectedOwner});
+  const AddPaymentDialog(
+      {super.key, required this.state, this.selectedOwner, this.paymentData});
   final String state;
   final RealEstateData? selectedOwner;
+  final PaymentData? paymentData;
 
   @override
   State<AddPaymentDialog> createState() => _AddPaymentDialogState();
@@ -35,7 +42,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
   TextEditingController amountOfPaymentTextController = TextEditingController();
   TextEditingController noteOfPaymentTextController = TextEditingController();
   late TextEditingController selectedOwnerToAddPaymentTextController;
-
+  List<Validators> errors = [];
   /* *!SECTION */
   /* *SECTION - Init State */
   @override
@@ -50,9 +57,112 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
     dateOfPaymentTextController = TextEditingController(
         text:
             '${paymentDate.year} / ${paymentDate.month} / ${paymentDate.day}');
+    if (widget.state == 'Edit') {
+      paymentDate = widget.paymentData!.paymentDate;
+      paymentNote = widget.paymentData!.paymentNote;
+      paymentAmount = widget.paymentData!.paymentAmount;
+      dateOfPaymentTextController.text =
+          '${paymentDate.year} / ${paymentDate.month} / ${paymentDate.day}';
+      noteOfPaymentTextController.text = paymentNote;
+      amountOfPaymentTextController.text = paymentAmount.toString();
+    }
+
     super.initState();
   }
 
+  Future<void> addOrEditPayment() async {
+    if (errors.isEmpty) {
+      if (paymentAmount != 0 && selectedOwner.id != -1) {
+        PaymentData payment;
+        if (widget.state == 'Edit') {
+          payment = PaymentData(
+              id: widget.paymentData!.id,
+              apartementName: selectedOwner.apartementName,
+              ownerName: selectedOwner.ownerName,
+              ownerPhoneNumber: selectedOwner.ownerPhoneNumber,
+              apartementId: selectedOwner.id,
+              paymentDate: paymentDate,
+              paymentAmount: paymentAmount,
+              paymentNote: paymentNote);
+          if (await editPayment(payment) == 200) {
+            Get.showSnackbar(const GetSnackBar(
+              duration: Duration(seconds: 2),
+              animationDuration: Duration(seconds: 1),
+              message: 'تم التعديل بنجاح',
+            ));
+            if (mounted) Navigator.of(context).pop();
+          }
+        } else {
+          payment = PaymentData(
+              id: await getPaymentLastID() + 1,
+              apartementName: selectedOwner.apartementName,
+              ownerName: selectedOwner.ownerName,
+              ownerPhoneNumber: selectedOwner.ownerPhoneNumber,
+              apartementId: selectedOwner.id,
+              paymentDate: paymentDate,
+              paymentAmount: paymentAmount,
+              paymentNote: paymentNote);
+          if (await insertNewPayment(payment) == 200) {
+            Get.showSnackbar(const GetSnackBar(
+              duration: Duration(seconds: 2),
+              animationDuration: Duration(seconds: 1),
+              message: 'تم الحفظ بنجاح',
+            ));
+            if (mounted) Navigator.of(context).pop();
+          }
+        }
+      } else {
+        Get.showSnackbar(const GetSnackBar(
+          duration: Duration(seconds: 2),
+          animationDuration: Duration(seconds: 1),
+          message: 'ادخل البيانات الاتية (المالك \\ المبلغ \\ التاريخ)',
+        ));
+      }
+    }
+  }
+
+/* *SECTION - SQL Backend */
+/* *SECTION - Add New Payment */
+  Future<int> insertNewPayment(PaymentData paymentData) async {
+    var insertDataResponse = await SQLFunctions.sendQuery(
+        query:
+            'INSERT INTO `SpainCity`.`PaymentsOfRealEsate` (`Id`, `realEstateId`, `realEstateOwnerName`,'
+            ' `realEstateOwnerTelephone`, `realEstateApartementName`, `paymentDate`, `paymentAmount`, `paymentNote`)'
+            ' VALUES (\'${paymentData.id}\', \'${paymentData.apartementId}\', \'${paymentData.ownerName}\','
+            ' \'${paymentData.ownerPhoneNumber}\', \'${paymentData.apartementName}\', '
+            '\'${paymentData.paymentDate}\', \'${paymentData.paymentAmount}\', \'${paymentData.paymentNote}\');');
+    return insertDataResponse.statusCode;
+  }
+
+/* *!SECTION */
+/* *SECTION - Update Payment */
+  Future<int> editPayment(PaymentData paymentData) async {
+    // UPDATE `SpainCity`.`PaymentsOfRealEsate` SET `realEstateId` = \'${paymentData.apartementId}\', `realEstateOwnerName` = \'Osama\', `realEstateOwnerTelephone` = \'01116578889\', `paymentDate` = \'2008-12-27\', `paymentAmount` = \'502\', `paymentNote` = \'ggg\' WHERE (`Id` = \'1\');
+    var editDataResponse = await SQLFunctions.sendQuery(
+        query:
+            'UPDATE `SpainCity`.`PaymentsOfRealEsate` SET `realEstateId` = \'${paymentData.apartementId}\','
+            ' `realEstateOwnerName` = \'${paymentData.ownerName}\','
+            ' `realEstateOwnerTelephone` = \'${paymentData.ownerPhoneNumber}\','
+            ' `paymentDate` = \'${paymentData.paymentDate}\', `paymentAmount` = \'${paymentData.paymentAmount}\','
+            ' `paymentNote` = \'${paymentData.paymentNote}\' WHERE (`Id` = \'${paymentData.id}\');');
+    return editDataResponse.statusCode;
+  }
+
+/* *!SECTION */
+/* *SECTION - get last PaymentId */
+  Future<int> getPaymentLastID() async {
+    var getLastIDResponse = await SQLFunctions.sendQuery(
+        query: "SELECT MAX(Id) FROM SpainCity.PaymentsOfRealEsate;");
+
+    if (getLastIDResponse.statusCode == 200) {
+      var data = json.decode(getLastIDResponse.body);
+      return data[0][0] ?? 0;
+    } else {
+      return int.parse(getLastIDResponse.body);
+    }
+  }
+
+/* *!SECTION */
   /* *!SECTION */
   @override
   Widget build(BuildContext context) {
@@ -65,7 +175,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
       child: ListView(
         shrinkWrap: true,
         children: [
-          /* *SECTION - Payment Date & Payment Amount */
+          /* *SECTION - Owner Who Payed TextField */
           TextTile(
               width: 435,
               textController: selectedOwnerToAddPaymentTextController,
@@ -87,9 +197,13 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                 });
               },
               icon: Icons.person_search_outlined),
+          /* *!SECTION */
+          /* *SECTION - Payment Amount & DateTextFields */
+
           Row(
             textDirection: TextDirection.rtl,
             children: [
+              /* *SECTION - Payment Date TextField */
               TextTile(
                   width: 200,
                   textController: dateOfPaymentTextController,
@@ -111,37 +225,62 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                   },
                   hintText: 'اختر التاريخ',
                   icon: Icons.calendar_month_outlined),
+              /* *!SECTION */
               const SizedBox(
                 width: 20,
               ),
+              /* *SECTION - Payment Amount TextField */
               TextTile(
                   width: 200,
                   onChange: (text, errorText) {
-                    if (Validators.isNumericOrEmptyOnly(text)) {
+                    if (Validators.isNumeric(text)) {
+                      errors.removeWhere((element) =>
+                          element.errorText == 'Amount Not Number');
+                      errorText('');
+                      paymentAmount = double.parse(text);
                     } else {
                       errorText('ادخل ارقام فقط');
+                      errors.add(const Validators(
+                          errorText: 'Amount Not Number', errorID: '1'));
                     }
                   },
                   textController: amountOfPaymentTextController,
                   title: 'المبلغ',
                   hintText: 'ادخل المبلغ',
                   icon: Icons.money),
+              /* *!SECTION */
             ],
           ),
+          /* *!SECTION */
+          /* *SECTION - Payment Note TextField */
+
           TextTile(
               width: 430,
               height: 100,
               textController: noteOfPaymentTextController,
               title: 'ملاحظات',
+              onChange: (text, errorText) {
+                paymentNote = text;
+              },
               hintText: 'ادخل الملاحظات',
               icon: Icons.description_outlined),
           /* *!SECTION */
+          /* *SECTION - Add Or Edit Button & Cancel Button */
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               widget.state == 'Add'
-                  ? ButtonTile(onTap: () {}, buttonText: 'حفظ')
-                  : ButtonTile(onTap: () {}, buttonText: 'تعديل'),
+                  ? ButtonTile(
+                      onTap: () {
+                        addOrEditPayment();
+                      },
+                      buttonText: 'حفظ')
+                  : ButtonTile(
+                      onTap: () {
+                        addOrEditPayment();
+                      },
+                      buttonText: 'تعديل'),
               const SizedBox(
                 width: 20,
               ),
@@ -152,6 +291,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                   buttonText: 'الغاء'),
             ],
           )
+          /* *!SECTION */
         ],
       ),
     );
