@@ -66,6 +66,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
             ownerName: element[2],
             ownerPhoneNumber: element[3],
             responsibleName: element[7],
+            apartementGarage: element[14],
             responsiblePhone: element[8]));
       }
     } else {
@@ -198,6 +199,11 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
         headerStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('H7')).value =
         'حالة الوحدة';
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('G7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('G7')).value =
+        'حالة الجراج';
+
 /* *!SECTION */
 /* *SECTION - Set Values */
     for (var i = 0; i < _realEstates.length; i++) {
@@ -255,6 +261,20 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
           apartementState
               .firstWhere((element) => element.id == stateOfRealEstate)
               .state;
+      // حالة الحراج
+      int garageState = realEstateData.apartementGarage;
+      aprtartementsExcelSheet
+              .cell(xlsx.CellIndex.indexByString('G${i + 8}'))
+              .cellStyle =
+          xlsx.CellStyle(
+              backgroundColorHex:
+                  stateOfRealEstate >= 1 ? '#f8cbad' : '#c6e0b4');
+      aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('G${i + 8}')).value =
+          garageState == 1
+              ? 'حصة جراج واحدة'
+              : garageState == 2
+                  ? 'حصتين جراج'
+                  : "لا يوجد حصة جراج";
     }
     aprtartementExcel.save(
         fileName: 'Spain City وحدات العمارة رقم $buildingId.xlsx');
@@ -293,6 +313,19 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
       onSort: (sortedColumns) {},
       columns: [
         // Set the name of the column
+        DaviColumn(
+          width: 150,
+          name: 'حالة الجراج',
+          cellBuilder: (context, row) {
+            return Text(row.data.apartementGarage == 1
+                ? 'حصة جراج واحدة'
+                : row.data.apartementGarage == 2
+                    ? 'حصتين جراج'
+                    : "لا يوجد حصة جراج");
+          },
+          sortable: true,
+          intValue: (row) => row.apartementGarage,
+        ),
 
         DaviColumn(
           width: 150,
@@ -402,8 +435,11 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
     var deleteResponse = await SQLFunctions.sendQuery(
         query:
             "DELETE FROM `SpainCity`.`RealEstates` WHERE (`idRealEstates` = $id);");
-
-    if (deleteResponse.statusCode == 200) {
+    var deleteAllPaymentsOfApartementResponse = await SQLFunctions.sendQuery(
+        query:
+            'DELETE FROM `SpainCity`.`PaymentsOfRealEsate` WHERE (`realEstateId` = \'$id\');');
+    if (deleteResponse.statusCode == 200 &&
+        deleteAllPaymentsOfApartementResponse.statusCode == 200) {
       setState(() {
         _model!.removeRow(
             _realEstates.firstWhere((element) => element.id == selectedRow));
@@ -453,20 +489,22 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                       ],
                     ),
                   ),
-                  Column(
-                    children: [
-                      Text(
-                        '(${_realEstates.length})',
-                        style: GoogleFonts.notoSansArabic(
-                            fontSize: 32, color: Colors.red),
-                      ),
-                      Text(
-                        'عدد السكان المقيمين',
-                        style: GoogleFonts.notoSansArabic(
-                            fontSize: 20, color: Colors.grey[700]),
-                      ),
-                    ],
-                  ),
+                  allApartementsOrFullyRecordedOnly == 'All_Owners'
+                      ? Column(
+                          children: [
+                            Text(
+                              '(${_realEstates.length})',
+                              style: GoogleFonts.notoSansArabic(
+                                  fontSize: 32, color: Colors.red),
+                            ),
+                            Text(
+                              'عدد السكان المقيمين',
+                              style: GoogleFonts.notoSansArabic(
+                                  fontSize: 20, color: Colors.grey[700]),
+                            ),
+                          ],
+                        )
+                      : const SizedBox(),
                   Row(
                     children: [
                       /* *SECTION - edit Button */

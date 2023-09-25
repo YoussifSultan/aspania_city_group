@@ -7,6 +7,7 @@ class RealEstateData {
       required this.apartementLink,
       required this.isApartementHasEnoughData,
       required this.apartementName,
+      this.apartementGarage = 0,
       this.responsibleName = '',
       this.responsiblePhone = '',
       this.ownerName = '',
@@ -29,6 +30,7 @@ class RealEstateData {
   late String ownerName;
   late String ownerPhoneNumber;
   late int ownerRole;
+  late int apartementGarage;
   late String ownerMail;
   late String ownerPassword;
   late String responsibleName;
@@ -43,6 +45,6 @@ class RealEstateData {
     return 'ID : $id || OwnerName : $ownerName || OwnerPhone : $ownerPhoneNumber || ownerMail $ownerMail'
         'ownerRole : $ownerRole || ownerPassword : $ownerPassword || apartementLink : $apartementLink'
         'Building Id : $apartementPostionInBuildingId || Floor Id : $apartementPostionInFloorId '
-        'Apartement Name : $apartementName';
+        'Apartement Name : $apartementName || Apartement Garage : $apartementGarage';
   }
 }

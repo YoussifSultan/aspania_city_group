@@ -150,6 +150,7 @@ class _ApartementSelectorState extends State<ApartementSelector> {
             apartementName: element[13],
             ownerName: element[2],
             ownerPhoneNumber: element[3],
+            apartementGarage: element[14],
             responsibleName: element[7],
             responsiblePhone: element[8]));
       }
