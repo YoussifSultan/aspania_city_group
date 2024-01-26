@@ -198,10 +198,17 @@ class _OverallPaymentsThroughPeriodState
 
 /* *!SECTION */
 /* *SECTION - SQL Backend */
-/* *SECTION - get Payment During The Month */
-  Future<void> getPaymentsDuringTheMonth() async {
+/* *SECTION - get Payment During Dates */
+  Future<void> getPaymentsDuringDates() async {
+    String fromDatePaymentFilterString =
+        "${fromDatePaymentFilter.value.year.toString()}-${fromDatePaymentFilter.value.month.toString().padLeft(2, '0')}-${fromDatePaymentFilter.value.day.toString().padLeft(2, '0')} ";
+    String toDatePaymentFilterString =
+        "${toDatePaymentFilter.value.year.toString()}-${toDatePaymentFilter.value.month.toString().padLeft(2, '0')}-${toDatePaymentFilter.value.day.toString().padLeft(2, '0')} ";
+    print(fromDatePaymentFilterString);
+    print(toDatePaymentFilterString);
     var getDataResponse = await SQLFunctions.sendQuery(
-        query: 'SELECT * FROM SpainCity.PaymentsOfRealEsate;');
+        query:
+            'SELECT * FROM SpainCity.PaymentsOfRealEsate where paymentDate between \'$fromDatePaymentFilterString\' and \'$toDatePaymentFilterString\';');
     List<PaymentData> payments = [];
 
     if (getDataResponse.statusCode == 200) {
@@ -228,7 +235,7 @@ class _OverallPaymentsThroughPeriodState
           paymentNote: getDataResponse.body));
     }
     if (_model != null && payments.isNotEmpty) {
-      _payments = payments;
+      _model!.addRows(payments);
       _model!.notifyUpdate();
     }
   }
@@ -256,7 +263,7 @@ class _OverallPaymentsThroughPeriodState
             intl.DateFormat.yMMMMEEEEd('ar').format(toDatePaymentFilter.value));
 
     _model = returnTheTableUX();
-    getPaymentsDuringTheMonth();
+    getPaymentsDuringDates();
     super.initState();
   }
 
@@ -400,17 +407,8 @@ class _OverallPaymentsThroughPeriodState
                             fromDatePaymentFilter(value);
                             _model!.removeRows();
 
-                            for (var element in _payments) {
-                              if (element.paymentDate.isAfter(
-                                      fromDatePaymentFilter.value
-                                          .subtract(const Duration(days: 1))) &&
-                                  element.paymentDate.isBefore(
-                                      toDatePaymentFilter.value
-                                          .add(const Duration(days: 1)))) {
-                                _model!.addRow(element);
-                                _model!.notifyUpdate();
-                              }
-                            }
+                            getPaymentsDuringDates();
+
                             fromDateOfPaymentsFilterTextController.text =
                                 intl.DateFormat.yMMMMEEEEd('ar')
                                     .format(fromDatePaymentFilter.value);
@@ -454,17 +452,8 @@ class _OverallPaymentsThroughPeriodState
                             toDatePaymentFilter(value);
                             _model!.removeRows();
 
-                            for (var element in _payments) {
-                              if (element.paymentDate.isAfter(
-                                      fromDatePaymentFilter.value
-                                          .subtract(const Duration(days: 1))) &&
-                                  element.paymentDate.isBefore(
-                                      toDatePaymentFilter.value
-                                          .add(const Duration(days: 1)))) {
-                                _model!.addRow(element);
-                                _model!.notifyUpdate();
-                              }
-                            }
+                            getPaymentsDuringDates();
+
                             toDateOfPaymentsFilterTextController.text =
                                 intl.DateFormat.yMMMMEEEEd('ar')
                                     .format(toDatePaymentFilter.value);
