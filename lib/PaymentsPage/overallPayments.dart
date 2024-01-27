@@ -4,6 +4,7 @@ import 'package:aspania_city_group/Common_Used/button_tile.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:aspania_city_group/PaymentsPage/AddPaymentDialog.dart';
+import 'package:aspania_city_group/class/buidlingproperties.dart';
 import 'package:aspania_city_group/class/payment.dart';
 import 'package:aspania_city_group/class/realestate.dart';
 import 'package:excel/excel.dart' as xlsx;
@@ -52,7 +53,7 @@ class _OverallPaymentsThroughPeriodState
         onSort: (sortedColumns) {},
         columns: [
           DaviColumn(
-              width: 400,
+              width: 200,
               headerAlignment: Alignment.center,
               name: 'ملاحظات',
               stringValue: (row) => row.paymentNote,
@@ -72,6 +73,36 @@ class _OverallPaymentsThroughPeriodState
               },
               name: 'تاريخ السداد',
               intValue: (row) => row.paymentDate.millisecondsSinceEpoch,
+              sortable: true),
+          DaviColumn(
+              headerAlignment: Alignment.center,
+              width: 150,
+              name: 'العمارة',
+              cellBuilder: (context, row) {
+                final List<Building> buildings = [
+                  Building(buildingName: 'عمارة رقم ۱', id: 1),
+                  Building(buildingName: 'عمارة رقم ۲', id: 2),
+                  Building(buildingName: 'عمارة رقم ۳', id: 3),
+                  Building(buildingName: 'عمارة رقم ٤', id: 4),
+                  Building(buildingName: 'عمارة رقم ٥', id: 5),
+                  Building(buildingName: 'عمارة رقم ٦', id: 6),
+                  Building(buildingName: 'عمارة رقم ۷', id: 7),
+                ];
+
+                String buildingNo =
+                    row.data.apartementLink.replaceAll(RegExp(r'[^0-9]'), '');
+
+                return Text(buildings
+                    .firstWhere(
+                        (element) => element.id == int.parse(buildingNo[0]))
+                    .buildingName);
+              },
+              intValue: (row) {
+                String buildingNo =
+                    row.apartementLink.replaceAll(RegExp(r'[^0-9]'), '');
+
+                return int.parse(buildingNo);
+              },
               sortable: true),
           DaviColumn(
               headerAlignment: Alignment.center,
@@ -127,7 +158,7 @@ class _OverallPaymentsThroughPeriodState
   /* *!SECTION */
 
 /* *SECTION - Export Excel */
-  void exportXLSXOfData() {
+  Future<void> exportXLSXOfData() async {
     var aprtartementExcel =
         xlsx.Excel.createExcel(); // automatically creates 1 empty sheet: Sheet1
     xlsx.Sheet aprtartementsExcelSheet =
@@ -152,20 +183,25 @@ class _OverallPaymentsThroughPeriodState
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('L7')).cellStyle =
         headerStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('L7')).value =
-        'تاريخ السداد';
+        'العمارة';
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('K7')).cellStyle =
         headerStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('K7')).value =
-        'مبلغ الفاتورة';
+        'تاريخ السداد';
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('J7')).cellStyle =
         headerStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('J7')).value =
+        'مبلغ الفاتورة';
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('I7')).cellStyle =
+        headerStyle;
+    aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('I7')).value =
         'ملاحظات';
 
 /* *!SECTION */
 /* *SECTION - Set Values */
-    for (var i = 0; i < _payments.length; i++) {
-      PaymentData payment = _payments[i];
+
+    for (var i = 0; i < _model!.rowsLength; i++) {
+      PaymentData payment = _model!.rowAt(i);
       //اسم المالك
       aprtartementsExcelSheet
           .cell(xlsx.CellIndex.indexByString('O${i + 8}'))
@@ -178,21 +214,42 @@ class _OverallPaymentsThroughPeriodState
       aprtartementsExcelSheet
           .cell(xlsx.CellIndex.indexByString('M${i + 8}'))
           .value = payment.apartementId;
-      // تاريخ السداد
+
+      //  العمارة
+      final List<Building> buildings = [
+        Building(buildingName: 'عمارة رقم ۱', id: 1),
+        Building(buildingName: 'عمارة رقم ۲', id: 2),
+        Building(buildingName: 'عمارة رقم ۳', id: 3),
+        Building(buildingName: 'عمارة رقم ٤', id: 4),
+        Building(buildingName: 'عمارة رقم ٥', id: 5),
+        Building(buildingName: 'عمارة رقم ٦', id: 6),
+        Building(buildingName: 'عمارة رقم ۷', id: 7),
+      ];
+
+      String buildingNo =
+          payment.apartementLink.replaceAll(RegExp(r'[^0-9]'), '');
+
       aprtartementsExcelSheet
               .cell(xlsx.CellIndex.indexByString('L${i + 8}'))
+              .value =
+          buildings
+              .firstWhere((element) => element.id == int.parse(buildingNo[0]))
+              .buildingName;
+      // تاريخ السداد
+      aprtartementsExcelSheet
+              .cell(xlsx.CellIndex.indexByString('K${i + 8}'))
               .value =
           '${payment.paymentDate.year} / ${payment.paymentDate.month} / ${payment.paymentDate.day}';
       // مبلغ الفاتورة
       aprtartementsExcelSheet
-          .cell(xlsx.CellIndex.indexByString('K${i + 8}'))
+          .cell(xlsx.CellIndex.indexByString('J${i + 8}'))
           .value = payment.paymentAmount;
       // ملاحظات
       aprtartementsExcelSheet
-          .cell(xlsx.CellIndex.indexByString('J${i + 8}'))
+          .cell(xlsx.CellIndex.indexByString('I${i + 8}'))
           .value = payment.paymentNote;
     }
-    aprtartementExcel.save(fileName: 'فواتير السداد خلال هذا الشهر.xlsx');
+    aprtartementExcel.save(fileName: 'فواتير السداد .xlsx');
 /* *!SECTION */
   }
 
@@ -204,8 +261,6 @@ class _OverallPaymentsThroughPeriodState
         "${fromDatePaymentFilter.value.year.toString()}-${fromDatePaymentFilter.value.month.toString().padLeft(2, '0')}-${fromDatePaymentFilter.value.day.toString().padLeft(2, '0')} ";
     String toDatePaymentFilterString =
         "${toDatePaymentFilter.value.year.toString()}-${toDatePaymentFilter.value.month.toString().padLeft(2, '0')}-${toDatePaymentFilter.value.day.toString().padLeft(2, '0')} ";
-    print(fromDatePaymentFilterString);
-    print(toDatePaymentFilterString);
     var getDataResponse = await SQLFunctions.sendQuery(
         query:
             'SELECT * FROM SpainCity.PaymentsOfRealEsate where paymentDate between \'$fromDatePaymentFilterString\' and \'$toDatePaymentFilterString\';');
@@ -219,6 +274,7 @@ class _OverallPaymentsThroughPeriodState
         payments.add(PaymentData(
             id: element[0],
             apartementId: element[1],
+            apartementLink: element[8],
             paymentDate: date,
             paymentAmount: element[6],
             paymentNote: element[7],
@@ -228,6 +284,7 @@ class _OverallPaymentsThroughPeriodState
       }
     } else {
       payments.add(PaymentData(
+          apartementLink: getDataResponse.statusCode.toString(),
           id: getDataResponse.statusCode,
           apartementId: getDataResponse.statusCode,
           paymentDate: DateTime.now(),
@@ -235,6 +292,7 @@ class _OverallPaymentsThroughPeriodState
           paymentNote: getDataResponse.body));
     }
     if (_model != null && payments.isNotEmpty) {
+      // _payments = payments;
       _model!.addRows(payments);
       _model!.notifyUpdate();
     }

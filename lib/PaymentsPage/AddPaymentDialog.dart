@@ -76,6 +76,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
         PaymentData payment;
         if (widget.state == 'Edit') {
           payment = PaymentData(
+              apartementLink: selectedOwner.apartementLink,
               id: widget.paymentData!.id,
               apartementName: selectedOwner.apartementName,
               ownerName: selectedOwner.ownerName,
@@ -97,6 +98,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
               id: await getPaymentLastID() + 1,
               apartementName: selectedOwner.apartementName,
               ownerName: selectedOwner.ownerName,
+              apartementLink: selectedOwner.apartementLink,
               ownerPhoneNumber: selectedOwner.ownerPhoneNumber,
               apartementId: selectedOwner.id,
               paymentDate: paymentDate,
@@ -127,10 +129,10 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
     var insertDataResponse = await SQLFunctions.sendQuery(
         query:
             'INSERT INTO `SpainCity`.`PaymentsOfRealEsate` (`Id`, `realEstateId`, `realEstateOwnerName`,'
-            ' `realEstateOwnerTelephone`, `realEstateApartementName`, `paymentDate`, `paymentAmount`, `paymentNote`)'
+            ' `realEstateOwnerTelephone`, `realEstateApartementName`, `paymentDate`, `paymentAmount`, `paymentNote` , `realEstateLink`)'
             ' VALUES (\'${paymentData.id}\', \'${paymentData.apartementId}\', \'${paymentData.ownerName}\','
             ' \'${paymentData.ownerPhoneNumber}\', \'${paymentData.apartementName}\', '
-            '\'${paymentData.paymentDate}\', \'${paymentData.paymentAmount}\', \'${paymentData.paymentNote}\');');
+            '\'${paymentData.paymentDate}\', \'${paymentData.paymentAmount}\', \'${paymentData.paymentNote}\' ,\'${paymentData.apartementLink}\');');
     return insertDataResponse.statusCode;
   }
 
