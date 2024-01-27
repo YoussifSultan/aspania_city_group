@@ -154,9 +154,9 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
     ];
     final List<ApartementStatus> apartementState = [
       ApartementStatus(state: 'مقيم', id: 1),
-      ApartementStatus(state: 'تحت التشطيب', id: 2),
-      ApartementStatus(state: 'مباعة \\ مغلق', id: 3),
-      ApartementStatus(state: 'طرف الشركة', id: 4),
+      ApartementStatus(state: 'غير مقيم', id: 2),
+      ApartementStatus(state: 'طرف الشركة', id: 3),
+      ApartementStatus(state: 'test', id: 4),
     ];
     var aprtartementExcel =
         xlsx.Excel.createExcel(); // automatically creates 1 empty sheet: Sheet1
@@ -252,9 +252,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                   ? '#c6e0b4'
                   : stateOfRealEstate == 2
                       ? '#ffe699'
-                      : stateOfRealEstate == 3
-                          ? '#b4c6e7'
-                          : '#f8cbad');
+                      : '#f8cbad');
       aprtartementsExcelSheet
               .cell(xlsx.CellIndex.indexByString('H${i + 8}'))
               .value =
@@ -303,9 +301,9 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
     ];
     final List<ApartementStatus> apartementState = [
       ApartementStatus(state: 'مقيم', id: 1),
-      ApartementStatus(state: 'تحت التشطيب', id: 2),
-      ApartementStatus(state: 'مباعة \\ مغلق', id: 3),
-      ApartementStatus(state: 'طرف الشركة', id: 4),
+      ApartementStatus(state: 'غير مقيم', id: 2),
+      ApartementStatus(state: 'طرف الشركة', id: 3),
+      ApartementStatus(state: 'test', id: 4),
     ];
     /* *!SECTION */
     return DaviModel(
@@ -340,17 +338,13 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                       ? Colors.greenAccent.withOpacity(0.2)
                       : row.data.apartementStatusId == 2
                           ? Colors.yellowAccent.withOpacity(0.2)
-                          : row.data.apartementStatusId == 3
-                              ? Colors.blueAccent.withOpacity(0.2)
-                              : Colors.redAccent.withOpacity(0.2),
+                          : Colors.redAccent.withOpacity(0.2),
                   border: Border.all(
                     color: row.data.apartementStatusId == 1
                         ? Colors.green.shade900
                         : row.data.apartementStatusId == 2
                             ? Colors.yellow.shade900
-                            : row.data.apartementStatusId == 3
-                                ? Colors.blue.shade900
-                                : Colors.red.shade900,
+                            : Colors.red.shade900,
                   ),
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                 ),
@@ -365,9 +359,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage> {
                           ? Colors.green.shade900
                           : row.data.apartementStatusId == 2
                               ? Colors.yellow.shade900
-                              : row.data.apartementStatusId == 3
-                                  ? Colors.blue.shade900
-                                  : Colors.red.shade900,
+                              : Colors.red.shade900,
                     ),
                   ),
                 ),

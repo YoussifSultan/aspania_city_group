@@ -92,9 +92,8 @@ class _AddRealEstateState extends State<AddRealEstate> {
   ];
   final List<ApartementStatus> apartementState = [
     ApartementStatus(state: 'مقيم', id: 1),
-    ApartementStatus(state: 'تحت التشطيب', id: 2),
-    ApartementStatus(state: 'مباعة \\ مغلق', id: 3),
-    ApartementStatus(state: 'طرف الشركة', id: 4),
+    ApartementStatus(state: 'غير مقيم', id: 2),
+    ApartementStatus(state: 'طرف الشركة', id: 3),
   ];
   final List<OwnerRole> ownerRole = [
     const OwnerRole(
