@@ -10,8 +10,8 @@ import 'package:http/src/response.dart';
 import '../class/buidlingproperties.dart';
 
 class ApartementSelector extends StatefulWidget {
-  const ApartementSelector({super.key});
-
+  const ApartementSelector({super.key, required this.width});
+  final double width;
   @override
   State<ApartementSelector> createState() => _ApartementSelectorState();
 }
@@ -22,7 +22,7 @@ class _ApartementSelectorState extends State<ApartementSelector> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Container(
-      width: width * 0.4,
+      width: widget.width,
       height: height * 0.8,
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(

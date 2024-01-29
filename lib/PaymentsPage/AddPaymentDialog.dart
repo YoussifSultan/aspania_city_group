@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:aspania_city_group/Common_Used/button_tile.dart';
+import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:aspania_city_group/Common_Used/text_tile.dart';
+import 'package:aspania_city_group/Dashboard/dashboard.dart';
 import 'package:aspania_city_group/DataTableForApartements/ApartementSelector.dart';
 import 'package:aspania_city_group/class/payment.dart';
 import 'package:aspania_city_group/class/realestate.dart';
@@ -10,11 +12,17 @@ import 'package:aspania_city_group/class/validators.dart';
 import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 
 class AddPaymentDialog extends StatefulWidget {
-  const AddPaymentDialog(
-      {super.key, required this.state, this.selectedOwner, this.paymentData});
+  const AddPaymentDialog({
+    super.key,
+    required this.state,
+    this.selectedOwner,
+    this.paymentData,
+  });
   final String state;
+
   final RealEstateData? selectedOwner;
   final PaymentData? paymentData;
 
@@ -168,18 +176,23 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
   /* *!SECTION */
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(20)),
-      width: 465,
-      height: 455,
-      child: ListView(
-        shrinkWrap: true,
+    /* *SECTION - Mobile View */
+    if (NavigationProperties.sizingInformation.deviceScreenType ==
+            DeviceScreenType.tablet ||
+        NavigationProperties.sizingInformation.deviceScreenType ==
+            DeviceScreenType.mobile) {
+      /* *SECTION - Main Screen */
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          const SizedBox(
+            height: 20,
+          ),
           /* *SECTION - Owner Who Payed TextField */
           TextTile(
-              width: 435,
+              width:
+                  NavigationProperties.sizingInformation.screenSize.width * 0.8,
               textController: selectedOwnerToAddPaymentTextController,
               title: "مالك الوحدة",
               hintText: "اختر المالك الوحدة",
@@ -189,7 +202,11 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                     builder: ((context) => FluidDialog(
                           rootPage: FluidDialogPage(
                             builder: (context) {
-                              return const ApartementSelector();
+                              return ApartementSelector(
+                                width: NavigationProperties
+                                        .sizingInformation.screenSize.width *
+                                    0.95,
+                              );
                             },
                           ),
                         ))).then((value) {
@@ -200,64 +217,58 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
               },
               icon: Icons.person_search_outlined),
           /* *!SECTION */
-          /* *SECTION - Payment Amount & DateTextFields */
 
-          Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              /* *SECTION - Payment Date TextField */
-              TextTile(
-                  width: 200,
-                  textController: dateOfPaymentTextController,
-                  title: 'تاريخ السداد',
-                  onTap: () {
-                    showDatePicker(
-                            textDirection: TextDirection.rtl,
-                            cancelText: "الغاء",
-                            confirmText: "تأكيد",
-                            context: context,
-                            initialDate: paymentDate,
-                            firstDate: DateTime(2020),
-                            lastDate: DateTime.now())
-                        .then((value) {
-                      paymentDate = value ?? paymentDate;
-                      dateOfPaymentTextController.text =
-                          '${paymentDate.year} / ${paymentDate.month} / ${paymentDate.day}';
-                    });
-                  },
-                  hintText: 'اختر التاريخ',
-                  icon: Icons.calendar_month_outlined),
-              /* *!SECTION */
-              const SizedBox(
-                width: 20,
-              ),
-              /* *SECTION - Payment Amount TextField */
-              TextTile(
-                  width: 200,
-                  onChange: (text, errorText) {
-                    if (Validators.isNumeric(text)) {
-                      errors.removeWhere((element) =>
-                          element.errorText == 'Amount Not Number');
-                      errorText('');
-                      paymentAmount = double.parse(text);
-                    } else {
-                      errorText('ادخل ارقام فقط');
-                      errors.add(const Validators(
-                          errorText: 'Amount Not Number', errorID: '1'));
-                    }
-                  },
-                  textController: amountOfPaymentTextController,
-                  title: 'المبلغ',
-                  hintText: 'ادخل المبلغ',
-                  icon: Icons.money),
-              /* *!SECTION */
-            ],
-          ),
+          /* *SECTION - Payment Date TextField */
+          TextTile(
+              width:
+                  NavigationProperties.sizingInformation.screenSize.width * 0.8,
+              textController: dateOfPaymentTextController,
+              title: 'تاريخ السداد',
+              onTap: () {
+                showDatePicker(
+                        textDirection: TextDirection.rtl,
+                        cancelText: "الغاء",
+                        confirmText: "تأكيد",
+                        context: context,
+                        initialDate: paymentDate,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime.now())
+                    .then((value) {
+                  paymentDate = value ?? paymentDate;
+                  dateOfPaymentTextController.text =
+                      '${paymentDate.year} / ${paymentDate.month} / ${paymentDate.day}';
+                });
+              },
+              hintText: 'اختر التاريخ',
+              icon: Icons.calendar_month_outlined),
+          /* *!SECTION */
+
+          /* *SECTION - Payment Amount TextField */
+          TextTile(
+              width:
+                  NavigationProperties.sizingInformation.screenSize.width * 0.8,
+              onChange: (text, errorText) {
+                if (Validators.isNumeric(text)) {
+                  errors.removeWhere(
+                      (element) => element.errorText == 'Amount Not Number');
+                  errorText('');
+                  paymentAmount = double.parse(text);
+                } else {
+                  errorText('ادخل ارقام فقط');
+                  errors.add(const Validators(
+                      errorText: 'Amount Not Number', errorID: '1'));
+                }
+              },
+              textController: amountOfPaymentTextController,
+              title: 'المبلغ',
+              hintText: 'ادخل المبلغ',
+              icon: Icons.money),
           /* *!SECTION */
           /* *SECTION - Payment Note TextField */
 
           TextTile(
-              width: 430,
+              width:
+                  NavigationProperties.sizingInformation.screenSize.width * 0.8,
               height: 100,
               textController: noteOfPaymentTextController,
               title: 'ملاحظات',
@@ -267,7 +278,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
               hintText: 'ادخل الملاحظات',
               icon: Icons.description_outlined),
           /* *!SECTION */
-          /* *SECTION - Add Or Edit Button & Cancel Button */
+
+          /* *SECTION - Add Or Edit Button */
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -283,19 +295,151 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                         addOrEditPayment();
                       },
                       buttonText: 'تعديل'),
-              const SizedBox(
-                width: 20,
-              ),
-              ButtonTile(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  buttonText: 'الغاء'),
             ],
-          )
+          ),
           /* *!SECTION */
         ],
-      ),
-    );
+      );
+      /* *!SECTION */
+    }
+    /* *!SECTION */
+    /* *SECTION - Desktop View */
+    if (NavigationProperties.sizingInformation.deviceScreenType ==
+        DeviceScreenType.desktop) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(20)),
+        width: 465,
+        height: 455,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            /* *SECTION - Owner Who Payed TextField */
+            TextTile(
+                width: 435,
+                textController: selectedOwnerToAddPaymentTextController,
+                title: "مالك الوحدة",
+                hintText: "اختر المالك الوحدة",
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: ((context) => FluidDialog(
+                            rootPage: FluidDialogPage(
+                              builder: (context) {
+                                return ApartementSelector(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                );
+                              },
+                            ),
+                          ))).then((value) {
+                    selectedOwner = value;
+                    selectedOwnerToAddPaymentTextController.text =
+                        value.ownerName;
+                  });
+                },
+                icon: Icons.person_search_outlined),
+            /* *!SECTION */
+            /* *SECTION - Payment Amount & DateTextFields */
+
+            Row(
+              textDirection: TextDirection.rtl,
+              children: [
+                /* *SECTION - Payment Date TextField */
+                TextTile(
+                    width: 200,
+                    textController: dateOfPaymentTextController,
+                    title: 'تاريخ السداد',
+                    onTap: () {
+                      showDatePicker(
+                              textDirection: TextDirection.rtl,
+                              cancelText: "الغاء",
+                              confirmText: "تأكيد",
+                              context: context,
+                              initialDate: paymentDate,
+                              firstDate: DateTime(2020),
+                              lastDate: DateTime.now())
+                          .then((value) {
+                        paymentDate = value ?? paymentDate;
+                        dateOfPaymentTextController.text =
+                            '${paymentDate.year} / ${paymentDate.month} / ${paymentDate.day}';
+                      });
+                    },
+                    hintText: 'اختر التاريخ',
+                    icon: Icons.calendar_month_outlined),
+                /* *!SECTION */
+                const SizedBox(
+                  width: 20,
+                ),
+                /* *SECTION - Payment Amount TextField */
+                TextTile(
+                    width: 200,
+                    onChange: (text, errorText) {
+                      if (Validators.isNumeric(text)) {
+                        errors.removeWhere((element) =>
+                            element.errorText == 'Amount Not Number');
+                        errorText('');
+                        paymentAmount = double.parse(text);
+                      } else {
+                        errorText('ادخل ارقام فقط');
+                        errors.add(const Validators(
+                            errorText: 'Amount Not Number', errorID: '1'));
+                      }
+                    },
+                    textController: amountOfPaymentTextController,
+                    title: 'المبلغ',
+                    hintText: 'ادخل المبلغ',
+                    icon: Icons.money),
+                /* *!SECTION */
+              ],
+            ),
+            /* *!SECTION */
+            /* *SECTION - Payment Note TextField */
+
+            TextTile(
+                width: 430,
+                height: 100,
+                textController: noteOfPaymentTextController,
+                title: 'ملاحظات',
+                onChange: (text, errorText) {
+                  paymentNote = text;
+                },
+                hintText: 'ادخل الملاحظات',
+                icon: Icons.description_outlined),
+            /* *!SECTION */
+            /* *SECTION - Add Or Edit Button & Cancel Button */
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                widget.state == 'Add'
+                    ? ButtonTile(
+                        onTap: () {
+                          addOrEditPayment();
+                        },
+                        buttonText: 'حفظ')
+                    : ButtonTile(
+                        onTap: () {
+                          addOrEditPayment();
+                        },
+                        buttonText: 'تعديل'),
+                const SizedBox(
+                  width: 20,
+                ),
+                ButtonTile(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    buttonText: 'الغاء'),
+              ],
+            )
+            /* *!SECTION */
+          ],
+        ),
+      );
+    }
+    /* *!SECTION */
+    return const SizedBox();
   }
 }

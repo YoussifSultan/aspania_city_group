@@ -474,7 +474,9 @@ class _PaymentsPageOfSpecifiedApartementState
                                   builder: ((context) => FluidDialog(
                                         rootPage: FluidDialogPage(
                                           builder: (context) {
-                                            return const ApartementSelector();
+                                            return ApartementSelector(
+                                              width: width * 0.4,
+                                            );
                                           },
                                         ),
                                       ))).then((value) async {

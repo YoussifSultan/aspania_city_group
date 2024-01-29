@@ -1,8 +1,10 @@
 /* *SECTION - ValueNotifiers */
 import 'package:flutter/material.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 
 /* *NOTE - 
 selectedTabVaueNotifier has only 
@@ -30,9 +32,16 @@ class NavigationProperties {
   static String realEstateSummaryPageRoute = 'realEstateSummary';
   static String addNewRealEstatePageRoute = 'AddNewApartement';
   static String dataTableOfApartements = 'showAllApartements';
+  static ZoomDrawerController drawerController = ZoomDrawerController();
+
+  static SizingInformation sizingInformation = SizingInformation(
+      deviceScreenType: DeviceScreenType.mobile,
+      refinedSize: RefinedSize.normal,
+      screenSize: Size.zero,
+      localWidgetSize: Size.zero);
   /* *!SECTION */
   static List selectedTabNeededParamters = [];
-  static RxString selectedTabVaueNotifier = 'Apartemnts'.obs;
+  static RxString selectedTabVaueNotifier = 'realEstateSummary'.obs;
 }
 
 /* *!SECTION */

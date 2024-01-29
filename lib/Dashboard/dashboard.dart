@@ -2,10 +2,13 @@ import 'package:aspania_city_group/Add_RealEstate/add_real_estate.dart';
 import 'package:aspania_city_group/Dashboard/real_estate_summary.dart';
 import 'package:aspania_city_group/DataTableForApartements/ShowAllApartements.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
+import 'package:aspania_city_group/DrawerMobile/MenuDrawer.dart';
 import 'package:aspania_city_group/PaymentsPage/overallPayments.dart';
 import 'package:aspania_city_group/Sign_InPage/SignIn_Page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
 import '../PaymentsPage/PaymentsDetailedPage.dart';
@@ -19,14 +22,8 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
-  /* *SECTION -  Animations */
-  /* *!SECTION */
-  /* *SECTION - ValueNotifiers */
-  /* *!SECTION */
-  /* *SECTION - Dispose */
-
-  /* *!SECTION */
   /* *SECTION - Init State */
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +38,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       backgroundColor: Colors.grey[100],
       body: SafeArea(child: ResponsiveBuilder(
         builder: (context, sizingInformation) {
+          NavigationProperties.sizingInformation = sizingInformation;
           // Check the sizing information here and return your UI
           /* *SECTION - Desktop Ui */
           if (sizingInformation.deviceScreenType == DeviceScreenType.desktop) {
@@ -56,48 +54,17 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   return FadeTransition(
                     opacity: openMainScreenAnimationController,
                     child: Container(
-                      padding: const EdgeInsets.only(
-                          top: 20, left: 20, right: 20, bottom: 20),
-                      width: width > 1250 ? width * 0.80 : width * 0.7,
-                      height: height * 0.95,
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: NavigationProperties.selectedTabVaueNotifier
-                                  .toString() ==
-                              NavigationProperties.realEstateSummaryPageRoute
-                          /* *SECTION - Real Estate Part */
-                          ? const RealEstatesPage()
-                          /* *!SECTION */
-                          : NavigationProperties.selectedTabVaueNotifier
-                                      .toString() ==
-                                  NavigationProperties.addNewRealEstatePageRoute
-                              ? AddRealEstate(
-                                  windowState: NavigationProperties
-                                      .selectedTabNeededParamters[1],
-                                  buildingNumber: NavigationProperties
-                                      .selectedTabNeededParamters[0],
-                                  dataToEdit: NavigationProperties
-                                      .selectedTabNeededParamters[2],
-                                )
-                              : NavigationProperties.selectedTabVaueNotifier
-                                          .toString() ==
-                                      NavigationProperties
-                                          .dataTableOfApartements
-                                  ? const ShowwAllAprtementsPage()
-                                  : NavigationProperties.selectedTabVaueNotifier
-                                              .toString() ==
-                                          NavigationProperties
-                                              .paymentsDetailedPageRoute
-                                      ? const PaymentsPageOfSpecifiedApartement()
-                                      : NavigationProperties
-                                                  .selectedTabVaueNotifier
-                                                  .toString() ==
-                                              NavigationProperties
-                                                  .overallPaymentsThroughPeriodPageRoute
-                                          ? const OverallPaymentsThroughPeriod()
-                                          : const SizedBox(),
-                    ),
+                        padding: const EdgeInsets.only(
+                            top: 20, left: 20, right: 20, bottom: 20),
+                        width: width > 1250 ? width * 0.80 : width * 0.7,
+                        height: height * 0.95,
+                        decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
+                        child: getScreenRequired(NavigationProperties
+                            .selectedTabVaueNotifier
+                            .toString())),
                   );
                 }),
                 const SizedBox(
@@ -201,7 +168,106 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           /* *!SECTION */
           if (sizingInformation.deviceScreenType == DeviceScreenType.tablet ||
               sizingInformation.deviceScreenType == DeviceScreenType.mobile) {
-            return Container(color: Colors.red);
+            return ZoomDrawer(
+              controller: NavigationProperties.drawerController,
+              style: DrawerStyle.defaultStyle,
+              menuScreen: const DrawerMenuScreen(),
+              isRtl: true,
+              mainScreen: Container(
+                color: Colors.grey[100],
+                child: ListView(
+                  children: [
+                    /* *SECTION - Top Part */
+                    Container(
+                      height: height * 0.07,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 10),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15)),
+                      child: Row(
+                        textDirection: TextDirection.rtl,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          /* *SECTION - Menu Icon */
+                          IconButton.filled(
+                              onPressed: () {
+                                NavigationProperties.drawerController.toggle!();
+                              },
+                              focusColor: Colors.transparent,
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Colors.transparent)),
+                              icon: const Icon(
+                                Icons.menu,
+                                color: Colors.black,
+                                size: 24,
+                              )),
+                          /* *!SECTION */
+                          /* *SECTION - Title Leaved to Changing*/
+                          Text(
+                            'اسبانيا سيتي',
+                            style: GoogleFonts.notoSansArabic(
+                                fontSize: 20, fontWeight: FontWeight.w500),
+                          ),
+                          /* *!SECTION */
+                          /* *SECTION - Home Icon */
+                          IconButton.filled(
+                              onPressed: () {},
+                              focusColor: Colors.transparent,
+                              style: const ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Colors.transparent)),
+                              icon: const Icon(
+                                Icons.more_horiz_outlined,
+                                color: Colors.black,
+                                size: 24,
+                              )),
+                          /* *!SECTION */
+                        ],
+                      ),
+                    ),
+
+                    /* *SECTION - Main Screen */
+
+                    Obx(() {
+                      AnimationController openMainScreenAnimationController =
+                          AnimationController(
+                              vsync: this,
+                              duration: const Duration(seconds: 1));
+                      openMainScreenAnimationController.forward();
+                      return FadeTransition(
+                          opacity: openMainScreenAnimationController,
+                          child: Container(
+                              clipBehavior: Clip.hardEdge,
+                              height:
+                                  sizingInformation.screenSize.height * 0.87,
+                              padding:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              margin: const EdgeInsets.only(
+                                  bottom: 10, left: 10, right: 10),
+                              decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(24))),
+                              child: getScreenRequired(NavigationProperties
+                                  .selectedTabVaueNotifier
+                                  .toString())));
+                    })
+                    /* *!SECTION */
+                  ],
+                ),
+              ),
+              borderRadius: 24.0,
+              showShadow: true,
+              angle: 0.0,
+              drawerShadowsBackgroundColor: Colors.grey[300] ?? Colors.white,
+              slideWidth: MediaQuery.of(context).size.width * 0.85,
+              openCurve: Curves.fastOutSlowIn,
+              closeCurve: Curves.bounceIn,
+            );
           }
 
           if (sizingInformation.deviceScreenType == DeviceScreenType.watch) {
@@ -212,5 +278,29 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         },
       )),
     );
+  }
+
+  Widget getScreenRequired(String requiredScreen) {
+    /* *SECTION - Real Estate Part */
+    if (requiredScreen == NavigationProperties.realEstateSummaryPageRoute) {
+      return const RealEstatesPage();
+    } else if (requiredScreen ==
+        NavigationProperties.addNewRealEstatePageRoute) {
+      return AddRealEstate(
+        windowState: NavigationProperties.selectedTabNeededParamters[1],
+        buildingNumber: NavigationProperties.selectedTabNeededParamters[0],
+        dataToEdit: NavigationProperties.selectedTabNeededParamters[2],
+      );
+    } else if (requiredScreen == NavigationProperties.dataTableOfApartements) {
+      return const ShowwAllAprtementsPage();
+    } else if (requiredScreen ==
+        NavigationProperties.paymentsDetailedPageRoute) {
+      return const PaymentsPageOfSpecifiedApartement();
+    } else if (requiredScreen ==
+        NavigationProperties.overallPaymentsThroughPeriodPageRoute) {
+      return const OverallPaymentsThroughPeriod();
+    }
+
+    return const SizedBox();
   }
 }
