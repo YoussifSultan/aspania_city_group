@@ -49,6 +49,7 @@ class _DrawerMenuScreenState extends State<DrawerMenuScreen> {
               ];
               NavigationProperties.selectedTabVaueNotifier(
                   NavigationProperties.dataTableOfApartements);
+
               NavigationProperties.drawerController.toggle!();
             },
           ),

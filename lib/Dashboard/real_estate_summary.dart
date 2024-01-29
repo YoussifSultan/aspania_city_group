@@ -54,8 +54,22 @@ class RealEstatesPage extends StatelessWidget {
                           .firstWhere((element) => element.id == index + 1)
                           .buildingName,
                       onAddingNewApartementButtonTap: () {},
-                      onShowAllOwnersInRealEstateButtonTap: () {},
-                      onShowAllApartementsInRealEstateButtonTap: () {});
+                      onShowAllOwnersInRealEstateButtonTap: () {
+                        NavigationProperties.selectedTabNeededParamters = [
+                          index + 1,
+                          'Recorded_Apartements'
+                        ];
+                        NavigationProperties.selectedTabVaueNotifier(
+                            NavigationProperties.dataTableOfApartements);
+                      },
+                      onShowAllApartementsInRealEstateButtonTap: () {
+                        NavigationProperties.selectedTabNeededParamters = [
+                          index + 1,
+                          'All_Apartements'
+                        ];
+                        NavigationProperties.selectedTabVaueNotifier(
+                            NavigationProperties.dataTableOfApartements);
+                      });
                 },
               ),
               const SizedBox(
