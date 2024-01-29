@@ -501,7 +501,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
                     return Obx(() {
                       return AnimatedContainer(
                         height: selectedRealestateFordetails.value == index
-                            ? 300
+                            ? 400
                             : 190,
                         padding: const EdgeInsets.fromLTRB(15, 5, 15, 10),
                         decoration: BoxDecoration(
@@ -703,6 +703,37 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
                                                       2
                                                   ? 'حصتين جراج'
                                                   : "لا يوجد حصة جراج"),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      MenuButtonCard(
+                                        icon: Icons.delete_outline,
+                                        title: 'حذف الوحدة',
+                                        onTap: () {
+                                          deleteData(_realEstates[index].id);
+                                        },
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      MenuButtonCard(
+                                        icon: Icons.edit_outlined,
+                                        title: 'تعديل الوحدة',
+                                        onTap: () {
+                                          NavigationProperties
+                                              .selectedTabNeededParamters = [
+                                            -1,
+                                            'EditOwner',
+                                            _realEstates.firstWhere((element) =>
+                                                element.id ==
+                                                _realEstates[index].id)
+                                          ];
+                                          NavigationProperties
+                                              .selectedTabVaueNotifier(
+                                                  NavigationProperties
+                                                      .addNewRealEstatePageRoute);
+                                        },
+                                      ),
                                     ],
                                   )),
                             ) /* *!SECTION */

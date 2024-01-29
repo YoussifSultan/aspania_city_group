@@ -59,6 +59,7 @@ class TextTile extends StatelessWidget {
                   width: width,
                   height: height,
                   child: TextField(
+                    textAlign: TextAlign.right,
                     onTap: () {
                       if (expandable) {
                         onTap!();
@@ -66,7 +67,6 @@ class TextTile extends StatelessWidget {
                     },
                     readOnly: expandable,
                     maxLines: height != 50 ? 3 : 1,
-                    textDirection: TextDirection.rtl,
                     controller: textController,
                     onChanged: (value) {
                       if (onChange != null) {

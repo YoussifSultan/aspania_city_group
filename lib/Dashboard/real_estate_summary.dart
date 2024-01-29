@@ -53,7 +53,22 @@ class RealEstatesPage extends StatelessWidget {
                       realEstateName: realEstates
                           .firstWhere((element) => element.id == index + 1)
                           .buildingName,
-                      onAddingNewApartementButtonTap: () {},
+                      onAddingNewApartementButtonTap: () {
+                        NavigationProperties.selectedTabNeededParamters = [
+                          index + 1,
+                          'AddOwner',
+                          RealEstateData(
+                              id: 0,
+                              apartementStatusId: 0,
+                              apartementPostionInFloorId: 0,
+                              apartementPostionInBuildingId: 0,
+                              apartementLink: 'None',
+                              isApartementHasEnoughData: false,
+                              apartementName: 'None')
+                        ];
+                        NavigationProperties.selectedTabVaueNotifier(
+                            NavigationProperties.addNewRealEstatePageRoute);
+                      },
                       onShowAllOwnersInRealEstateButtonTap: () {
                         NavigationProperties.selectedTabNeededParamters = [
                           index + 1,

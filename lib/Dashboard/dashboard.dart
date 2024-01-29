@@ -215,7 +215,29 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           /* *!SECTION */
                           /* *SECTION - Home Icon */
                           IconButton.filled(
-                              onPressed: () {},
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  clipBehavior: Clip.hardEdge,
+                                  context: context,
+                                  backgroundColor: Colors.grey[50],
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(20),
+                                          topLeft: Radius.circular(20))),
+                                  builder: (context) {
+                                    return Container(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          20, 20, 20, 20),
+                                      child: const Column(
+                                        children: [
+                                          MenuButtonCard(
+                                              icon: Icons.abc, title: 'test')
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
                               focusColor: Colors.transparent,
                               style: const ButtonStyle(
                                   backgroundColor: MaterialStatePropertyAll(

@@ -55,4 +55,59 @@ class DialogOfTile {
       ),
     );
   }
+
+  static Future<dynamic> bottomSheetTile(
+      {required BuildContext context,
+      required double width,
+      required double height,
+      required Function onMenuButtonTap,
+      required List<String> menuStrings}) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          /* *SECTION - Building Selection */
+          return Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(20)),
+                color: Colors.grey[50],
+              ),
+              padding: const EdgeInsets.all(10),
+              height: height * 0.6,
+              child: ScrollConfiguration(
+                behavior:
+                    ScrollConfiguration.of(context).copyWith(scrollbars: false),
+                child: ListView.separated(
+                  itemCount: menuStrings.length,
+                  itemBuilder: (context, index) {
+                    /* *SECTION - Building Item With Hover */
+                    RxBool onHoverOfBuildingItem = false.obs;
+                    return Obx(() {
+                      return MenuButtonCard(
+                          backgroundColor: onHoverOfBuildingItem.value
+                              ? Colors.grey[500]
+                              : Colors.white,
+                          icon: Icons.abc,
+                          hasIcon: false,
+                          onHover: (isHovering) {
+                            onHoverOfBuildingItem(isHovering);
+                          },
+                          onTap: () {
+                            onMenuButtonTap(index);
+                          },
+                          title: menuStrings[index]);
+                    });
+                    /* *!SECTION */
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(
+                      height: 10,
+                    );
+                  },
+                ),
+              ));
+          /* *!SECTION */
+        });
+  }
 }

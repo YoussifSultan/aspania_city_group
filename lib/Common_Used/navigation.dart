@@ -1,4 +1,5 @@
 /* *SECTION - ValueNotifiers */
+import 'package:aspania_city_group/class/realestate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
