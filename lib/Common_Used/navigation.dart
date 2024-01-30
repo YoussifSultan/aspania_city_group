@@ -23,6 +23,9 @@ buildingNumber , window State (Edit_Owner, Add_Owner), realestate data
 6. Add Payment Page Mobile (
   State(Edit,Add) , selectedOwner, paymentData
 )
+7. Filter Page Mobile (
+  state(PaymentsDuringMonth,PaymentsWithFilter), [Buidling No ,from date,toDate,ownerSearchName]
+)
  */
 class NavigationProperties {
   static String ownerPageRoute = 'Owners';
@@ -31,6 +34,7 @@ class NavigationProperties {
   static String overallPaymentsThroughPeriodPageRoute =
       'OverallPaymentPeriodPage';
   static String addPaymentMobilePage = 'AddNewPayment';
+  static String filterPaymentsPage = 'filterPaymentPage';
   /* *!SECTION */
   static String nonePageRoute = 'None';
   /* *SECTION - Apartements */

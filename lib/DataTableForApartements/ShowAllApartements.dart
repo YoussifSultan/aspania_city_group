@@ -489,7 +489,9 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
 
       return Obx(() {
         if (updateMobileListWhenDataIsPopulated.value == false) {
-          return const SizedBox();
+          return const Center(
+              child: SizedBox(
+                  height: 50, width: 50, child: CircularProgressIndicator()));
         }
         final List<ApartementStatus> apartementState = [
           ApartementStatus(state: 'مقيم', id: 1),

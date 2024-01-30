@@ -6,6 +6,7 @@ import 'package:aspania_city_group/DataTableForApartements/ShowAllApartements.da
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/DrawerMobile/MenuDrawer.dart';
 import 'package:aspania_city_group/PaymentsPage/AddPaymentDialog.dart';
+import 'package:aspania_city_group/PaymentsPage/filter_payments_Page.dart';
 import 'package:aspania_city_group/PaymentsPage/overallPayments.dart';
 import 'package:aspania_city_group/Sign_InPage/SignIn_Page.dart';
 import 'package:flutter/material.dart';
@@ -316,13 +317,18 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       return const PaymentsPageOfSpecifiedApartement();
     } else if (requiredScreen ==
         NavigationProperties.overallPaymentsThroughPeriodPageRoute) {
-      return const OverallPaymentsThroughPeriod();
+      return OverallPaymentsThroughPeriod(
+        status: NavigationProperties.selectedTabNeededParamters[0],
+        queryStatement: NavigationProperties.selectedTabNeededParamters[1],
+      );
     } else if (requiredScreen == NavigationProperties.addPaymentMobilePage) {
       return AddPaymentDialog(
         state: NavigationProperties.selectedTabNeededParamters[0],
         selectedOwner: NavigationProperties.selectedTabNeededParamters[1],
         paymentData: NavigationProperties.selectedTabNeededParamters[2],
       );
+    } else if (requiredScreen == NavigationProperties.filterPaymentsPage) {
+      return const FilterPaymentsPage();
     }
 
     return const Text('Add it in dashboard 329:50');

@@ -24,7 +24,12 @@ import '../Common_Used/text_tile.dart';
 import '../Dashboard/menu_card_button.dart';
 
 class OverallPaymentsThroughPeriod extends StatefulWidget {
-  const OverallPaymentsThroughPeriod({super.key});
+  const OverallPaymentsThroughPeriod(
+      {super.key,
+      this.status = 'PaymentsDuringMonth',
+      required this.queryStatement});
+  final String status;
+  final String queryStatement;
 
   @override
   State<OverallPaymentsThroughPeriod> createState() =>
@@ -119,42 +124,6 @@ class _OverallPaymentsThroughPeriodState
               stringValue: (row) => row.ownerName,
               sortable: true),
         ]);
-  }
-
-  void _onLastRowWidget(bool visible) {
-    if (visible && !_loading) {
-      setState(() {
-        _loading = true;
-      });
-      if (_payments.length > lastindexOfPaymentsLoaded + 5) {
-        Future.delayed(const Duration(seconds: 2), () {
-          setState(() {
-            _loading = false;
-            List<PaymentData> newValues = _payments
-                .getRange(
-                    lastindexOfPaymentsLoaded, lastindexOfPaymentsLoaded + 5)
-                .toList();
-            lastindexOfPaymentsLoaded += 5;
-            _model!.addRows(newValues);
-          });
-        });
-      } else if ((_payments.length - lastindexOfPaymentsLoaded) <= 4) {
-        Future.delayed(const Duration(seconds: 2), () {
-          setState(() {
-            _loading = false;
-            List<PaymentData> newValues = _payments
-                .getRange(
-                    lastindexOfPaymentsLoaded,
-                    lastindexOfPaymentsLoaded +
-                        (_payments.length - lastindexOfPaymentsLoaded))
-                .toList();
-            lastindexOfPaymentsLoaded = _payments.length;
-            _model!.addRows(newValues);
-            reahedTheEndOfTable = true;
-          });
-        });
-      }
-    }
   }
 
   /* *!SECTION */
@@ -301,6 +270,46 @@ class _OverallPaymentsThroughPeriodState
   }
 
 /* *!SECTION */
+/* *SECTION - get Payment With Specific Query */
+  Future<void> getPaymentsWithSpecificQuery(String query) async {
+    var getDataResponse = await SQLFunctions.sendQuery(query: query);
+    List<PaymentData> payments = [];
+
+    if (getDataResponse.statusCode == 200) {
+      var data = json.decode(getDataResponse.body);
+      for (var element in data) {
+        DateTime date = intl.DateFormat("E, d MMM yyyy hh:mm:ss")
+            .parse(element[8].toString().replaceAll(' GMT', ''));
+
+        payments.add(PaymentData(
+            id: element[0],
+            apartementId: element[1],
+            apartementPostionInBuildingId: element[2],
+            paymentDate: date,
+            paymentAmount: element[7],
+            paymentNote: element[9],
+            ownerName: element[3],
+            apartementName: element[4].toString(),
+            ownerPhoneNumber: element[6].toString()));
+      }
+    } else {
+      payments.add(PaymentData(
+          apartementPostionInBuildingId: getDataResponse.statusCode,
+          id: getDataResponse.statusCode,
+          apartementId: getDataResponse.statusCode,
+          paymentDate: DateTime.now(),
+          paymentAmount: double.parse(getDataResponse.body),
+          paymentNote: getDataResponse.body));
+    }
+    if (_model != null && payments.isNotEmpty) {
+      _model!.addRows(payments);
+      _payments.addAll(payments);
+      _model!.notifyUpdate();
+      updateMobileListWhenDataIsPopulated(true);
+    }
+  }
+
+/* *!SECTION */
 /* *SECTION - Delete Payment */
   Future<int> deletePaymentData(int id) async {
     var deleteResponse = await SQLFunctions.sendQuery(
@@ -323,8 +332,11 @@ class _OverallPaymentsThroughPeriodState
             intl.DateFormat.yMMMMEEEEd('ar').format(toDatePaymentFilter.value));
 
     _model = returnTheTableUX();
-    getPaymentsDuringDates();
-
+    if (widget.status == 'PaymentsDuringMonth') {
+      getPaymentsDuringDates();
+    } else if (widget.status == 'PaymentsWithFilters') {
+      getPaymentsWithSpecificQuery(widget.queryStatement);
+    }
     super.initState();
   }
 
@@ -367,6 +379,12 @@ class _OverallPaymentsThroughPeriodState
             menuTitle: 'طباعة تقرير',
             onMenuTapButton: () {
               exportXLSXOfData();
+            }),
+        MenuOption(
+            menuTitle: 'تحديد البيانات',
+            onMenuTapButton: () {
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.filterPaymentsPage);
             })
       ];
 
@@ -699,7 +717,6 @@ class _OverallPaymentsThroughPeriodState
                         BoxDecoration(borderRadius: BorderRadius.circular(10)),
                     child: Davi<PaymentData>(
                       _model,
-                      onLastRowWidget: _onLastRowWidget,
                       tapToSortEnabled: true,
                       lastRowWidget: !reahedTheEndOfTable
                           ? const Center(
