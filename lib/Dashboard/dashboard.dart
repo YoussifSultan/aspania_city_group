@@ -1,4 +1,6 @@
 import 'package:aspania_city_group/Add_RealEstate/add_real_estate.dart';
+import 'package:aspania_city_group/Common_Used/dialog_tile.dart';
+import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Dashboard/real_estate_summary.dart';
 import 'package:aspania_city_group/DataTableForApartements/ShowAllApartements.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
@@ -39,7 +41,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       backgroundColor: Colors.grey[100],
       body: SafeArea(child: ResponsiveBuilder(
         builder: (context, sizingInformation) {
-          NavigationProperties.sizingInformation = sizingInformation;
+          GlobalClass.sizingInformation = sizingInformation;
           // Check the sizing information here and return your UI
           /* *SECTION - Desktop Ui */
           if (sizingInformation.deviceScreenType == DeviceScreenType.desktop) {
@@ -170,7 +172,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           if (sizingInformation.deviceScreenType == DeviceScreenType.tablet ||
               sizingInformation.deviceScreenType == DeviceScreenType.mobile) {
             return ZoomDrawer(
-              controller: NavigationProperties.drawerController,
+              controller: GlobalClass.drawerController,
               style: DrawerStyle.defaultStyle,
               menuScreen: const DrawerMenuScreen(),
               isRtl: true,
@@ -195,7 +197,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           /* *SECTION - Menu Icon */
                           IconButton.filled(
                               onPressed: () {
-                                NavigationProperties.drawerController.toggle!();
+                                GlobalClass.drawerController.toggle!();
                               },
                               focusColor: Colors.transparent,
                               style: const ButtonStyle(
@@ -214,30 +216,23 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                 fontSize: 20, fontWeight: FontWeight.w500),
                           ),
                           /* *!SECTION */
-                          /* *SECTION - Home Icon */
+                          /* *SECTION - Options Icon */
                           IconButton.filled(
                               onPressed: () {
-                                showModalBottomSheet(
-                                  clipBehavior: Clip.hardEdge,
-                                  context: context,
-                                  backgroundColor: Colors.grey[50],
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(20),
-                                          topLeft: Radius.circular(20))),
-                                  builder: (context) {
-                                    return Container(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          20, 20, 20, 20),
-                                      child: const Column(
-                                        children: [
-                                          MenuButtonCard(
-                                              icon: Icons.abc, title: 'test')
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
+                                if (GlobalClass.menuOptionsMobile.isNotEmpty) {
+                                  DialogTile.bottomSheetTile(
+                                      context: context,
+                                      width: width,
+                                      height: height,
+                                      onMenuButtonTap: (index) {
+                                        GlobalClass.menuOptionsMobile[index]
+                                            .onMenuTapButton();
+                                        Navigator.of(context).pop();
+                                      },
+                                      menuText: GlobalClass.menuOptionsMobile
+                                          .map((e) => e.menuTitle)
+                                          .toList());
+                                }
                               },
                               focusColor: Colors.transparent,
                               style: const ButtonStyle(

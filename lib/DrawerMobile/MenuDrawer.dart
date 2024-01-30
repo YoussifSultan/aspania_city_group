@@ -1,3 +1,4 @@
+import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _DrawerMenuScreenState extends State<DrawerMenuScreen> {
             onTap: () {
               NavigationProperties.selectedTabVaueNotifier(
                   NavigationProperties.realEstateSummaryPageRoute);
-              NavigationProperties.drawerController.toggle!();
+              GlobalClass.drawerController.toggle!();
             },
           ),
           /* *!SECTION */
@@ -50,7 +51,7 @@ class _DrawerMenuScreenState extends State<DrawerMenuScreen> {
               NavigationProperties.selectedTabVaueNotifier(
                   NavigationProperties.dataTableOfApartements);
 
-              NavigationProperties.drawerController.toggle!();
+              GlobalClass.drawerController.toggle!();
             },
           ),
           /* *!SECTION */
@@ -65,7 +66,7 @@ class _DrawerMenuScreenState extends State<DrawerMenuScreen> {
               NavigationProperties.selectedTabNeededParamters = [];
               NavigationProperties.selectedTabVaueNotifier(
                   NavigationProperties.overallPaymentsThroughPeriodPageRoute);
-              NavigationProperties.drawerController.toggle!();
+              GlobalClass.drawerController.toggle!();
             },
           ),
           /* *!SECTION */

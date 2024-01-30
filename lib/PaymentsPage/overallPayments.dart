@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aspania_city_group/Common_Used/button_tile.dart';
+import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Common_Used/show_data_tile.dart';
 import 'package:aspania_city_group/Common_Used/sql_functions.dart';
@@ -333,10 +334,42 @@ class _OverallPaymentsThroughPeriodState
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     /* *SECTION - Mobile View */
-    if (NavigationProperties.sizingInformation.deviceScreenType ==
+    if (GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.tablet ||
-        NavigationProperties.sizingInformation.deviceScreenType ==
+        GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.mobile) {
+      GlobalClass.menuOptionsMobile = [
+        MenuOption(
+            menuTitle: 'تسجيل فاتورة',
+            onMenuTapButton: () {
+              NavigationProperties.selectedTabNeededParamters = [
+                'Add',
+                RealEstateData(
+                    id: -1,
+                    apartementStatusId: -1,
+                    apartementPostionInFloorId: -1,
+                    apartementPostionInBuildingId: -1,
+                    apartementLink: '',
+                    isApartementHasEnoughData: false,
+                    apartementName: ''),
+                PaymentData(
+                    id: -1,
+                    apartementId: -1,
+                    apartementPostionInBuildingId: -1,
+                    paymentDate: DateTime.now(),
+                    paymentAmount: -1,
+                    paymentNote: '')
+              ];
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.addPaymentMobilePage);
+            }),
+        MenuOption(
+            menuTitle: 'طباعة تقرير',
+            onMenuTapButton: () {
+              exportXLSXOfData();
+            })
+      ];
+
       return ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
           child: ListView(children: [
@@ -363,8 +396,13 @@ class _OverallPaymentsThroughPeriodState
                       index: index,
                       selectedPaymentForDetails:
                           selectedPaymentForDetails.value,
-                      onTapDeleteButton: () {
-                        deletePaymentData(_payments[index].id);
+                      onTapDeleteButton: () async {
+                        if (await deletePaymentData(_payments[index].id) ==
+                            200) {
+                          Get.showSnackbar(const GetSnackBar(
+                            message: 'تم الحذف بنجاح',
+                          ));
+                        }
                       },
                       onTapEditButton: () async {
                         var getDataResponse = await SQLFunctions.sendQuery(
@@ -427,7 +465,7 @@ class _OverallPaymentsThroughPeriodState
     }
     /* *!SECTION */
     /* *SECTION - Desktop View */
-    else if (NavigationProperties.sizingInformation.deviceScreenType ==
+    else if (GlobalClass.sizingInformation.deviceScreenType ==
         DeviceScreenType.desktop) {
       return Scaffold(
           body: Container(

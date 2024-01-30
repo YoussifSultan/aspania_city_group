@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/show_data_tile.dart';
 import 'package:aspania_city_group/Common_Used/useful_functions.dart';
 import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
@@ -456,10 +457,36 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
     double width = MediaQuery.of(context).size.width;
     final RxBool onMoreButtonHover = false.obs;
     /* *SECTION - Mobile View */
-    if (NavigationProperties.sizingInformation.deviceScreenType ==
+    if (GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.tablet ||
-        NavigationProperties.sizingInformation.deviceScreenType ==
+        GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.mobile) {
+      GlobalClass.menuOptionsMobile = [
+        MenuOption(
+            menuTitle: 'اضافة وحدة جديدة',
+            onMenuTapButton: () {
+              NavigationProperties.selectedTabNeededParamters = [
+                -1,
+                'AddOwner',
+                RealEstateData(
+                    id: 0,
+                    apartementStatusId: 0,
+                    apartementPostionInFloorId: 0,
+                    apartementPostionInBuildingId: 0,
+                    apartementLink: 'None',
+                    isApartementHasEnoughData: false,
+                    apartementName: 'None')
+              ];
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.addNewRealEstatePageRoute);
+            }),
+        MenuOption(
+            menuTitle: 'طباعة تقرير',
+            onMenuTapButton: () {
+              exportXLSXOfData();
+            })
+      ];
+
       return Obx(() {
         if (updateMobileListWhenDataIsPopulated.value == false) {
           return const SizedBox();
@@ -545,7 +572,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
     }
     /* *!SECTION */
     /* *SECTION - Desktop View */
-    else if (NavigationProperties.sizingInformation.deviceScreenType ==
+    else if (GlobalClass.sizingInformation.deviceScreenType ==
         DeviceScreenType.desktop) {
       return Scaffold(
           body: Container(

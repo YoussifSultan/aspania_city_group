@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aspania_city_group/Common_Used/button_tile.dart';
+import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Common_Used/sql_functions.dart';
 import 'package:aspania_city_group/Common_Used/text_tile.dart';
@@ -99,7 +100,15 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
               animationDuration: Duration(seconds: 1),
               message: 'تم التعديل بنجاح',
             ));
-            if (mounted) Navigator.of(context).pop();
+            if (mounted && GlobalClass.sizingInformation.isDesktop) {
+              Navigator.of(context).pop();
+            } else if (mounted &&
+                (GlobalClass.sizingInformation.isMobile ||
+                    GlobalClass.sizingInformation.isTablet)) {
+              NavigationProperties.selectedTabNeededParamters = [];
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.overallPaymentsThroughPeriodPageRoute);
+            }
           }
         } else {
           payment = PaymentData(
@@ -119,7 +128,15 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
               animationDuration: Duration(seconds: 1),
               message: 'تم الحفظ بنجاح',
             ));
-            if (mounted) Navigator.of(context).pop();
+            if (mounted && GlobalClass.sizingInformation.isDesktop) {
+              Navigator.of(context).pop();
+            } else if (mounted &&
+                (GlobalClass.sizingInformation.isMobile ||
+                    GlobalClass.sizingInformation.isTablet)) {
+              NavigationProperties.selectedTabNeededParamters = [];
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.overallPaymentsThroughPeriodPageRoute);
+            }
           }
         }
       } else {
@@ -178,10 +195,11 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
   @override
   Widget build(BuildContext context) {
     /* *SECTION - Mobile View */
-    if (NavigationProperties.sizingInformation.deviceScreenType ==
+    if (GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.tablet ||
-        NavigationProperties.sizingInformation.deviceScreenType ==
+        GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.mobile) {
+      GlobalClass.menuOptionsMobile = [];
       /* *SECTION - Main Screen */
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -192,8 +210,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
           ),
           /* *SECTION - Owner Who Payed TextField */
           TextTile(
-              width:
-                  NavigationProperties.sizingInformation.screenSize.width * 0.8,
+              width: GlobalClass.sizingInformation.screenSize.width * 0.8,
               textController: selectedOwnerToAddPaymentTextController,
               title: "مالك الوحدة",
               hintText: "اختر المالك الوحدة",
@@ -204,7 +221,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                           rootPage: FluidDialogPage(
                             builder: (context) {
                               return ApartementSelector(
-                                width: NavigationProperties
+                                width: GlobalClass
                                         .sizingInformation.screenSize.width *
                                     0.95,
                               );
@@ -221,8 +238,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
 
           /* *SECTION - Payment Date TextField */
           TextTile(
-              width:
-                  NavigationProperties.sizingInformation.screenSize.width * 0.8,
+              width: GlobalClass.sizingInformation.screenSize.width * 0.8,
               textController: dateOfPaymentTextController,
               title: 'تاريخ السداد',
               onTap: () {
@@ -246,8 +262,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
 
           /* *SECTION - Payment Amount TextField */
           TextTile(
-              width:
-                  NavigationProperties.sizingInformation.screenSize.width * 0.8,
+              width: GlobalClass.sizingInformation.screenSize.width * 0.8,
               onChange: (text, errorText) {
                 if (Validators.isNumeric(text)) {
                   errors.removeWhere(
@@ -268,8 +283,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
           /* *SECTION - Payment Note TextField */
 
           TextTile(
-              width:
-                  NavigationProperties.sizingInformation.screenSize.width * 0.8,
+              width: GlobalClass.sizingInformation.screenSize.width * 0.8,
               height: 100,
               textController: noteOfPaymentTextController,
               title: 'ملاحظات',
@@ -305,7 +319,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
     }
     /* *!SECTION */
     /* *SECTION - Desktop View */
-    if (NavigationProperties.sizingInformation.deviceScreenType ==
+    if (GlobalClass.sizingInformation.deviceScreenType ==
         DeviceScreenType.desktop) {
       return Container(
         padding: const EdgeInsets.all(20),

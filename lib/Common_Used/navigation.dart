@@ -30,20 +30,13 @@ class NavigationProperties {
   static String paymentsDetailedPageRoute = 'PaymentDetailsInApartementPage';
   static String overallPaymentsThroughPeriodPageRoute =
       'OverallPaymentPeriodPage';
+  static String addPaymentMobilePage = 'AddNewPayment';
   /* *!SECTION */
   static String nonePageRoute = 'None';
   /* *SECTION - Apartements */
   static String realEstateSummaryPageRoute = 'realEstateSummary';
   static String addNewRealEstatePageRoute = 'AddNewApartement';
   static String dataTableOfApartements = 'showAllApartements';
-  static String addPaymentMobilePage = 'AddNewPayment';
-  static ZoomDrawerController drawerController = ZoomDrawerController();
-
-  static SizingInformation sizingInformation = SizingInformation(
-      deviceScreenType: DeviceScreenType.mobile,
-      refinedSize: RefinedSize.normal,
-      screenSize: Size.zero,
-      localWidgetSize: Size.zero);
   /* *!SECTION */
   static List selectedTabNeededParamters = [];
   static RxString selectedTabVaueNotifier = 'realEstateSummary'.obs;

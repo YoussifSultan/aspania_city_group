@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aspania_city_group/Common_Used/button_tile.dart';
+import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/text_tile.dart';
 import 'package:aspania_city_group/class/buidlingproperties.dart';
 import 'package:aspania_city_group/class/realestate.dart';
@@ -402,10 +403,12 @@ class _AddRealEstateState extends State<AddRealEstate> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     /* *SECTION - Mobile view */
-    if (NavigationProperties.sizingInformation.deviceScreenType ==
+    if (GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.tablet ||
-        NavigationProperties.sizingInformation.deviceScreenType ==
+        GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.mobile) {
+      GlobalClass.menuOptionsMobile = [];
+
       return ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
           child: ListView(children: [
@@ -539,11 +542,11 @@ class _AddRealEstateState extends State<AddRealEstate> {
                     for (var element in realEstates) {
                       realEstateNames.add(element.buildingName);
                     }
-                    DialogOfTile.bottomSheetTile(
+                    DialogTile.bottomSheetTile(
                         context: context,
                         width: width,
                         height: height,
-                        menuStrings: realEstateNames,
+                        menuText: realEstateNames,
                         onMenuButtonTap: (index) {
                           Building building = realEstates
                               .firstWhere((element) => element.id == index + 1);
@@ -576,11 +579,11 @@ class _AddRealEstateState extends State<AddRealEstate> {
                     for (var element in realEstateFloors) {
                       realEstateFloorsNames.add(element.floorName);
                     }
-                    DialogOfTile.bottomSheetTile(
+                    DialogTile.bottomSheetTile(
                         context: context,
                         width: width,
                         height: height,
-                        menuStrings: realEstateFloorsNames,
+                        menuText: realEstateFloorsNames,
                         onMenuButtonTap: (index) {
                           Floor floor = realEstateFloors
                               .firstWhere((element) => element.id == index + 1);
@@ -607,11 +610,11 @@ class _AddRealEstateState extends State<AddRealEstate> {
                     for (var element in apartementState) {
                       stateNames.add(element.state);
                     }
-                    DialogOfTile.bottomSheetTile(
+                    DialogTile.bottomSheetTile(
                         context: context,
                         width: width,
                         height: height,
-                        menuStrings: stateNames,
+                        menuText: stateNames,
                         onMenuButtonTap: (index) {
                           apartementStateTextController.text = apartementState
                               .firstWhere((element) => element.id == index + 1)
@@ -809,11 +812,11 @@ class _AddRealEstateState extends State<AddRealEstate> {
                     for (var element in ownerRole) {
                       ownerRoleNames.add(element.ownerRole);
                     }
-                    DialogOfTile.bottomSheetTile(
+                    DialogTile.bottomSheetTile(
                         context: context,
                         width: width,
                         height: height,
-                        menuStrings: ownerRoleNames,
+                        menuText: ownerRoleNames,
                         onMenuButtonTap: (index) {
                           ownerRoleTextController.text = ownerRole
                               .firstWhere((element) => element.id == index + 1)
@@ -929,7 +932,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
     /* *!SECTION */
 
     /* *SECTION - Desktop View */
-    else if (NavigationProperties.sizingInformation.deviceScreenType ==
+    else if (GlobalClass.sizingInformation.deviceScreenType ==
         DeviceScreenType.desktop) {
       return Column(
         children: [
@@ -1076,7 +1079,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                 for (var element in realEstates) {
                                   realEstateNames.add(element.buildingName);
                                 }
-                                DialogOfTile.dialogMenuTile(
+                                DialogTile.dialogMenuTile(
                                     context: context,
                                     width: width,
                                     height: height,
@@ -1118,7 +1121,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                 for (var element in realEstateFloors) {
                                   realEstateFloorsNames.add(element.floorName);
                                 }
-                                DialogOfTile.dialogMenuTile(
+                                DialogTile.dialogMenuTile(
                                     context: context,
                                     width: width,
                                     height: height,
@@ -1156,7 +1159,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
                                 for (var element in apartementState) {
                                   stateNames.add(element.state);
                                 }
-                                DialogOfTile.dialogMenuTile(
+                                DialogTile.dialogMenuTile(
                                     context: context,
                                     width: width,
                                     height: height,
@@ -1449,7 +1452,7 @@ class OwnerMailAndRoleFields extends StatelessWidget {
             for (var element in ownerRole) {
               ownerRoleNames.add(element.ownerRole);
             }
-            DialogOfTile.dialogMenuTile(
+            DialogTile.dialogMenuTile(
                 context: context,
                 width: width,
                 height: height,

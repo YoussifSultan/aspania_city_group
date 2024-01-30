@@ -1,3 +1,4 @@
+import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/class/realestate.dart';
 import 'package:flutter/material.dart';
@@ -26,10 +27,31 @@ class RealEstatesPage extends StatelessWidget {
     ];
     double width = MediaQuery.of(context).size.width;
     /* *SECTION - Mobile View */
-    if (NavigationProperties.sizingInformation.deviceScreenType ==
+    if (GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.tablet ||
-        NavigationProperties.sizingInformation.deviceScreenType ==
+        GlobalClass.sizingInformation.deviceScreenType ==
             DeviceScreenType.mobile) {
+      GlobalClass.menuOptionsMobile = [
+        MenuOption(
+            menuTitle: 'اضافة وحدة جديدة',
+            onMenuTapButton: () {
+              NavigationProperties.selectedTabNeededParamters = [
+                -1,
+                'AddOwner',
+                RealEstateData(
+                    id: 0,
+                    apartementStatusId: 0,
+                    apartementPostionInFloorId: 0,
+                    apartementPostionInBuildingId: 0,
+                    apartementLink: 'None',
+                    isApartementHasEnoughData: false,
+                    apartementName: 'None')
+              ];
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.addNewRealEstatePageRoute);
+            })
+      ];
+
       return ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
           child: ListView(
@@ -48,8 +70,7 @@ class RealEstatesPage extends StatelessWidget {
                 },
                 itemBuilder: (context, index) {
                   return RealEstateActionsMobileWidget(
-                      width: NavigationProperties
-                          .sizingInformation.screenSize.width,
+                      width: GlobalClass.sizingInformation.screenSize.width,
                       realEstateName: realEstates
                           .firstWhere((element) => element.id == index + 1)
                           .buildingName,
@@ -95,7 +116,7 @@ class RealEstatesPage extends StatelessWidget {
     }
     /* *!SECTION */
     /* *SECTION - Desktop View */
-    else if (NavigationProperties.sizingInformation.deviceScreenType ==
+    else if (GlobalClass.sizingInformation.deviceScreenType ==
         DeviceScreenType.desktop) {
       return ListView(
         shrinkWrap: true,

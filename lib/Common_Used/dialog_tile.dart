@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import '../Dashboard/menu_card_button.dart';
 
-class DialogOfTile {
+class DialogTile {
   static Future<dynamic> dialogMenuTile(
       {required BuildContext context,
       required double width,
@@ -61,7 +61,7 @@ class DialogOfTile {
       required double width,
       required double height,
       required Function onMenuButtonTap,
-      required List<String> menuStrings}) {
+      required List<String> menuText}) {
     return showModalBottomSheet(
         context: context,
         builder: (context) {
@@ -79,7 +79,7 @@ class DialogOfTile {
                 behavior:
                     ScrollConfiguration.of(context).copyWith(scrollbars: false),
                 child: ListView.separated(
-                  itemCount: menuStrings.length,
+                  itemCount: menuText.length,
                   itemBuilder: (context, index) {
                     /* *SECTION - Building Item With Hover */
                     RxBool onHoverOfBuildingItem = false.obs;
@@ -96,7 +96,7 @@ class DialogOfTile {
                           onTap: () {
                             onMenuButtonTap(index);
                           },
-                          title: menuStrings[index]);
+                          title: menuText[index]);
                     });
                     /* *!SECTION */
                   },
