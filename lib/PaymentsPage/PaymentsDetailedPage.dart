@@ -262,7 +262,7 @@ class _PaymentsPageOfSpecifiedApartementState
         payments.add(PaymentData(
             id: element[0],
             apartementId: element[1],
-            apartementLink: element[8],
+            apartementPostionInBuildingId: element[8],
             paymentDate: date,
             paymentAmount: element[6],
             paymentNote: element[7],
@@ -274,7 +274,7 @@ class _PaymentsPageOfSpecifiedApartementState
       payments.add(PaymentData(
           id: getDataResponse.statusCode,
           apartementId: getDataResponse.statusCode,
-          apartementLink: getDataResponse.statusCode.toString(),
+          apartementPostionInBuildingId: getDataResponse.statusCode,
           paymentDate: DateTime.now(),
           paymentAmount: double.parse(getDataResponse.body),
           paymentNote: getDataResponse.body));

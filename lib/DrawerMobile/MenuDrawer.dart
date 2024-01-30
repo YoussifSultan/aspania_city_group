@@ -62,6 +62,9 @@ class _DrawerMenuScreenState extends State<DrawerMenuScreen> {
             title: 'سداد',
             icon: Icons.payments_rounded,
             onTap: () {
+              NavigationProperties.selectedTabNeededParamters = [];
+              NavigationProperties.selectedTabVaueNotifier(
+                  NavigationProperties.overallPaymentsThroughPeriodPageRoute);
               NavigationProperties.drawerController.toggle!();
             },
           ),

@@ -74,7 +74,6 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
       noteOfPaymentTextController.text = paymentNote;
       amountOfPaymentTextController.text = paymentAmount.toString();
     }
-
     super.initState();
   }
 
@@ -84,7 +83,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
         PaymentData payment;
         if (widget.state == 'Edit') {
           payment = PaymentData(
-              apartementLink: selectedOwner.apartementLink,
+              apartementPostionInBuildingId:
+                  selectedOwner.apartementPostionInBuildingId,
               id: widget.paymentData!.id,
               apartementName: selectedOwner.apartementName,
               ownerName: selectedOwner.ownerName,
@@ -106,7 +106,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
               id: await getPaymentLastID() + 1,
               apartementName: selectedOwner.apartementName,
               ownerName: selectedOwner.ownerName,
-              apartementLink: selectedOwner.apartementLink,
+              apartementPostionInBuildingId:
+                  selectedOwner.apartementPostionInBuildingId,
               ownerPhoneNumber: selectedOwner.ownerPhoneNumber,
               apartementId: selectedOwner.id,
               paymentDate: paymentDate,
@@ -140,7 +141,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
             ' `realEstateOwnerTelephone`, `realEstateApartementName`, `paymentDate`, `paymentAmount`, `paymentNote` , `realEstateLink`)'
             ' VALUES (\'${paymentData.id}\', \'${paymentData.apartementId}\', \'${paymentData.ownerName}\','
             ' \'${paymentData.ownerPhoneNumber}\', \'${paymentData.apartementName}\', '
-            '\'${paymentData.paymentDate}\', \'${paymentData.paymentAmount}\', \'${paymentData.paymentNote}\' ,\'${paymentData.apartementLink}\');');
+            '\'${paymentData.paymentDate}\', \'${paymentData.paymentAmount}\', \'${paymentData.paymentNote}\' ,\'${paymentData.apartementPostionInBuildingId}\');');
     return insertDataResponse.statusCode;
   }
 

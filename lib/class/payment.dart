@@ -2,7 +2,7 @@ class PaymentData {
   PaymentData({
     required this.id,
     required this.apartementId,
-    required this.apartementLink,
+    required this.apartementPostionInBuildingId,
     this.ownerName = '',
     this.ownerPhoneNumber = '',
     this.apartementName = '',
@@ -14,7 +14,7 @@ class PaymentData {
   final int id;
   final int apartementId;
   final String apartementName;
-  final String apartementLink;
+  final int apartementPostionInBuildingId;
   final String ownerName;
   final String ownerPhoneNumber;
   final DateTime paymentDate;
@@ -23,7 +23,7 @@ class PaymentData {
 
   @override
   String toString() {
-    return 'ID : $id  ApartementID : $apartementId  Apartement Link :$apartementLink'
+    return 'ID : $id  ApartementID : $apartementId  Apartement Link :$apartementPostionInBuildingId'
         ' Owner Name : $ownerName '
         'Phone Number Of Owner : $ownerPhoneNumber ApartementName : $apartementName'
         'Payment Date : ${paymentDate.toString()} Payment Amount : $paymentAmount'

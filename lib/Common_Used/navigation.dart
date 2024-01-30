@@ -20,6 +20,9 @@ buildingNumber , window State (Edit_Owner, Add_Owner), realestate data
 5.Payment Page(
   RealEstate ID ,
 )
+6. Add Payment Page Mobile (
+  State(Edit,Add) , selectedOwner, paymentData
+)
  */
 class NavigationProperties {
   static String ownerPageRoute = 'Owners';
@@ -33,6 +36,7 @@ class NavigationProperties {
   static String realEstateSummaryPageRoute = 'realEstateSummary';
   static String addNewRealEstatePageRoute = 'AddNewApartement';
   static String dataTableOfApartements = 'showAllApartements';
+  static String addPaymentMobilePage = 'AddNewPayment';
   static ZoomDrawerController drawerController = ZoomDrawerController();
 
   static SizingInformation sizingInformation = SizingInformation(
