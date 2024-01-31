@@ -132,7 +132,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                             icon: Icons.payments_rounded,
                             onTap: () {
                               NavigationProperties.selectedTabNeededParamters =
-                                  [];
+                                  ['PaymentsDuringMonth', ''];
                               NavigationProperties.selectedTabVaueNotifier(
                                   NavigationProperties
                                       .overallPaymentsThroughPeriodPageRoute);

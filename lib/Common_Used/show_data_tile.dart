@@ -20,7 +20,6 @@ class LabelAndDataVerticalWidget extends StatelessWidget {
       children: [
         Text(labelText,
             maxLines: 1,
-            textDirection: TextDirection.rtl,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.notoSansArabic(
               fontSize: 16,
@@ -57,9 +56,8 @@ class LabelAndDataHorizontalWidget extends StatelessWidget {
       textDirection: TextDirection.rtl,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('$labelText:',
+        Text(':$labelText',
             maxLines: 1,
-            textDirection: TextDirection.rtl,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.notoSansArabic(
               fontSize: 16,
@@ -68,7 +66,6 @@ class LabelAndDataHorizontalWidget extends StatelessWidget {
             )),
         Text(dataText,
             maxLines: 1,
-            textDirection: TextDirection.rtl,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.notoSansArabic(
               fontSize: 16,

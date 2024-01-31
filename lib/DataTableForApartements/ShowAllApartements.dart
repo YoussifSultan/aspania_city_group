@@ -939,178 +939,191 @@ class _RealEstateMobileTileState extends State<RealEstateMobileTile> {
         borderRadius: BorderRadius.circular(24),
       ),
       duration: const Duration(milliseconds: 500),
-      child: Column(
-        textDirection: TextDirection.rtl,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /* *SECTION - Owner Name */
-          Text(widget.currentRealEstate.ownerName,
-              maxLines: 1,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            /* *SECTION - Owner Name */
+            Text(widget.currentRealEstate.ownerName,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.notoSansArabic(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                )),
+            /* *!SECTION */
+            const SizedBox(
+              height: 10,
+            ),
+            /* *SECTION - Apartement Details */
+            Row(
               textDirection: TextDirection.rtl,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.notoSansArabic(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              )),
-          /* *!SECTION */
-          const SizedBox(
-            height: 10,
-          ),
-          /* *SECTION - Apartement Details */
-          Row(
-            textDirection: TextDirection.rtl,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              /* *SECTION - Realestate BuildingNo */
-              LabelAndDataVerticalWidget(
-                  labelText: 'عمارة',
-                  dataText: UsefulFunctions.replaceArabicNumber(widget
-                      .currentRealEstate.apartementPostionInBuildingId
-                      .toString())),
-              /* *!SECTION */
-              /* *SECTION - Realestate FloorNo */
-              LabelAndDataVerticalWidget(
-                  labelText: 'الدور', dataText: widget.floorName),
-              /* *!SECTION */
-              /* *SECTION - Realestate ApartementName */
-              LabelAndDataVerticalWidget(
-                  labelText: 'الوحدة',
-                  dataText: widget.currentRealEstate.apartementName),
-              /* *!SECTION */
-              /* *SECTION - Realestate ApartementStatus */
-              Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                Text('الحالة',
-                    maxLines: 1,
-                    textDirection: TextDirection.rtl,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.notoSansArabic(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.grey,
-                    )),
-                Center(
-                  child: Container(
-                    width: 80,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: widget.currentRealEstate.apartementStatusId == 1
-                          ? Colors.greenAccent.withOpacity(0.2)
-                          : widget.currentRealEstate.apartementStatusId == 2
-                              ? Colors.yellowAccent.withOpacity(0.2)
-                              : Colors.redAccent.withOpacity(0.2),
-                      border: Border.all(
-                        color: widget.currentRealEstate.apartementStatusId == 1
-                            ? Colors.green.shade900
-                            : widget.currentRealEstate.apartementStatusId == 2
-                                ? Colors.yellow.shade900
-                                : Colors.red.shade900,
-                      ),
-                      borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    ),
-                    child: Center(
-                      child: Text(
-                        widget.realestateState,
-                        style: TextStyle(
-                          color: widget.currentRealEstate.apartementStatusId ==
-                                  1
-                              ? Colors.green.shade900
-                              : widget.currentRealEstate.apartementStatusId == 2
-                                  ? Colors.yellow.shade900
-                                  : Colors.red.shade900,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                /* *SECTION - Realestate BuildingNo */
+                LabelAndDataVerticalWidget(
+                    labelText: 'عمارة',
+                    dataText: UsefulFunctions.replaceArabicNumber(widget
+                        .currentRealEstate.apartementPostionInBuildingId
+                        .toString())),
+                /* *!SECTION */
+                /* *SECTION - Realestate FloorNo */
+                LabelAndDataVerticalWidget(
+                    labelText: 'الدور', dataText: widget.floorName),
+                /* *!SECTION */
+                /* *SECTION - Realestate ApartementName */
+                LabelAndDataVerticalWidget(
+                    labelText: 'الوحدة',
+                    dataText: widget.currentRealEstate.apartementName),
+                /* *!SECTION */
+                /* *SECTION - Realestate ApartementStatus */
+                Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text('الحالة',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.notoSansArabic(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey,
+                          )),
+                      Center(
+                        child: Container(
+                          width: 80,
+                          height: 25,
+                          decoration: BoxDecoration(
+                            color:
+                                widget.currentRealEstate.apartementStatusId == 1
+                                    ? Colors.greenAccent.withOpacity(0.2)
+                                    : widget.currentRealEstate
+                                                .apartementStatusId ==
+                                            2
+                                        ? Colors.yellowAccent.withOpacity(0.2)
+                                        : Colors.redAccent.withOpacity(0.2),
+                            border: Border.all(
+                              color:
+                                  widget.currentRealEstate.apartementStatusId ==
+                                          1
+                                      ? Colors.green.shade900
+                                      : widget.currentRealEstate
+                                                  .apartementStatusId ==
+                                              2
+                                          ? Colors.yellow.shade900
+                                          : Colors.red.shade900,
+                            ),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Center(
+                            child: Text(
+                              widget.realestateState,
+                              style: TextStyle(
+                                color: widget.currentRealEstate
+                                            .apartementStatusId ==
+                                        1
+                                    ? Colors.green.shade900
+                                    : widget.currentRealEstate
+                                                .apartementStatusId ==
+                                            2
+                                        ? Colors.yellow.shade900
+                                        : Colors.red.shade900,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                )
-              ]) /* *!SECTION */
-            ],
-          ),
-          /* *!SECTION */
-          const Divider(),
-          /* *SECTION - See More */
-          Visibility(
-            visible: widget.selectedRealestateFordetails == widget.index
-                ? false
-                : true,
-            child: AnimatedOpacity(
-              opacity:
-                  widget.selectedRealestateFordetails == widget.index ? 0 : 1,
-              duration: const Duration(milliseconds: 500),
-              child: MenuButtonCard(
-                icon: Icons.open_in_new,
-                title: 'المزيد',
-                onTap: () {
-                  widget.onTapMoreButton();
-                },
+                      )
+                    ]) /* *!SECTION */
+              ],
+            ),
+            /* *!SECTION */
+            const Divider(),
+            /* *SECTION - See More */
+            Visibility(
+              visible: widget.selectedRealestateFordetails == widget.index
+                  ? false
+                  : true,
+              child: AnimatedOpacity(
+                opacity:
+                    widget.selectedRealestateFordetails == widget.index ? 0 : 1,
+                duration: const Duration(milliseconds: 500),
+                child: MenuButtonCard(
+                  icon: Icons.open_in_new,
+                  title: 'المزيد',
+                  onTap: () {
+                    widget.onTapMoreButton();
+                  },
+                ),
               ),
             ),
-          ),
-          /* *!SECTION */
-          /* *SECTION - Details Of Real Estate */
-          Visibility(
-            visible: widget.selectedRealestateFordetails == widget.index
-                ? true
-                : false,
-            child: AnimatedOpacity(
-                opacity:
-                    widget.selectedRealestateFordetails == widget.index ? 1 : 0,
-                duration: const Duration(milliseconds: 500),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    LabelAndDataVerticalWidget(
-                        labelText: 'اسم المسئول',
-                        dataText: widget.currentRealEstate.responsibleName),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    LabelAndDataHorizontalWidget(
-                        labelText: 'تليفون المالك',
-                        dataText: widget.currentRealEstate.ownerPhoneNumber),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    LabelAndDataHorizontalWidget(
-                        labelText: 'تليفون المسئول',
-                        dataText: widget.currentRealEstate.ownerPhoneNumber),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    LabelAndDataHorizontalWidget(
-                        labelText: 'حصة الجراج',
-                        dataText: widget.currentRealEstate.apartementGarage == 1
-                            ? 'حصة جراج واحدة'
-                            : widget.currentRealEstate.apartementGarage == 2
-                                ? 'حصتين جراج'
-                                : "لا يوجد حصة جراج"),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    MenuButtonCard(
-                      icon: Icons.delete_outline,
-                      title: 'حذف الوحدة',
-                      onTap: () {
-                        widget.onTapDeleteButton();
-                      },
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    MenuButtonCard(
-                        icon: Icons.edit_outlined,
-                        title: 'تعديل الوحدة',
+            /* *!SECTION */
+            /* *SECTION - Details Of Real Estate */
+            Visibility(
+              visible: widget.selectedRealestateFordetails == widget.index
+                  ? true
+                  : false,
+              child: AnimatedOpacity(
+                  opacity: widget.selectedRealestateFordetails == widget.index
+                      ? 1
+                      : 0,
+                  duration: const Duration(milliseconds: 500),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      LabelAndDataVerticalWidget(
+                          labelText: 'اسم المسئول',
+                          dataText: widget.currentRealEstate.responsibleName),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      LabelAndDataHorizontalWidget(
+                          labelText: 'تليفون المالك',
+                          dataText: widget.currentRealEstate.ownerPhoneNumber),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      LabelAndDataHorizontalWidget(
+                          labelText: 'تليفون المسئول',
+                          dataText: widget.currentRealEstate.ownerPhoneNumber),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      LabelAndDataHorizontalWidget(
+                          labelText: 'حصة الجراج',
+                          dataText: widget.currentRealEstate.apartementGarage ==
+                                  1
+                              ? 'حصة جراج واحدة'
+                              : widget.currentRealEstate.apartementGarage == 2
+                                  ? 'حصتين جراج'
+                                  : "لا يوجد حصة جراج"),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      MenuButtonCard(
+                        icon: Icons.delete_outline,
+                        title: 'حذف الوحدة',
                         onTap: () {
-                          widget.onTapEditButton();
-                        })
-                  ],
-                )),
-          ) /* *!SECTION */
-        ],
+                          widget.onTapDeleteButton();
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      MenuButtonCard(
+                          icon: Icons.edit_outlined,
+                          title: 'تعديل الوحدة',
+                          onTap: () {
+                            widget.onTapEditButton();
+                          })
+                    ],
+                  )),
+            ) /* *!SECTION */
+          ],
+        ),
       ),
     );
   }

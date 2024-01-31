@@ -40,6 +40,7 @@ dependencies:
   google_fonts: ^5.1.0
   barcode_widget: ^2.0.4
   excel: ^2.1.0
+  selector_wheel: ^1.1.2
   animated_tree_view: ^2.1.0
   fluid_dialog: ^2.0.0
   http: ^1.1.0

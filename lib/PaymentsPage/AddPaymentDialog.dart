@@ -105,7 +105,10 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
             } else if (mounted &&
                 (GlobalClass.sizingInformation.isMobile ||
                     GlobalClass.sizingInformation.isTablet)) {
-              NavigationProperties.selectedTabNeededParamters = [];
+              NavigationProperties.selectedTabNeededParamters = [
+                'PaymentsDuringMonth',
+                ''
+              ];
               NavigationProperties.selectedTabVaueNotifier(
                   NavigationProperties.overallPaymentsThroughPeriodPageRoute);
             }
@@ -133,7 +136,10 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
             } else if (mounted &&
                 (GlobalClass.sizingInformation.isMobile ||
                     GlobalClass.sizingInformation.isTablet)) {
-              NavigationProperties.selectedTabNeededParamters = [];
+              NavigationProperties.selectedTabNeededParamters = [
+                'PaymentsDuringMonth',
+                ''
+              ];
               NavigationProperties.selectedTabVaueNotifier(
                   NavigationProperties.overallPaymentsThroughPeriodPageRoute);
             }
@@ -155,10 +161,10 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
     var insertDataResponse = await SQLFunctions.sendQuery(
         query:
             'INSERT INTO `SpainCity`.`PaymentsOfRealEsate` (`Id`, `realEstateId`, `realEstateOwnerName`,'
-            ' `realEstateOwnerTelephone`, `realEstateApartementName`, `paymentDate`, `paymentAmount`, `paymentNote` , `realEstateLink`)'
+            ' `realEstateOwnerTelephone`, `realEstateApartementName`, `paymentDate`, `paymentAmount`, `paymentNote` )'
             ' VALUES (\'${paymentData.id}\', \'${paymentData.apartementId}\', \'${paymentData.ownerName}\','
             ' \'${paymentData.ownerPhoneNumber}\', \'${paymentData.apartementName}\', '
-            '\'${paymentData.paymentDate}\', \'${paymentData.paymentAmount}\', \'${paymentData.paymentNote}\' ,\'${paymentData.apartementPostionInBuildingId}\');');
+            '\'${paymentData.paymentDate}\', \'${paymentData.paymentAmount}\', \'${paymentData.paymentNote}\' );');
     return insertDataResponse.statusCode;
   }
 
@@ -249,7 +255,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                         context: context,
                         initialDate: paymentDate,
                         firstDate: DateTime(2020),
-                        lastDate: DateTime.now())
+                        lastDate: DateTime(2030))
                     .then((value) {
                   paymentDate = value ?? paymentDate;
                   dateOfPaymentTextController.text =
@@ -374,7 +380,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                               context: context,
                               initialDate: paymentDate,
                               firstDate: DateTime(2020),
-                              lastDate: DateTime.now())
+                              lastDate: DateTime(2030))
                           .then((value) {
                         paymentDate = value ?? paymentDate;
                         dateOfPaymentTextController.text =

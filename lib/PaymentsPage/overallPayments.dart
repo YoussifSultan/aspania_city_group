@@ -162,7 +162,7 @@ class _OverallPaymentsThroughPeriodState
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('J7')).cellStyle =
         headerStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('J7')).value =
-        'مبلغ الفاتورة';
+        'قيمة المسدد';
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('I7')).cellStyle =
         headerStyle;
     aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('I7')).value =
@@ -936,118 +936,116 @@ class _PaymentMobileTileState extends State<PaymentMobileTile> {
           borderRadius: BorderRadius.circular(24),
         ),
         duration: const Duration(milliseconds: 500),
-        child: Column(
-            textDirection: TextDirection.rtl,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /* *SECTION - Owner Name */
-              Text(widget.currentPayment.ownerName,
-                  maxLines: 1,
-                  textDirection: TextDirection.rtl,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.notoSansArabic(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                  )),
-              /* *!SECTION */
-              const SizedBox(
-                height: 10,
-              ),
-              /* *SECTION - Apartement Details */
-              Row(
-                  textDirection: TextDirection.rtl,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    /* *SECTION - Realestate BuildingNo */
-                    LabelAndDataVerticalWidget(
-                        labelText: 'عمارة',
-                        dataText: UsefulFunctions.replaceArabicNumber(widget
-                            .currentPayment.apartementPostionInBuildingId
-                            .toString())),
-                    /* *!SECTION */
-                    /* *SECTION - Apaartement Number */
-                    LabelAndDataVerticalWidget(
-                        labelText: 'الوحدة',
-                        dataText: widget.currentPayment.apartementName),
-                    /* *!SECTION */
-                    /* *SECTION - Payment Amount */
-                    LabelAndDataVerticalWidget(
-                        labelText: 'التاريخ',
-                        dataText: intl.DateFormat.yMd('ar')
-                            .format(widget.currentPayment.paymentDate),
-                        dataTextDirection: TextDirection.rtl),
+        child: SingleChildScrollView(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            /* *SECTION - Owner Name */
+            Text(widget.currentPayment.ownerName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.notoSansArabic(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                )),
+            /* *!SECTION */
+            const SizedBox(
+              height: 10,
+            ),
+            /* *SECTION - Apartement Details */
+            Row(
+                textDirection: TextDirection.rtl,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  /* *SECTION - Realestate BuildingNo */
+                  LabelAndDataVerticalWidget(
+                      labelText: 'عمارة',
+                      dataText: UsefulFunctions.replaceArabicNumber(widget
+                          .currentPayment.apartementPostionInBuildingId
+                          .toString())),
+                  /* *!SECTION */
+                  /* *SECTION - Apaartement Number */
+                  LabelAndDataVerticalWidget(
+                      labelText: 'الوحدة',
+                      dataText: widget.currentPayment.apartementName),
+                  /* *!SECTION */
+                  /* *SECTION - Payment Amount */
+                  LabelAndDataVerticalWidget(
+                      labelText: 'التاريخ',
+                      dataText: intl.DateFormat.yMd('ar')
+                          .format(widget.currentPayment.paymentDate),
+                      dataTextDirection: TextDirection.rtl),
 
-                    /* *!SECTION */
-                    /* *SECTION - Payment Amount */
-                    LabelAndDataVerticalWidget(
-                        labelText: 'المبلغ',
-                        dataText: UsefulFunctions.replaceArabicNumber(
-                            widget.currentPayment.paymentAmount.toString())),
-                    /* *!SECTION */
-                  ]),
-              const Divider(),
-              /* *SECTION - See More */
-              Visibility(
-                visible: widget.selectedPaymentForDetails == widget.index
-                    ? false
-                    : true,
-                child: AnimatedOpacity(
-                  opacity:
-                      widget.selectedPaymentForDetails == widget.index ? 0 : 1,
-                  duration: const Duration(milliseconds: 500),
-                  child: MenuButtonCard(
-                    icon: Icons.open_in_new,
-                    title: 'المزيد',
-                    onTap: () {
-                      widget.onTapMoreButton();
-                    },
-                  ),
+                  /* *!SECTION */
+                  /* *SECTION - Payment Amount */
+                  LabelAndDataVerticalWidget(
+                      labelText: 'المبلغ',
+                      dataText: UsefulFunctions.replaceArabicNumber(
+                          widget.currentPayment.paymentAmount.toString())),
+                  /* *!SECTION */
+                ]),
+            const Divider(),
+            /* *SECTION - See More */
+            Visibility(
+              visible: widget.selectedPaymentForDetails == widget.index
+                  ? false
+                  : true,
+              child: AnimatedOpacity(
+                opacity:
+                    widget.selectedPaymentForDetails == widget.index ? 0 : 1,
+                duration: const Duration(milliseconds: 500),
+                child: MenuButtonCard(
+                  icon: Icons.open_in_new,
+                  title: 'المزيد',
+                  onTap: () {
+                    widget.onTapMoreButton();
+                  },
                 ),
               ),
-              /* *!SECTION */
-              /* *SECTION - Details Of Real Estate */
-              Visibility(
-                  visible: widget.selectedPaymentForDetails == widget.index
-                      ? true
-                      : false,
-                  child: AnimatedOpacity(
-                      opacity: widget.selectedPaymentForDetails == widget.index
-                          ? 1
-                          : 0,
-                      duration: const Duration(milliseconds: 500),
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            LabelAndDataHorizontalWidget(
-                              labelText: 'رقم تليفون',
-                              dataText: widget.currentPayment.ownerPhoneNumber,
-                            ),
-                            LabelAndDataHorizontalWidget(
-                              labelText: 'الملاحظة',
-                              dataText: widget.currentPayment.paymentNote,
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            MenuButtonCard(
-                              icon: Icons.delete_outline,
-                              title: 'حذف الفاتورة',
+            ),
+            /* *!SECTION */
+            /* *SECTION - Details Of Real Estate */
+            Visibility(
+                visible: widget.selectedPaymentForDetails == widget.index
+                    ? true
+                    : false,
+                child: AnimatedOpacity(
+                    opacity: widget.selectedPaymentForDetails == widget.index
+                        ? 1
+                        : 0,
+                    duration: const Duration(milliseconds: 500),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          LabelAndDataHorizontalWidget(
+                            labelText: 'رقم تليفون',
+                            dataText: widget.currentPayment.ownerPhoneNumber,
+                          ),
+                          LabelAndDataHorizontalWidget(
+                            labelText: 'الملاحظة',
+                            dataText: widget.currentPayment.paymentNote,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          MenuButtonCard(
+                            icon: Icons.delete_outline,
+                            title: 'حذف الفاتورة',
+                            onTap: () {
+                              widget.onTapDeleteButton();
+                            },
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          MenuButtonCard(
+                              icon: Icons.edit_outlined,
+                              title: 'تعديل الفاتورة',
                               onTap: () {
-                                widget.onTapDeleteButton();
-                              },
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            MenuButtonCard(
-                                icon: Icons.edit_outlined,
-                                title: 'تعديل الفاتورة',
-                                onTap: () {
-                                  widget.onTapEditButton();
-                                })
-                          ])))
-            ]));
+                                widget.onTapEditButton();
+                              })
+                        ])))
+          ]),
+        ));
   }
 }

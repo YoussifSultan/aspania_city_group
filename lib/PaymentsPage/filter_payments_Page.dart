@@ -140,7 +140,7 @@ class _FilterPaymentsPageState extends State<FilterPaymentsPage> {
                       context: context,
                       initialDate: toDateFilter,
                       firstDate: DateTime(2020),
-                      lastDate: DateTime.now())
+                      lastDate: DateTime(2030))
                   .then((value) {
                 if (!value!.isBefore(fromDateFilter)) {
                   toDateFilter = value;

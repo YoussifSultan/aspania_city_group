@@ -166,8 +166,7 @@ class _SigninScreenState extends State<SigninScreen> {
             return Center(
               child: Container(
                 alignment: Alignment.center,
-                width: 450,
-                margin: const EdgeInsets.only(right: 30, left: 20),
+                width: width * 0.9,
                 height: 375,
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -189,7 +188,7 @@ class _SigninScreenState extends State<SigninScreen> {
                   /* *!SECTION */
                   /* *SECTION - Account */
                   TextTile(
-                      width: 300,
+                      width: width * 0.8,
                       textController: account,
                       onSubmit: (value) {
                         validateDataEnteredAndPushTheDashboard();
@@ -202,7 +201,7 @@ class _SigninScreenState extends State<SigninScreen> {
 
                   /* *SECTION - Password */
                   TextTile(
-                      width: 300,
+                      width: width * 0.8,
                       textController: password,
                       isPassword: true,
                       onSubmit: (value) {
@@ -230,8 +229,8 @@ class _SigninScreenState extends State<SigninScreen> {
   }
 
   void validateDataEnteredAndPushTheDashboard() {
-    if (account.text == 'spaincity.administrator@gmail.com' &&
-        password.text == 'SpainCityAdmin#2024') {
+    if (account.text == 'spainadmin@gmail.com' &&
+        password.text == 'Spaincity2024') {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Dashboard()),
