@@ -104,7 +104,7 @@ class _ApartementSelectorState extends State<ApartementSelector> {
                               width: 10,
                             ),
                             Text(
-                              item.data.ownerName,
+                              item.data.apartementName,
                               style: GoogleFonts.notoSansArabic(fontSize: 18),
                             )
                           ],

@@ -1,6 +1,8 @@
 import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Dashboard/menu_card_button.dart';
+import 'package:aspania_city_group/class/payment.dart';
+import 'package:aspania_city_group/class/realestate.dart';
 import 'package:flutter/material.dart';
 
 class DrawerMenuScreen extends StatefulWidget {
@@ -27,8 +29,8 @@ class _DrawerMenuScreenState extends State<DrawerMenuScreen> {
           /* *SECTION - Menu Buttons */
           /* *SECTION - Real Estates Item */
           MenuButtonCard(
-            title: 'الوحدات',
-            icon: Icons.category_outlined,
+            title: 'عرض العمارات',
+            icon: Icons.apartment_rounded,
             onTap: () {
               NavigationProperties.selectedTabVaueNotifier(
                   NavigationProperties.realEstateSummaryPageRoute);
@@ -41,16 +43,29 @@ class _DrawerMenuScreenState extends State<DrawerMenuScreen> {
           ),
           /* *SECTION - Owners Item */
           MenuButtonCard(
-            title: 'المقيمين',
-            icon: Icons.people_alt_outlined,
+            title: 'تسجيل سداد',
+            icon: Icons.add_card_rounded,
             onTap: () {
               NavigationProperties.selectedTabNeededParamters = [
-                -1,
-                'All_Owners'
+                'Add',
+                RealEstateData(
+                    id: -1,
+                    apartementStatusId: -1,
+                    apartementPostionInFloorId: -1,
+                    apartementPostionInBuildingId: -1,
+                    apartementLink: '',
+                    isApartementHasEnoughData: false,
+                    apartementName: ''),
+                PaymentData(
+                    id: -1,
+                    apartementId: -1,
+                    apartementPostionInBuildingId: -1,
+                    paymentDate: DateTime.now(),
+                    paymentAmount: -1,
+                    paymentNote: '')
               ];
               NavigationProperties.selectedTabVaueNotifier(
-                  NavigationProperties.dataTableOfApartements);
-
+                  NavigationProperties.addPaymentMobilePage);
               GlobalClass.drawerController.toggle!();
             },
           ),
@@ -60,7 +75,7 @@ class _DrawerMenuScreenState extends State<DrawerMenuScreen> {
           ),
           /* *SECTION - Payments Item */
           MenuButtonCard(
-            title: 'سداد',
+            title: 'عرض السدادات',
             icon: Icons.payments_rounded,
             onTap: () {
               NavigationProperties.selectedTabNeededParamters = [

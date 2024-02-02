@@ -230,7 +230,7 @@ class _SigninScreenState extends State<SigninScreen> {
 
   void validateDataEnteredAndPushTheDashboard() {
     if (account.text == 'spainadmin@gmail.com' &&
-        password.text == 'Spaincity2024') {
+        password.text == 'spaincity2030') {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Dashboard()),

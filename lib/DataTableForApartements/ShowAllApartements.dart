@@ -19,7 +19,8 @@ import '../class/buidlingproperties.dart';
 import '../Common_Used/navigation.dart';
 
 class ShowwAllAprtementsPage extends StatefulWidget {
-  const ShowwAllAprtementsPage({super.key});
+  const ShowwAllAprtementsPage({super.key, required this.sqlQueryStatement});
+  final String sqlQueryStatement;
 
   @override
   State<ShowwAllAprtementsPage> createState() => _ShowwAllAprtementsPageState();
@@ -34,29 +35,16 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
   RxInt selectedRealestateFordetails = (-1).obs;
   late ScrollController horizontalScrollControllerOfDataTable =
       ScrollController(initialScrollOffset: 1000);
-  int buildingId = NavigationProperties.selectedTabNeededParamters[0];
-  String allApartementsOrFullyRecordedOnly =
-      NavigationProperties.selectedTabNeededParamters[1];
+
   bool _loading = false;
   bool reahedTheEndOfTable = false;
   int selectedRow = 0;
   /* *SECTION - SQL Backend */
   /* *SECTION - Get All Real Estates */
-  Future<void> getData() async {
+  Future<void> getData(String query) async {
     var getDataResponse;
-    if (allApartementsOrFullyRecordedOnly == 'All_Apartements') {
-      getDataResponse = await SQLFunctions.sendQuery(
-          query:
-              "SELECT * FROM SpainCity.RealEstates where apartementPostionInBuildingId = $buildingId");
-    } else if (allApartementsOrFullyRecordedOnly == 'Recorded_Apartements') {
-      getDataResponse = await SQLFunctions.sendQuery(
-          query:
-              "SELECT * FROM SpainCity.RealEstates where apartementPostionInBuildingId = $buildingId and isApartementHasEnoughData =1");
-    } else if (allApartementsOrFullyRecordedOnly == 'All_Owners') {
-      getDataResponse = await SQLFunctions.sendQuery(
-          query:
-              "SELECT * FROM SpainCity.RealEstates where apartementStatusId =1;");
-    }
+    getDataResponse = await SQLFunctions.sendQuery(query: query);
+
     List<RealEstateData> apartements = [];
 
     if (getDataResponse.statusCode == 200) {
@@ -134,7 +122,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
 
   @override
   void initState() {
-    getData();
+    getData(widget.sqlQueryStatement);
     _model = returnTheTableUX();
     super.initState();
   }
@@ -166,8 +154,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
     ];
     var aprtartementExcel =
         xlsx.Excel.createExcel(); // automatically creates 1 empty sheet: Sheet1
-    xlsx.Sheet aprtartementsExcelSheet =
-        aprtartementExcel['وحدات العمارة رقم $buildingId'];
+    xlsx.Sheet aprtartementsExcelSheet = aprtartementExcel['وحدات  '];
     xlsx.CellStyle headerStyle = xlsx.CellStyle(
         bottomBorder: xlsx.Border(borderStyle: xlsx.BorderStyle.Thick),
         fontSize: 14,
@@ -280,8 +267,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
                   ? 'حصتين جراج'
                   : "لا يوجد حصة جراج";
     }
-    aprtartementExcel.save(
-        fileName: 'Spain City وحدات العمارة رقم $buildingId.xlsx');
+    aprtartementExcel.save(fileName: ' وحدات  .xlsx');
 /* *!SECTION */
   }
 
@@ -487,90 +473,95 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
             })
       ];
 
-      return Obx(() {
-        if (updateMobileListWhenDataIsPopulated.value == false) {
-          return const Center(
-              child: SizedBox(
-                  height: 50, width: 50, child: CircularProgressIndicator()));
-        }
-        final List<ApartementStatus> apartementState = [
-          ApartementStatus(state: 'مقيم', id: 1),
-          ApartementStatus(state: 'غير مقيم', id: 2),
-          ApartementStatus(state: 'طرف الشركة', id: 3),
-          ApartementStatus(state: 'test', id: 4),
-        ];
-        final List<Floor> realEstateFloors = [
-          Floor(floorName: 'المنخفض', id: 1),
-          Floor(floorName: 'مرتفع', id: 2),
-          Floor(floorName: 'الاول', id: 3),
-          Floor(floorName: 'الثاني', id: 4),
-          Floor(floorName: 'الثالث', id: 5),
-          Floor(floorName: 'الرابع', id: 6),
-        ];
+      return Scaffold(
+        body: Obx(() {
+          if (updateMobileListWhenDataIsPopulated.value == false) {
+            return const Center(
+                child: SizedBox(
+                    height: 50, width: 50, child: CircularProgressIndicator()));
+          }
+          final List<ApartementStatus> apartementState = [
+            ApartementStatus(state: 'مقيم', id: 1),
+            ApartementStatus(state: 'غير مقيم', id: 2),
+            ApartementStatus(state: 'طرف الشركة', id: 3),
+            ApartementStatus(state: 'test', id: 4),
+          ];
+          final List<Floor> realEstateFloors = [
+            Floor(floorName: 'المنخفض', id: 1),
+            Floor(floorName: 'مرتفع', id: 2),
+            Floor(floorName: 'الاول', id: 3),
+            Floor(floorName: 'الثاني', id: 4),
+            Floor(floorName: 'الثالث', id: 5),
+            Floor(floorName: 'الرابع', id: 6),
+          ];
 
-        return ScrollConfiguration(
-            behavior:
-                ScrollConfiguration.of(context).copyWith(scrollbars: false),
-            child: ListView(
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  separatorBuilder: (context, index) {
-                    return const SizedBox(
-                      height: 10,
-                    );
-                  },
-                  itemCount: _realEstates.length,
-                  itemBuilder: (context, index) {
-                    RealEstateData currentRealEstate = _realEstates[index];
+          return ScrollConfiguration(
+              behavior:
+                  ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              child: ListView(
+                children: [
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    separatorBuilder: (context, index) {
+                      return const SizedBox(
+                        height: 10,
+                      );
+                    },
+                    itemCount: _realEstates.length,
+                    itemBuilder: (context, index) {
+                      RealEstateData currentRealEstate = _realEstates[index];
 
-                    /* *SECTION - RealEstate Tile */
-                    return Obx(() {
-                      return RealEstateMobileTile(
-                          selectedRealestateFordetails:
-                              selectedRealestateFordetails.value,
-                          currentRealEstate: currentRealEstate,
-                          index: index,
-                          floorName: realEstateFloors
-                              .firstWhere((element) =>
-                                  element.id ==
-                                  currentRealEstate.apartementPostionInFloorId)
-                              .floorName,
-                          realestateState: apartementState
-                              .firstWhere((element) =>
-                                  element.id ==
-                                  currentRealEstate.apartementStatusId)
-                              .state,
-                          onTapMoreButton: () {
-                            selectedRealestateFordetails(index);
-                          },
-                          onTapDeleteButton: () {
-                            deleteData(_realEstates[index].id);
-                          },
-                          onTapEditButton: () {
-                            NavigationProperties.selectedTabNeededParamters = [
-                              -1,
-                              'EditOwner',
-                              _realEstates.firstWhere((element) =>
-                                  element.id == _realEstates[index].id)
-                            ];
-                            NavigationProperties.selectedTabVaueNotifier(
-                                NavigationProperties.addNewRealEstatePageRoute);
-                          });
-                    });
-                    /* *!SECTION */
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-              ],
-            ));
-      });
+                      /* *SECTION - RealEstate Tile */
+                      return Obx(() {
+                        return RealEstateMobileTile(
+                            selectedRealestateFordetails:
+                                selectedRealestateFordetails.value,
+                            currentRealEstate: currentRealEstate,
+                            index: index,
+                            floorName: realEstateFloors
+                                .firstWhere((element) =>
+                                    element.id ==
+                                    currentRealEstate
+                                        .apartementPostionInFloorId)
+                                .floorName,
+                            realestateState: apartementState
+                                .firstWhere((element) =>
+                                    element.id ==
+                                    currentRealEstate.apartementStatusId)
+                                .state,
+                            onTapMoreButton: () {
+                              selectedRealestateFordetails(index);
+                            },
+                            onTapDeleteButton: () {
+                              deleteData(_realEstates[index].id);
+                            },
+                            onTapEditButton: () {
+                              NavigationProperties.selectedTabNeededParamters =
+                                  [
+                                -1,
+                                'EditOwner',
+                                _realEstates.firstWhere((element) =>
+                                    element.id == _realEstates[index].id)
+                              ];
+                              NavigationProperties.selectedTabVaueNotifier(
+                                  NavigationProperties
+                                      .addNewRealEstatePageRoute);
+                            });
+                      });
+                      /* *!SECTION */
+                    },
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ));
+        }),
+      );
     }
     /* *!SECTION */
     /* *SECTION - Desktop View */
@@ -595,34 +586,13 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
                     SizedBox(
                       height: 50,
                       child: RoutesBuilder(
-                        routeLabels: [
-                          'الوحدات',
-                          buildingId != -1
-                              ? 'عرض وحدات العمارة $buildingId'
-                              : 'عرض جميع المقيمين',
-                        ],
+                        routeLabels: const ['الوحدات', 'عرض وحدات العمارة '],
                         routeScreen: [
                           NavigationProperties.realEstateSummaryPageRoute,
                           NavigationProperties.nonePageRoute
                         ],
                       ),
                     ),
-                    allApartementsOrFullyRecordedOnly == 'All_Owners'
-                        ? Column(
-                            children: [
-                              Text(
-                                '(${_realEstates.length})',
-                                style: GoogleFonts.notoSansArabic(
-                                    fontSize: 32, color: Colors.red),
-                              ),
-                              Text(
-                                'عدد السكان المقيمين',
-                                style: GoogleFonts.notoSansArabic(
-                                    fontSize: 20, color: Colors.grey[700]),
-                              ),
-                            ],
-                          )
-                        : const SizedBox(),
                     Row(
                       children: [
                         /* *SECTION - edit Button */
@@ -673,7 +643,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
                                             Navigator.of(context).pop();
                                             NavigationProperties
                                                 .selectedTabNeededParamters = [
-                                              buildingId,
+                                              -1,
                                               'AddOwner',
                                               RealEstateData(
                                                   id: 0,

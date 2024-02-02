@@ -352,7 +352,7 @@ class _OverallPaymentsThroughPeriodState
             DeviceScreenType.mobile) {
       GlobalClass.menuOptionsMobile = [
         MenuOption(
-            menuTitle: 'تسجيل فاتورة',
+            menuTitle: 'تسجيل سداد',
             onMenuTapButton: () {
               NavigationProperties.selectedTabNeededParamters = [
                 'Add',
@@ -388,98 +388,101 @@ class _OverallPaymentsThroughPeriodState
             })
       ];
 
-      return ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-          child: ListView(children: [
-            const SizedBox(
-              height: 20,
-            ),
-            Obx(() {
-              if (updateMobileListWhenDataIsPopulated.value == false) {
-                return const Center(
-                    child: SizedBox(
-                        height: 50,
-                        width: 50,
-                        child: CircularProgressIndicator()));
-              }
-              return ListView.separated(
-                shrinkWrap: true,
-                itemCount: _payments.length,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  PaymentData currentPayment = _payments[index];
-                  return Obx(
-                    () => PaymentMobileTile(
-                      currentPayment: currentPayment,
-                      index: index,
-                      selectedPaymentForDetails:
-                          selectedPaymentForDetails.value,
-                      onTapDeleteButton: () async {
-                        if (await deletePaymentData(_payments[index].id) ==
-                            200) {
-                          Get.showSnackbar(const GetSnackBar(
-                            message: 'تم الحذف بنجاح',
-                          ));
-                        }
-                      },
-                      onTapEditButton: () async {
-                        var getDataResponse = await SQLFunctions.sendQuery(
-                            query:
-                                'SELECT * FROM SpainCity.RealEstates where idRealEstates = ${currentPayment.apartementId}');
-                        List<RealEstateData> selectedApartement = [];
-
-                        if (getDataResponse.statusCode == 200) {
-                          var data = json.decode(getDataResponse.body);
-                          for (var element in data) {
-                            selectedApartement.add(RealEstateData(
-                                id: element[0],
-                                apartementStatusId: element[12],
-                                apartementPostionInFloorId: element[11],
-                                apartementPostionInBuildingId: element[10],
-                                apartementLink: element[9],
-                                isApartementHasEnoughData:
-                                    element[1] == 1 ? true : false,
-                                apartementName: element[13],
-                                ownerName: element[2],
-                                ownerPhoneNumber: element[3],
-                                responsibleName: element[7],
-                                responsiblePhone: element[8]));
+      return Scaffold(
+        body: ScrollConfiguration(
+            behavior:
+                ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            child: ListView(children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Obx(() {
+                if (updateMobileListWhenDataIsPopulated.value == false) {
+                  return const Center(
+                      child: SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: CircularProgressIndicator()));
+                }
+                return ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: _payments.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (BuildContext context, int index) {
+                    PaymentData currentPayment = _payments[index];
+                    return Obx(
+                      () => PaymentMobileTile(
+                        currentPayment: currentPayment,
+                        index: index,
+                        selectedPaymentForDetails:
+                            selectedPaymentForDetails.value,
+                        onTapDeleteButton: () async {
+                          if (await deletePaymentData(_payments[index].id) ==
+                              200) {
+                            Get.showSnackbar(const GetSnackBar(
+                              message: 'تم الحذف بنجاح',
+                            ));
                           }
-                        } else {
-                          selectedApartement.add(RealEstateData(
-                              id: 400,
-                              apartementStatusId: 400,
-                              apartementPostionInFloorId: 400,
-                              apartementPostionInBuildingId: 400,
-                              apartementLink: getDataResponse.body,
-                              isApartementHasEnoughData: false,
-                              apartementName: getDataResponse.body));
-                        }
-                        NavigationProperties.selectedTabNeededParamters = [
-                          'Edit',
-                          selectedApartement.first,
-                          currentPayment
-                        ];
-                        NavigationProperties.selectedTabVaueNotifier(
-                            NavigationProperties.addPaymentMobilePage);
-                      },
-                      onTapMoreButton: () {
-                        selectedPaymentForDetails(index);
-                      },
-                    ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return const SizedBox(
-                    height: 10,
-                  );
-                },
-              );
-            }),
-            const SizedBox(
-              height: 20,
-            )
-          ]));
+                        },
+                        onTapEditButton: () async {
+                          var getDataResponse = await SQLFunctions.sendQuery(
+                              query:
+                                  'SELECT * FROM SpainCity.RealEstates where idRealEstates = ${currentPayment.apartementId}');
+                          List<RealEstateData> selectedApartement = [];
+
+                          if (getDataResponse.statusCode == 200) {
+                            var data = json.decode(getDataResponse.body);
+                            for (var element in data) {
+                              selectedApartement.add(RealEstateData(
+                                  id: element[0],
+                                  apartementStatusId: element[12],
+                                  apartementPostionInFloorId: element[11],
+                                  apartementPostionInBuildingId: element[10],
+                                  apartementLink: element[9],
+                                  isApartementHasEnoughData:
+                                      element[1] == 1 ? true : false,
+                                  apartementName: element[13],
+                                  ownerName: element[2],
+                                  ownerPhoneNumber: element[3],
+                                  responsibleName: element[7],
+                                  responsiblePhone: element[8]));
+                            }
+                          } else {
+                            selectedApartement.add(RealEstateData(
+                                id: 400,
+                                apartementStatusId: 400,
+                                apartementPostionInFloorId: 400,
+                                apartementPostionInBuildingId: 400,
+                                apartementLink: getDataResponse.body,
+                                isApartementHasEnoughData: false,
+                                apartementName: getDataResponse.body));
+                          }
+                          NavigationProperties.selectedTabNeededParamters = [
+                            'Edit',
+                            selectedApartement.first,
+                            currentPayment
+                          ];
+                          NavigationProperties.selectedTabVaueNotifier(
+                              NavigationProperties.addPaymentMobilePage);
+                        },
+                        onTapMoreButton: () {
+                          selectedPaymentForDetails(index);
+                        },
+                      ),
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(
+                      height: 10,
+                    );
+                  },
+                );
+              }),
+              const SizedBox(
+                height: 20,
+              )
+            ])),
+      );
     }
     /* *!SECTION */
     /* *SECTION - Desktop View */

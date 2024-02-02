@@ -195,7 +195,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          /* *SECTION - Menu Icon */
                           IconButton.filled(
                               onPressed: () {
                                 GlobalClass.drawerController.toggle!();
@@ -212,38 +211,62 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                           /* *!SECTION */
                           /* *SECTION - Title Leaved to Changing*/
                           Text(
-                            'اسبانيا سيتي',
+                            'Spain City',
                             style: GoogleFonts.notoSansArabic(
                                 fontSize: 20, fontWeight: FontWeight.w500),
                           ),
                           /* *!SECTION */
                           /* *SECTION - Options Icon */
-                          IconButton.filled(
-                              onPressed: () {
-                                if (GlobalClass.menuOptionsMobile.isNotEmpty) {
-                                  DialogTile.bottomSheetTile(
-                                      context: context,
-                                      width: width,
-                                      height: height,
-                                      onMenuButtonTap: (index) {
-                                        GlobalClass.menuOptionsMobile[index]
-                                            .onMenuTapButton();
-                                        Navigator.of(context).pop();
-                                      },
-                                      menuText: GlobalClass.menuOptionsMobile
-                                          .map((e) => e.menuTitle)
-                                          .toList());
-                                }
-                              },
-                              focusColor: Colors.transparent,
-                              style: const ButtonStyle(
-                                  backgroundColor: MaterialStatePropertyAll(
-                                      Colors.transparent)),
-                              icon: const Icon(
-                                Icons.more_horiz_outlined,
-                                color: Colors.black,
-                                size: 24,
-                              )),
+                          Row(
+                            children: [
+                              IconButton.filled(
+                                  onPressed: () {
+                                    if (GlobalClass
+                                        .menuOptionsMobile.isNotEmpty) {
+                                      DialogTile.bottomSheetTile(
+                                          context: context,
+                                          width: width,
+                                          height: height,
+                                          onMenuButtonTap: (index) {
+                                            GlobalClass.menuOptionsMobile[index]
+                                                .onMenuTapButton();
+                                            Navigator.of(context).pop();
+                                          },
+                                          menuText: GlobalClass
+                                              .menuOptionsMobile
+                                              .map((e) => e.menuTitle)
+                                              .toList());
+                                    }
+                                  },
+                                  focusColor: Colors.transparent,
+                                  style: const ButtonStyle(
+                                      backgroundColor: MaterialStatePropertyAll(
+                                          Colors.transparent)),
+                                  icon: const Icon(
+                                    Icons.more_horiz_outlined,
+                                    color: Colors.black,
+                                    size: 24,
+                                  )),
+                              /* *SECTION - Home Icon */
+                              IconButton.filled(
+                                  onPressed: () {
+                                    NavigationProperties
+                                        .selectedTabVaueNotifier(
+                                            NavigationProperties
+                                                .realEstateSummaryPageRoute);
+                                  },
+                                  focusColor: Colors.transparent,
+                                  style: const ButtonStyle(
+                                      backgroundColor: MaterialStatePropertyAll(
+                                          Colors.transparent)),
+                                  icon: const Icon(
+                                    Icons.home_outlined,
+                                    color: Colors.black,
+                                    size: 24,
+                                  )),
+                              /* *!SECTION */
+                            ],
+                          ),
                           /* *!SECTION */
                         ],
                       ),
@@ -283,7 +306,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               showShadow: true,
               angle: 0.0,
               drawerShadowsBackgroundColor: Colors.grey[300] ?? Colors.white,
-              slideWidth: MediaQuery.of(context).size.width * 0.85,
+              slideWidth: MediaQuery.of(context).size.width * 0.95,
               openCurve: Curves.fastOutSlowIn,
               closeCurve: Curves.bounceIn,
             );
@@ -311,7 +334,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         dataToEdit: NavigationProperties.selectedTabNeededParamters[2],
       );
     } else if (requiredScreen == NavigationProperties.dataTableOfApartements) {
-      return const ShowwAllAprtementsPage();
+      return ShowwAllAprtementsPage(
+        sqlQueryStatement: NavigationProperties.selectedTabNeededParamters[0],
+      );
     } else if (requiredScreen ==
         NavigationProperties.paymentsDetailedPageRoute) {
       return const PaymentsPageOfSpecifiedApartement();

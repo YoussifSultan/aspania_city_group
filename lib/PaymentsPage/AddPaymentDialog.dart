@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aspania_city_group/Common_Used/button_tile.dart';
+import 'package:aspania_city_group/Common_Used/dialog_tile.dart';
 import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Common_Used/sql_functions.dart';
@@ -50,7 +51,8 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
   late TextEditingController dateOfPaymentTextController;
   TextEditingController amountOfPaymentTextController = TextEditingController();
   TextEditingController noteOfPaymentTextController = TextEditingController();
-  late TextEditingController selectedOwnerToAddPaymentTextController;
+  late TextEditingController selectedApartementToAddPayemntTextController;
+  late TextEditingController shownOwnerNameAccordingToSelectedApartementNumber;
   List<Validators> errors = [];
   /* *!SECTION */
   /* *SECTION - Init State */
@@ -61,7 +63,9 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
     } catch (e) {
       selectedOwner = selectedOwner;
     }
-    selectedOwnerToAddPaymentTextController =
+    selectedApartementToAddPayemntTextController =
+        TextEditingController(text: selectedOwner.apartementName);
+    shownOwnerNameAccordingToSelectedApartementNumber =
         TextEditingController(text: selectedOwner.ownerName);
     dateOfPaymentTextController = TextEditingController(
         text:
@@ -207,119 +211,125 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
             DeviceScreenType.mobile) {
       GlobalClass.menuOptionsMobile = [];
       /* *SECTION - Main Screen */
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(
-            height: 20,
-          ),
-          /* *SECTION - Owner Who Payed TextField */
-          TextTile(
-              width: GlobalClass.sizingInformation.screenSize.width * 0.8,
-              textController: selectedOwnerToAddPaymentTextController,
-              title: "مالك الوحدة",
-              hintText: "اختر المالك الوحدة",
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: ((context) => FluidDialog(
-                          rootPage: FluidDialogPage(
-                            builder: (context) {
-                              return ApartementSelector(
-                                width: GlobalClass
-                                        .sizingInformation.screenSize.width *
-                                    0.95,
-                              );
-                            },
-                          ),
-                        ))).then((value) {
-                  selectedOwner = value;
-                  selectedOwnerToAddPaymentTextController.text =
-                      value.ownerName;
-                });
-              },
-              icon: Icons.person_search_outlined),
-          /* *!SECTION */
+      return Scaffold(
+        body: ListView(
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            /* *SECTION - Apartement Name whose owner payed TextField */
+            TextTile(
+                width: GlobalClass.sizingInformation.screenSize.width * 0.8,
+                textController: selectedApartementToAddPayemntTextController,
+                title: "اختر الوحدة",
+                hintText: "اختر رقم الوحدة",
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: ((context) => FluidDialog(
+                            rootPage: FluidDialogPage(
+                              builder: (context) {
+                                return ApartementSelector(
+                                  width: GlobalClass
+                                          .sizingInformation.screenSize.width *
+                                      0.95,
+                                );
+                              },
+                            ),
+                          ))).then((value) {
+                    selectedOwner = value;
+                    selectedApartementToAddPayemntTextController.text =
+                        selectedOwner.apartementName;
+                    shownOwnerNameAccordingToSelectedApartementNumber.text =
+                        selectedOwner.ownerName;
+                  });
+                },
+                icon: Icons.search_outlined),
+            /* *!SECTION */
+/* *SECTION - Show owner Name payed TextField */
+            TextTile(
+                width: GlobalClass.sizingInformation.screenSize.width * 0.8,
+                textController:
+                    shownOwnerNameAccordingToSelectedApartementNumber,
+                title: "اسم المالك",
+                hintText: "",
+                onTap: () {},
+                icon: Icons.person_search_outlined),
+            /* *!SECTION */
+            /* *SECTION - Payment Date TextField */
+            TextTile(
+                width: GlobalClass.sizingInformation.screenSize.width * 0.8,
+                textController: dateOfPaymentTextController,
+                title: 'تاريخ السداد',
+                onTap: () {
+                  DialogTile.showMonthAndDateSelectorBottomSheet(context)
+                      .then((value) {
+                    paymentDate = value[0] == null
+                        ? paymentDate
+                        : DateTime(value[0], value[1], 15);
+                    dateOfPaymentTextController.text =
+                        '${paymentDate.year} / ${paymentDate.month} / ${paymentDate.day}';
+                  });
+                },
+                hintText: 'اختر التاريخ',
+                icon: Icons.calendar_month_outlined),
+            /* *!SECTION */
 
-          /* *SECTION - Payment Date TextField */
-          TextTile(
-              width: GlobalClass.sizingInformation.screenSize.width * 0.8,
-              textController: dateOfPaymentTextController,
-              title: 'تاريخ السداد',
-              onTap: () {
-                showDatePicker(
-                        textDirection: TextDirection.rtl,
-                        cancelText: "الغاء",
-                        confirmText: "تأكيد",
-                        context: context,
-                        initialDate: paymentDate,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2030))
-                    .then((value) {
-                  paymentDate = value ?? paymentDate;
-                  dateOfPaymentTextController.text =
-                      '${paymentDate.year} / ${paymentDate.month} / ${paymentDate.day}';
-                });
-              },
-              hintText: 'اختر التاريخ',
-              icon: Icons.calendar_month_outlined),
-          /* *!SECTION */
+            /* *SECTION - Payment Amount TextField */
+            TextTile(
+                width: GlobalClass.sizingInformation.screenSize.width * 0.8,
+                onChange: (text, errorText) {
+                  if (Validators.isNumeric(text)) {
+                    errors.removeWhere(
+                        (element) => element.errorText == 'Amount Not Number');
+                    errorText('');
+                    paymentAmount = double.parse(text);
+                  } else {
+                    errorText('ادخل ارقام فقط');
+                    errors.add(const Validators(
+                        errorText: 'Amount Not Number', errorID: '1'));
+                  }
+                },
+                textController: amountOfPaymentTextController,
+                title: 'قيمة السداد',
+                hintText: 'ادخل قيمة السداد',
+                icon: Icons.money),
+            /* *!SECTION */
+            /* *SECTION - Payment Note TextField */
 
-          /* *SECTION - Payment Amount TextField */
-          TextTile(
-              width: GlobalClass.sizingInformation.screenSize.width * 0.8,
-              onChange: (text, errorText) {
-                if (Validators.isNumeric(text)) {
-                  errors.removeWhere(
-                      (element) => element.errorText == 'Amount Not Number');
-                  errorText('');
-                  paymentAmount = double.parse(text);
-                } else {
-                  errorText('ادخل ارقام فقط');
-                  errors.add(const Validators(
-                      errorText: 'Amount Not Number', errorID: '1'));
-                }
-              },
-              textController: amountOfPaymentTextController,
-              title: 'المبلغ',
-              hintText: 'ادخل المبلغ',
-              icon: Icons.money),
-          /* *!SECTION */
-          /* *SECTION - Payment Note TextField */
+            TextTile(
+                width: GlobalClass.sizingInformation.screenSize.width * 0.8,
+                height: 100,
+                textController: noteOfPaymentTextController,
+                title: 'ملاحظات',
+                onChange: (text, errorText) {
+                  paymentNote = text;
+                },
+                hintText: 'ادخل الملاحظات',
+                icon: Icons.description_outlined),
+            /* *!SECTION */
 
-          TextTile(
-              width: GlobalClass.sizingInformation.screenSize.width * 0.8,
-              height: 100,
-              textController: noteOfPaymentTextController,
-              title: 'ملاحظات',
-              onChange: (text, errorText) {
-                paymentNote = text;
-              },
-              hintText: 'ادخل الملاحظات',
-              icon: Icons.description_outlined),
-          /* *!SECTION */
+            /* *SECTION - Add Or Edit Button */
 
-          /* *SECTION - Add Or Edit Button */
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              widget.state == 'Add'
-                  ? ButtonTile(
-                      onTap: () {
-                        addOrEditPayment();
-                      },
-                      buttonText: 'حفظ')
-                  : ButtonTile(
-                      onTap: () {
-                        addOrEditPayment();
-                      },
-                      buttonText: 'تعديل'),
-            ],
-          ),
-          /* *!SECTION */
-        ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                widget.state == 'Add'
+                    ? ButtonTile(
+                        onTap: () {
+                          addOrEditPayment();
+                        },
+                        buttonText: 'حفظ')
+                    : ButtonTile(
+                        onTap: () {
+                          addOrEditPayment();
+                        },
+                        buttonText: 'تعديل'),
+              ],
+            ),
+            /* *!SECTION */
+          ],
+        ),
       );
       /* *!SECTION */
     }
@@ -339,7 +349,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
             /* *SECTION - Owner Who Payed TextField */
             TextTile(
                 width: 435,
-                textController: selectedOwnerToAddPaymentTextController,
+                textController: selectedApartementToAddPayemntTextController,
                 title: "مالك الوحدة",
                 hintText: "اختر المالك الوحدة",
                 onTap: () {
@@ -356,7 +366,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
                             ),
                           ))).then((value) {
                     selectedOwner = value;
-                    selectedOwnerToAddPaymentTextController.text =
+                    selectedApartementToAddPayemntTextController.text =
                         value.ownerName;
                   });
                 },

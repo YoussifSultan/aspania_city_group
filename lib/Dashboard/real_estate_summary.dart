@@ -73,63 +73,68 @@ class _RealEstatesPageState extends State<RealEstatesPage> {
             })
       ];
 
-      return ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-          child: ListView(
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: 7,
-                separatorBuilder: (context, index) {
-                  return const SizedBox(
-                    height: 10,
-                  );
-                },
-                itemBuilder: (context, index) {
-                  return RealEstateActionsMobileWidget(
-                      width: GlobalClass.sizingInformation.screenSize.width,
-                      realEstateName: realEstates
-                          .firstWhere((element) => element.id == index + 1)
-                          .buildingName,
-                      onAddingNewApartementButtonTap: () {
-                        NavigationProperties.selectedTabNeededParamters = [
-                          index + 1,
-                          'AddOwner',
-                          RealEstateData(
-                              id: 0,
-                              apartementStatusId: 0,
-                              apartementPostionInFloorId: 0,
-                              apartementPostionInBuildingId: 0,
-                              apartementLink: 'None',
-                              isApartementHasEnoughData: false,
-                              apartementName: 'None')
-                        ];
-                        NavigationProperties.selectedTabVaueNotifier(
-                            NavigationProperties.addNewRealEstatePageRoute);
-                      },
-                      onShowPaymentsOptionsButtonTap: () {
-                        showBottomSheetForPrintingPaymentsAccordingToBuildingNoAndMonthAndYear(
-                            context, index);
-                      },
-                      onShowAllApartementsInRealEstateButtonTap: () {
-                        NavigationProperties.selectedTabNeededParamters = [
-                          index + 1,
-                          'All_Apartements'
-                        ];
-                        NavigationProperties.selectedTabVaueNotifier(
-                            NavigationProperties.dataTableOfApartements);
-                      });
-                },
-              ),
-              const SizedBox(
-                height: 20,
-              )
-            ],
-          ));
+      return Scaffold(
+        body: ScrollConfiguration(
+            behavior:
+                ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            child: ListView(
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                ListView.separated(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: 7,
+                  separatorBuilder: (context, index) {
+                    return const SizedBox(
+                      height: 10,
+                    );
+                  },
+                  itemBuilder: (context, index) {
+                    return RealEstateActionsMobileWidget(
+                        width: GlobalClass.sizingInformation.screenSize.width,
+                        realEstateName: realEstates
+                            .firstWhere((element) => element.id == index + 1)
+                            .buildingName,
+                        onShowAllCitzensInBuildingButtonTap: () {
+                          NavigationProperties.selectedTabNeededParamters = [
+                            '''SELECT 
+    *
+FROM
+    SpainCity.RealEstates realestate
+WHERE
+    realestate.apartementPostionInBuildingId = '${index + 1}'
+        AND realestate.apartementStatusId = '1';'''
+                          ];
+                          NavigationProperties.selectedTabVaueNotifier(
+                              NavigationProperties.dataTableOfApartements);
+                        },
+                        ononShowAllNonCitzensInBuildingButtonTapButtonTap: () {
+                          NavigationProperties.selectedTabNeededParamters = [
+                            '''SELECT 
+    *
+FROM
+    SpainCity.RealEstates realestate
+WHERE
+    realestate.apartementPostionInBuildingId = '${index + 1}'
+        AND realestate.apartementStatusId != '1';'''
+                          ];
+                          NavigationProperties.selectedTabVaueNotifier(
+                              NavigationProperties.dataTableOfApartements);
+                        },
+                        onPrintPaymentsReportButtonTap: () {
+                          showBottomSheetForPrintingPaymentsAccordingToBuildingNoAndMonthAndYear(
+                              context, index);
+                        });
+                  },
+                ),
+                const SizedBox(
+                  height: 20,
+                )
+              ],
+            )),
+      );
     }
     /* *!SECTION */
     /* *SECTION - Desktop View */
@@ -323,16 +328,12 @@ class _RealEstatesPageState extends State<RealEstatesPage> {
                                       await SQLFunctions.sendQuery(
                                           query:
                                               '''SELECT      realestate.ownerName AS 'اسم المالك',     realestate.ownerPhoneNumber AS 'رقم التليفون', 	realestate.apartementPostionInFloorId As 'الدور',     realestate.apartementPostionInBuildingId As 'رقم العمارة', 	realestate.apartementStatusId As 'حالة الوحدة', 	realestate.apartementName AS 'رقم الوحدة', 	payments.paymentDate AS 'تاريخ السداد',     CASE         WHEN ISNULL(payments.paymentAmount) THEN 'غير مسدد'         ELSE payments.paymentAmount     END AS 'قيمة المسدد' FROM     SpainCity.RealEstates realestate         LEFT OUTER JOIN     SpainCity.PaymentsOfRealEsate payments ON realestate.idRealEstates = payments.realEstateId         AND payments.paymentDate BETWEEN concat($selectedYear,'-',$selectedMonthFomratted,'-01') AND concat($selectedYear,'-',$selectedMonthFomratted,'-31')          where realestate.apartementPostionInBuildingId =${index + 1}  order by realestate.apartementName ''');
-                                  print(
-                                      '''Set @SelectedYear ='$selectedYear'; Set @SelectedMonth ='$selectedMonthFomratted'; Set @SelectedBuildingNo =${index + 1}; SELECT      realestate.ownerName AS 'اسم المالك',     realestate.ownerPhoneNumber AS 'رقم التليفون', 	realestate.apartementPostionInFloorId As 'الدور',     realestate.apartementPostionInBuildingId As 'رقم العمارة', 	realestate.apartementStatusId As 'حالة الوحدة', 	realestate.apartementName AS 'رقم الوحدة', 	payments.paymentDate AS 'تاريخ السداد',     CASE         WHEN ISNULL(payments.paymentAmount) THEN 'غير مسدد'         ELSE payments.paymentAmount     END AS 'قيمة المسدد' FROM     SpainCity.RealEstates realestate         LEFT OUTER JOIN     SpainCity.PaymentsOfRealEsate payments ON realestate.idRealEstates = payments.realEstateId         AND payments.paymentDate BETWEEN concat(@SelectedYear,'-',@SelectedMonth,'-01') AND concat(@SelectedYear,'-',@SelectedMonth,'-31')          where realestate.apartementPostionInBuildingId =@SelectedBuildingNo  order by realestate.apartementName ''');
                                   if (getDataResponse.statusCode == 200) {
                                     var data =
                                         json.decode(getDataResponse.body);
                                     exportXLSXOfData(data,
                                         'عرض كشف السدادات خلال  $selectedYear/$selectedMonthلعمارة رقم ${index + 1}');
-                                  } else {
-                                    print(getDataResponse.body);
-                                  }
+                                  } else {}
                                 });
                               },
                               buttonText: 'طباعة التقرير')
@@ -620,21 +621,16 @@ class RealEstateActionsMobileWidget extends StatelessWidget {
     super.key,
     required this.width,
     required this.realEstateName,
-    required this.onAddingNewApartementButtonTap,
-    required this.onShowPaymentsOptionsButtonTap,
-    required this.onShowAllApartementsInRealEstateButtonTap,
+    required this.onShowAllCitzensInBuildingButtonTap,
+    required this.ononShowAllNonCitzensInBuildingButtonTapButtonTap,
+    required this.onPrintPaymentsReportButtonTap,
   });
 
   final double width;
   final String realEstateName;
-  final Function onAddingNewApartementButtonTap;
-  final Function onShowPaymentsOptionsButtonTap;
-  final Function onShowAllApartementsInRealEstateButtonTap;
-  /* *SECTION - OnHover Properties */
-  final RxBool onAddingNewApartementButtonHoverValueNotifier = false.obs;
-  final RxBool onPaymentsOptionsValueNotifier = false.obs;
-  final RxBool onShowAllApartementsInRealEstateValueNotifier = false.obs;
-  /* *!SECTION */
+  final Function onShowAllCitzensInBuildingButtonTap;
+  final Function ononShowAllNonCitzensInBuildingButtonTapButtonTap;
+  final Function onPrintPaymentsReportButtonTap;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -667,65 +663,42 @@ class RealEstateActionsMobileWidget extends StatelessWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(20))),
             child: Column(
               children: [
-                /* *SECTION - Add New Apartement */
-                Obx(() {
-                  return MenuButtonCard(
-                    icon: Icons.add_home_outlined,
-                    title: 'اضف وحدة جديدة',
-                    onHover: (isHovering) {
-                      onAddingNewApartementButtonHoverValueNotifier(isHovering);
-                    },
-                    menuCardRadius: const BorderRadius.only(
-                        topRight: Radius.circular(20),
-                        topLeft: Radius.circular(20)),
-                    backgroundColor:
-                        onAddingNewApartementButtonHoverValueNotifier.value
-                            ? Colors.yellowAccent[100]
-                            : Colors.grey[50],
-                    onTap: () {
-                      onAddingNewApartementButtonTap();
-                    },
-                  );
-                }),
+                /* *SECTION - Show Citzens in Building */
+                MenuButtonCard(
+                  icon: Icons.local_hotel_outlined,
+                  title: 'عرض المقيمين ',
+                  menuCardRadius: const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(20)),
+                  backgroundColor: Colors.grey[50],
+                  onTap: () {
+                    onShowAllCitzensInBuildingButtonTap();
+                  },
+                ),
                 /* *!SECTION */
-                /* *SECTION - Show Owners In RealEstate */
-                Obx(() {
-                  return MenuButtonCard(
-                    onHover: (isHovering) {
-                      onPaymentsOptionsValueNotifier(isHovering);
-                    },
-                    icon: Icons.show_chart,
-                    title: 'السدادات',
-                    menuCardRadius: const BorderRadius.only(),
-                    backgroundColor: onPaymentsOptionsValueNotifier.value
-                        ? Colors.yellowAccent[100]
-                        : Colors.grey[50],
-                    onTap: () {
-                      onShowPaymentsOptionsButtonTap();
-                    },
-                  );
-                }),
+                /* *SECTION - Show people who aren't citzens */
+                MenuButtonCard(
+                  icon: Icons.directions_walk_outlined,
+                  title: 'عرض الغير مقيمين ',
+                  menuCardRadius: const BorderRadius.only(),
+                  backgroundColor: Colors.grey[50],
+                  onTap: () {
+                    ononShowAllNonCitzensInBuildingButtonTapButtonTap();
+                  },
+                ),
                 /* *!SECTION */
-                /* *SECTION - Show all Apartements */
-                Obx(() {
-                  return MenuButtonCard(
-                    onHover: (isHovering) {
-                      onShowAllApartementsInRealEstateValueNotifier(isHovering);
-                    },
-                    icon: Icons.all_inbox,
-                    title: 'جميع الوحدات',
-                    menuCardRadius: const BorderRadius.only(
-                        bottomRight: Radius.circular(20),
-                        bottomLeft: Radius.circular(20)),
-                    backgroundColor:
-                        onShowAllApartementsInRealEstateValueNotifier.value
-                            ? Colors.yellowAccent[100]
-                            : Colors.grey[50],
-                    onTap: () {
-                      onShowAllApartementsInRealEstateButtonTap();
-                    },
-                  );
-                }),
+                /* *SECTION - Payments */
+                MenuButtonCard(
+                  icon: Icons.document_scanner_outlined,
+                  title: 'تقرير سداد',
+                  menuCardRadius: const BorderRadius.only(
+                      bottomRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(20)),
+                  backgroundColor: Colors.grey[50],
+                  onTap: () {
+                    onPrintPaymentsReportButtonTap();
+                  },
+                ),
                 /* *!SECTION */
               ],
             )),

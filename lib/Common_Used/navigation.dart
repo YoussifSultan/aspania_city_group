@@ -15,7 +15,7 @@ selectedTabVaueNotifier has only
 buildingNumber , window State (Edit_Owner, Add_Owner), realestate data
 )
 4. Show AllRealEstate (
-  index of building , All_Apartements ORRR Recorded_Apartements ORRR All_Owners
+  SQLQueryStatement
 )
 5.Payment Page(
   RealEstate ID ,

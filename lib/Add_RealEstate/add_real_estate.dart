@@ -418,109 +418,6 @@ class _AddRealEstateState extends State<AddRealEstate> {
             ),
             Center(
               child: Text(
-                'بيانات المالك',
-                style: GoogleFonts.notoSansArabic(
-                    fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-
-            /* *!SECTION */
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                /* *SECTION - Owner Name */
-                TextTile(
-                  width: width * 0.8,
-                  onChange: (text, errorText) {
-                    if (!Validators.isArabicOnly(text)) {
-                      errorText('ادخل حروف فقط');
-                      errorsofTextController.addIf(
-                          !errorsofTextController.contains('ownerName'),
-                          'ownerName');
-                    } else {
-                      errorText('');
-                      errorsofTextController.remove('ownerName');
-                    }
-                  },
-                  textController: ownerNameTextController,
-                  hintText: 'ادخل اسم الماك',
-                  icon: Icons.person_outlined,
-                  title: 'اسم المالك',
-                ),
-
-                /* *!SECTION */
-                /* *SECTION - Owner Phone */
-                TextTile(
-                  width: width * 0.8,
-                  onChange: (text, errorText) {
-                    if (!Validators.isNumericOrEmptyOnly(text)) {
-                      errorText('ادخل ارقام فقط');
-                      errorsofTextController.addIf(
-                          !errorsofTextController.contains('ownerName'),
-                          'ownerPhone');
-                    } else {
-                      errorText('');
-                      errorsofTextController.remove('ownerPhone');
-                    }
-                  },
-                  textController: ownerPhoneNumberTextController,
-                  hintText: 'ادخل رقم تلفون',
-                  icon: Icons.phone_outlined,
-                  title: 'رقم تليفون المالك',
-                ),
-                /* *!SECTION */
-                /* *SECTION - Responsible Name */
-                TextTile(
-                  width: width * 0.8,
-                  onChange: (text, errorText) {
-                    if (!Validators.isArabicOnly(text)) {
-                      errorText('ادخل حروف فقط');
-                      errorsofTextController.addIf(
-                          !errorsofTextController.contains('responsibleName'),
-                          'responsibleName');
-                    } else {
-                      errorText('');
-                      errorsofTextController.remove('responsibleName');
-                    }
-                  },
-                  textController: responsibleNameTextController,
-                  hintText: 'ادخل اسم المسئول عن الوحدة',
-                  icon: Icons.handshake_outlined,
-                  title: 'اسم المسئول',
-                ),
-
-                /* *!SECTION */
-                /* *SECTION - responsible Phone */
-                TextTile(
-                  width: width * 0.8,
-                  onChange: (text, errorText) {
-                    if (!Validators.isNumericOrEmptyOnly(text)) {
-                      errorText('ادخل ارقام فقط');
-                      errorsofTextController.addIf(
-                          !errorsofTextController.contains('responsiblePhone'),
-                          'responsiblePhone');
-                    } else {
-                      errorText('');
-                      errorsofTextController.remove('responsiblePhone');
-                    }
-                  },
-                  textController: responsiblePhoneNumberTextController,
-                  hintText: 'ادخل رقم تليفون',
-                  icon: Icons.mobile_friendly_outlined,
-                  title: 'رقم تليفون المسئول',
-                ),
-                /* *!SECTION */
-              ],
-            ),
-            /* *SECTION -  Apartement Data header*/
-            const SizedBox(
-              height: 10,
-            ),
-            Center(
-              child: Text(
                 'بيانات الوحدة',
                 style: GoogleFonts.notoSansArabic(
                     fontSize: 20, fontWeight: FontWeight.bold),
@@ -762,6 +659,109 @@ class _AddRealEstateState extends State<AddRealEstate> {
                     /* *!SECTION */
                   ],
                 )
+                /* *!SECTION */
+              ],
+            ),
+/* *SECTION - Owner Data Header */
+            const SizedBox(
+              height: 20,
+            ),
+            Center(
+              child: Text(
+                'بيانات المالك',
+                style: GoogleFonts.notoSansArabic(
+                    fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+
+            /* *!SECTION */
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                /* *SECTION - Owner Name */
+                TextTile(
+                  width: width * 0.8,
+                  onChange: (text, errorText) {
+                    if (!Validators.isArabicOnly(text)) {
+                      errorText('ادخل حروف فقط');
+                      errorsofTextController.addIf(
+                          !errorsofTextController.contains('ownerName'),
+                          'ownerName');
+                    } else {
+                      errorText('');
+                      errorsofTextController.remove('ownerName');
+                    }
+                  },
+                  textController: ownerNameTextController,
+                  hintText: 'ادخل اسم الماك',
+                  icon: Icons.person_outlined,
+                  title: 'اسم المالك',
+                ),
+
+                /* *!SECTION */
+                /* *SECTION - Owner Phone */
+                TextTile(
+                  width: width * 0.8,
+                  onChange: (text, errorText) {
+                    if (!Validators.isNumericOrEmptyOnly(text)) {
+                      errorText('ادخل ارقام فقط');
+                      errorsofTextController.addIf(
+                          !errorsofTextController.contains('ownerName'),
+                          'ownerPhone');
+                    } else {
+                      errorText('');
+                      errorsofTextController.remove('ownerPhone');
+                    }
+                  },
+                  textController: ownerPhoneNumberTextController,
+                  hintText: 'ادخل رقم تلفون',
+                  icon: Icons.phone_outlined,
+                  title: 'رقم تليفون المالك',
+                ),
+                /* *!SECTION */
+                /* *SECTION - Responsible Name */
+                TextTile(
+                  width: width * 0.8,
+                  onChange: (text, errorText) {
+                    if (!Validators.isArabicOnly(text)) {
+                      errorText('ادخل حروف فقط');
+                      errorsofTextController.addIf(
+                          !errorsofTextController.contains('responsibleName'),
+                          'responsibleName');
+                    } else {
+                      errorText('');
+                      errorsofTextController.remove('responsibleName');
+                    }
+                  },
+                  textController: responsibleNameTextController,
+                  hintText: 'ادخل اسم المسئول عن الوحدة',
+                  icon: Icons.handshake_outlined,
+                  title: 'اسم المسئول',
+                ),
+
+                /* *!SECTION */
+                /* *SECTION - responsible Phone */
+                TextTile(
+                  width: width * 0.8,
+                  onChange: (text, errorText) {
+                    if (!Validators.isNumericOrEmptyOnly(text)) {
+                      errorText('ادخل ارقام فقط');
+                      errorsofTextController.addIf(
+                          !errorsofTextController.contains('responsiblePhone'),
+                          'responsiblePhone');
+                    } else {
+                      errorText('');
+                      errorsofTextController.remove('responsiblePhone');
+                    }
+                  },
+                  textController: responsiblePhoneNumberTextController,
+                  hintText: 'ادخل رقم تليفون',
+                  icon: Icons.mobile_friendly_outlined,
+                  title: 'رقم تليفون المسئول',
+                ),
                 /* *!SECTION */
               ],
             ),
