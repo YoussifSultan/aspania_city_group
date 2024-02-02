@@ -7,7 +7,7 @@ class RealEstateData {
       required this.apartementLink,
       required this.isApartementHasEnoughData,
       required this.apartementName,
-      this.apartementGarage = 0,
+      this.apartementGarage ,
       this.responsibleName = '',
       this.responsiblePhone = '',
       this.ownerName = '',
@@ -30,7 +30,7 @@ class RealEstateData {
   late String ownerName;
   late String ownerPhoneNumber;
   late int ownerRole;
-  late int apartementGarage;
+  late String? apartementGarage;
   late String ownerMail;
   late String ownerPassword;
   late String responsibleName;

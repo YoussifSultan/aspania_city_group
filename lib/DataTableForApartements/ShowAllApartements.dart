@@ -253,19 +253,17 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
               .firstWhere((element) => element.id == stateOfRealEstate)
               .state;
       // حالة الحراج
-      int garageState = realEstateData.apartementGarage;
+      String garageState =
+          realEstateData.apartementGarage ?? 'لا يوجد حصة جراج';
       aprtartementsExcelSheet
               .cell(xlsx.CellIndex.indexByString('G${i + 8}'))
               .cellStyle =
           xlsx.CellStyle(
               backgroundColorHex:
                   stateOfRealEstate >= 1 ? '#f8cbad' : '#c6e0b4');
-      aprtartementsExcelSheet.cell(xlsx.CellIndex.indexByString('G${i + 8}')).value =
-          garageState == 1
-              ? 'حصة جراج واحدة'
-              : garageState == 2
-                  ? 'حصتين جراج'
-                  : "لا يوجد حصة جراج";
+      aprtartementsExcelSheet
+          .cell(xlsx.CellIndex.indexByString('G${i + 8}'))
+          .value = garageState;
     }
     aprtartementExcel.save(fileName: ' وحدات  .xlsx');
 /* *!SECTION */
@@ -307,14 +305,10 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
           width: 150,
           name: 'حالة الجراج',
           cellBuilder: (context, row) {
-            return Text(row.data.apartementGarage == 1
-                ? 'حصة جراج واحدة'
-                : row.data.apartementGarage == 2
-                    ? 'حصتين جراج'
-                    : "لا يوجد حصة جراج");
+            return Text(row.data.apartementGarage ?? "لا يوجد حصة جراج");
           },
           sortable: true,
-          intValue: (row) => row.apartementGarage,
+          stringValue: (row) => row.apartementGarage,
         ),
 
         DaviColumn(
@@ -474,6 +468,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
       ];
 
       return Scaffold(
+        backgroundColor: Colors.white,
         body: Obx(() {
           if (updateMobileListWhenDataIsPopulated.value == false) {
             return const Center(
@@ -1064,12 +1059,8 @@ class _RealEstateMobileTileState extends State<RealEstateMobileTile> {
                       ),
                       LabelAndDataHorizontalWidget(
                           labelText: 'حصة الجراج',
-                          dataText: widget.currentRealEstate.apartementGarage ==
-                                  1
-                              ? 'حصة جراج واحدة'
-                              : widget.currentRealEstate.apartementGarage == 2
-                                  ? 'حصتين جراج'
-                                  : "لا يوجد حصة جراج"),
+                          dataText: widget.currentRealEstate.apartementGarage ??
+                              "لا يوجد حصة جراج"),
                       const SizedBox(
                         height: 10,
                       ),

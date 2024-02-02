@@ -41,6 +41,8 @@ class _AddRealEstateState extends State<AddRealEstate> {
   TextEditingController apartementStateTextController = TextEditingController();
   TextEditingController apartementNumberTextController =
       TextEditingController();
+  TextEditingController apartementGarageTextController =
+      TextEditingController();
   TextEditingController ownerNameTextController = TextEditingController();
   TextEditingController responsibleNameTextController = TextEditingController();
   TextEditingController responsiblePhoneNumberTextController =
@@ -55,7 +57,6 @@ class _AddRealEstateState extends State<AddRealEstate> {
   /* *!SECTION */
   /* *SECTION - ValueNotfiers */
   RxString onApartementLinkUpdated = ''.obs;
-  RxInt onApartementGarageState = 0.obs;
   /* *SECTION - Edit Data */
   RealEstateData realEstateDataToEdit = RealEstateData(
       id: 0,
@@ -134,7 +135,8 @@ class _AddRealEstateState extends State<AddRealEstate> {
         apartementStatusID = realEstateDataToEdit.apartementStatusId;
         onApartementLinkUpdated(
             'www.spain-city.com/id?${buildingID ?? ''}${floorID ?? ''}${apartementID ?? ''}');
-        onApartementGarageState(realEstateDataToEdit.apartementGarage);
+        apartementGarageTextController.text =
+            realEstateDataToEdit.apartementGarage ?? '';
         apartementLinkTextController.text = realEstateDataToEdit.apartementLink;
         if (realEstateDataToEdit.isApartementHasEnoughData) {
           ownerNameTextController.text = realEstateDataToEdit.ownerName;
@@ -169,7 +171,16 @@ class _AddRealEstateState extends State<AddRealEstate> {
     int newID = await getLastID() + 1;
     var insertDataResponse = await SQLFunctions.sendQuery(
       query:
-          "INSERT INTO `SpainCity`.`RealEstates` (`idRealEstates`, `isApartementHasEnoughData`, `ownerName`,`ownerPhoneNumber`, `ownerRole`, `ownerMail`, `ownerPassword`,`responsibleName`, `responsiblePhone`, `apartementLink`, `apartementPostionInBuildingId`, `apartementPostionInFloorId`, `apartementStatusId`, `apartementName`,`apartementGarage`) VALUES (${newID.toString()}, ${apartement.isApartementHasEnoughData == true ? 1 : 0}, \'${apartement.ownerName}\', \'${apartement.ownerPhoneNumber}\', ${apartement.ownerRole}, \'${apartement.ownerMail}\', \'${apartement.ownerPassword}\', \'${apartement.responsibleName}\', \'${apartement.responsiblePhone}\', \'${apartement.apartementLink}\',  ${apartement.apartementPostionInBuildingId}, ${apartement.apartementPostionInFloorId}, ${apartement.apartementStatusId}, \'${apartement.apartementName}\', ${apartement.apartementGarage});",
+          '''INSERT INTO `SpainCity`.`RealEstates` (`idRealEstates`, `isApartementHasEnoughData`,
+           `ownerName`,`ownerPhoneNumber`, `ownerRole`, `ownerMail`, `ownerPassword`,`responsibleName`,
+            `responsiblePhone`, `apartementLink`, `apartementPostionInBuildingId`, `apartementPostionInFloorId`,
+             `apartementStatusId`, `apartementName`,`apartementGarage`) VALUES 
+             (${newID.toString()}, ${apartement.isApartementHasEnoughData == true ? 1 : 0}, '${apartement.ownerName}',
+              '${apartement.ownerPhoneNumber}', ${apartement.ownerRole}, '${apartement.ownerMail}',
+               '${apartement.ownerPassword}', '${apartement.responsibleName}', '${apartement.responsiblePhone}',
+                '${apartement.apartementLink}',  ${apartement.apartementPostionInBuildingId},
+                 ${apartement.apartementPostionInFloorId}, ${apartement.apartementStatusId}, 
+                 '${apartement.apartementName}', '${apartement.apartementGarage}');''',
     );
 
     if (insertDataResponse.statusCode == 200) {
@@ -182,7 +193,17 @@ class _AddRealEstateState extends State<AddRealEstate> {
   Future<String> editData(RealEstateData apartement) async {
     var updateDataResponse = await SQLFunctions.sendQuery(
       query:
-          "UPDATE `SpainCity`.`RealEstates` SET `idRealEstates` = ${apartement.id}, `isApartementHasEnoughData` = ${apartement.isApartementHasEnoughData == true ? 1 : 0}, `ownerName` = \'${apartement.ownerName}\', `ownerPhoneNumber` = \'${apartement.ownerPhoneNumber}\', `ownerRole` = ${apartement.ownerRole}, `ownerMail` = \'${apartement.ownerMail}\', `ownerPassword` = \'${apartement.ownerPassword}\', `responsibleName` = \'${apartement.responsibleName}\', `responsiblePhone` = \'${apartement.responsiblePhone}\', `apartementLink` = \'${apartement.apartementLink}\', `apartementPostionInBuildingId` = ${apartement.apartementPostionInBuildingId}, `apartementPostionInFloorId` = ${apartement.apartementPostionInFloorId}, `apartementStatusId` = ${apartement.apartementStatusId}, `apartementName` = \'${apartement.apartementName}\' ,`apartementGarage` = ${apartement.apartementGarage} WHERE (`idRealEstates` = ${apartement.id});",
+          '''UPDATE `SpainCity`.`RealEstates` SET `idRealEstates` = ${apartement.id},
+           `isApartementHasEnoughData` = ${apartement.isApartementHasEnoughData == true ? 1 : 0},
+            `ownerName` = '${apartement.ownerName}', `ownerPhoneNumber` = '${apartement.ownerPhoneNumber}',
+             `ownerRole` = ${apartement.ownerRole}, `ownerMail` = '${apartement.ownerMail}',
+              `ownerPassword` = '${apartement.ownerPassword}', `responsibleName` = '${apartement.responsibleName}',
+               `responsiblePhone` = '${apartement.responsiblePhone}', `apartementLink` = '${apartement.apartementLink}', 
+               `apartementPostionInBuildingId` = ${apartement.apartementPostionInBuildingId},
+                `apartementPostionInFloorId` = ${apartement.apartementPostionInFloorId},
+                 `apartementStatusId` = ${apartement.apartementStatusId}, 
+                 `apartementName` = '${apartement.apartementName}' ,
+                 `apartementGarage` = '${apartement.apartementGarage}' WHERE (`idRealEstates` = ${apartement.id});''',
     );
 
     if (updateDataResponse.statusCode == 200) {
@@ -247,7 +268,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
         }
         RealEstateData realEstateData = RealEstateData(
             id: widget.dataToEdit!.id,
-            apartementGarage: onApartementGarageState.value,
+            apartementGarage: apartementGarageTextController.text,
             apartementStatusId: apartementStatusID ?? 1,
             apartementPostionInFloorId: floorID ?? 1,
             apartementPostionInBuildingId: buildingID ?? 1,
@@ -314,7 +335,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
         RealEstateData realEstateData = RealEstateData(
             id: widget.dataToEdit!.id,
             ownerName: ownerNameTextController.text,
-            apartementGarage: onApartementGarageState.value,
+            apartementGarage: apartementGarageTextController.text,
             ownerPhoneNumber: ownerPhoneNumberTextController.text,
             responsibleName: responsibleNameTextController.text.isEmpty
                 ? ownerNameTextController.text
@@ -363,7 +384,7 @@ class _AddRealEstateState extends State<AddRealEstate> {
           ownerRoleTextController.text = "";
           ownerPasswordTextController.text = "";
           confirmPasswordTextController.text = "";
-          onApartementGarageState(0);
+          apartementGarageTextController.text = "";
         }
         Get.showSnackbar(GetSnackBar(
           animationDuration: const Duration(seconds: 1),
@@ -546,119 +567,12 @@ class _AddRealEstateState extends State<AddRealEstate> {
                 ),
                 /* *!SECTION */
                 /* *SECTION - Garage State */
-                Column(
-                  textDirection: TextDirection.rtl,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    /* *SECTION - title */
-                    Text(
-                      'حالة الجراج',
-                      style: GoogleFonts.notoSansArabic(
-                          fontSize: 18, color: Colors.grey[500]),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    /* *!SECTION */
-                    /* *SECTION - State Selector */
-                    Obx(() => Column(
-                          textDirection: TextDirection.rtl,
-                          children: [
-                            /* *SECTION - No Share in Garage */
-                            GestureDetector(
-                              onTap: () {
-                                onApartementGarageState(0);
-                              },
-                              child: Container(
-                                height: 35,
-                                margin: const EdgeInsets.only(left: 2),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    color: onApartementGarageState.value == 0
-                                        ? Colors.grey[500]
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                        color: Colors.grey[500] ?? Colors.white,
-                                        width: 2),
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Text(
-                                  'لا يوجد حصة جراج',
-                                  style: GoogleFonts.notoSansArabic(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                            ),
-                            /* *!SECTION */
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            /* *SECTION - 1 Share in Garage */
-                            GestureDetector(
-                              onTap: () {
-                                onApartementGarageState(1);
-                              },
-                              child: Container(
-                                height: 35,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: onApartementGarageState.value == 1
-                                      ? Colors.grey[500]
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                      color: Colors.grey[500] ?? Colors.white,
-                                      width: 2),
-                                ),
-                                child: Text(
-                                  'حصة واحدة',
-                                  style: GoogleFonts.notoSansArabic(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                            ),
-                            /* *!SECTION */
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            /* *SECTION - 2 Share in Garage */
-                            GestureDetector(
-                              onTap: () {
-                                onApartementGarageState(2);
-                              },
-                              child: Container(
-                                height: 35,
-                                margin: const EdgeInsets.only(right: 2),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    color: onApartementGarageState.value == 2
-                                        ? Colors.grey[500]
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                        color: Colors.grey[500] ?? Colors.white,
-                                        width: 2),
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Text(
-                                  'حصتين',
-                                  style: GoogleFonts.notoSansArabic(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ),
-                            )
-                            /* *!SECTION */
-                          ],
-                        ))
-                    /* *!SECTION */
-                  ],
-                )
+                TextTile(
+                    width: width * 0.8,
+                    textController: apartementGarageTextController,
+                    title: 'الجراج',
+                    hintText: 'ادخل ارقام الجراج',
+                    icon: Icons.car_repair_outlined)
                 /* *!SECTION */
               ],
             ),
@@ -1209,129 +1123,12 @@ class _AddRealEstateState extends State<AddRealEstate> {
                           height: 20,
                         ),
                         /* *SECTION - Garage State */
-                        Column(
-                          textDirection: TextDirection.rtl,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            /* *SECTION - title */
-                            Text(
-                              'حالة الجراج',
-                              style: GoogleFonts.notoSansArabic(
-                                  fontSize: 18, color: Colors.grey[500]),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            /* *!SECTION */
-                            /* *SECTION - State Selector */
-                            Obx(() => Row(
-                                  textDirection: TextDirection.rtl,
-                                  children: [
-                                    /* *SECTION - No Share in Garage */
-                                    GestureDetector(
-                                      onTap: () {
-                                        onApartementGarageState(0);
-                                      },
-                                      child: Container(
-                                        height: 50,
-                                        margin: const EdgeInsets.only(left: 2),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                            color:
-                                                onApartementGarageState.value ==
-                                                        0
-                                                    ? Colors.grey[500]
-                                                    : Colors.transparent,
-                                            border: Border.all(
-                                                color: Colors.grey[500] ??
-                                                    Colors.white,
-                                                width: 2),
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                    topRight:
-                                                        Radius.circular(20),
-                                                    bottomRight:
-                                                        Radius.circular(20))),
-                                        child: Text(
-                                          'لا يوجد حصة جراج',
-                                          style: GoogleFonts.notoSansArabic(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ),
-                                    ),
-                                    /* *!SECTION */
-                                    /* *SECTION - 1 Share in Garage */
-                                    GestureDetector(
-                                      onTap: () {
-                                        onApartementGarageState(1);
-                                      },
-                                      child: Container(
-                                        height: 50,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color:
-                                              onApartementGarageState.value == 1
-                                                  ? Colors.grey[500]
-                                                  : Colors.transparent,
-                                          border: Border.all(
-                                              color: Colors.grey[500] ??
-                                                  Colors.white,
-                                              width: 2),
-                                        ),
-                                        child: Text(
-                                          'حصة واحدة',
-                                          style: GoogleFonts.notoSansArabic(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ),
-                                    ),
-                                    /* *!SECTION */
-                                    /* *SECTION - 2 Share in Garage */
-                                    GestureDetector(
-                                      onTap: () {
-                                        onApartementGarageState(2);
-                                      },
-                                      child: Container(
-                                        height: 50,
-                                        margin: const EdgeInsets.only(right: 2),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                            color:
-                                                onApartementGarageState.value ==
-                                                        2
-                                                    ? Colors.grey[500]
-                                                    : Colors.transparent,
-                                            border: Border.all(
-                                                color: Colors.grey[500] ??
-                                                    Colors.white,
-                                                width: 2),
-                                            borderRadius: const BorderRadius
-                                                .only(
-                                                topLeft: Radius.circular(20),
-                                                bottomLeft:
-                                                    Radius.circular(20))),
-                                        child: Text(
-                                          'حصتين',
-                                          style: GoogleFonts.notoSansArabic(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ),
-                                    )
-                                    /* *!SECTION */
-                                  ],
-                                ))
-                            /* *!SECTION */
-                          ],
-                        )
+                        TextTile(
+                            width: width,
+                            textController: apartementGarageTextController,
+                            title: 'الجراج',
+                            hintText: 'ادخل ارقام الجراج',
+                            icon: Icons.car_repair_outlined)
                         /* *!SECTION */
                       ],
                     ),
