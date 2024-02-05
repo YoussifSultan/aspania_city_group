@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:aspania_city_group/Common_Used/dialog_tile.dart';
 import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/show_data_tile.dart';
 import 'package:aspania_city_group/Common_Used/useful_functions.dart';
@@ -562,7 +563,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
     /* *SECTION - Desktop View */
     else if (GlobalClass.sizingInformation.deviceScreenType ==
         DeviceScreenType.desktop) {
-      return Scaffold(
+      /*    return Scaffold(
           body: Container(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
         color: Colors.white,
@@ -863,6 +864,7 @@ class _ShowwAllAprtementsPageState extends State<ShowwAllAprtementsPage>
               ),
             ]),
       ));
+    */
     }
     /* *!SECTION */
     return const SizedBox();
@@ -1057,10 +1059,36 @@ class _RealEstateMobileTileState extends State<RealEstateMobileTile> {
                       const SizedBox(
                         height: 10,
                       ),
-                      LabelAndDataHorizontalWidget(
-                          labelText: 'حصة الجراج',
-                          dataText: widget.currentRealEstate.apartementGarage ??
-                              "لا يوجد حصة جراج"),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            color: const Color.fromRGBO(16, 17, 73, 1),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Row(
+                          textDirection: TextDirection.rtl,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(':حصة الجراج',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.notoSansArabic(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.blue[50],
+                                )),
+                            Text(
+                                widget.currentRealEstate.apartementGarage ??
+                                    "لا يوجد حصة جراج",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.notoSansArabic(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                )),
+                          ],
+                        ),
+                      ),
                       const SizedBox(
                         height: 10,
                       ),
@@ -1068,7 +1096,24 @@ class _RealEstateMobileTileState extends State<RealEstateMobileTile> {
                         icon: Icons.delete_outline,
                         title: 'حذف الوحدة',
                         onTap: () {
-                          widget.onTapDeleteButton();
+                          DialogTile.bottomSheetTile(
+                              context: context,
+                              width: GlobalClass
+                                  .sizingInformation.screenSize.width,
+                              height: GlobalClass
+                                  .sizingInformation.screenSize.height,
+                              onMenuButtonTap: (index) {
+                                if (index == 0) {
+                                  widget.onTapDeleteButton();
+                                  Navigator.of(context).pop();
+                                } else if (index == 1) {
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                              menuText: [
+                                ' ${widget.currentRealEstate.apartementName} حذف الوحدة',
+                                'الغاء الحذف'
+                              ]);
                         },
                       ),
                       const SizedBox(

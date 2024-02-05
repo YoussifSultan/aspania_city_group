@@ -32,11 +32,11 @@ class _SigninScreenState extends State<SigninScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: Center(
-        child: ResponsiveBuilder(builder: (context, sizingInformation) {
-          /* *SECTION - Laptop View */
-          if (sizingInformation.isDesktop) {
-            return ListView(
+      body: ResponsiveBuilder(builder: (context, sizingInformation) {
+        /* *SECTION - Laptop View */
+        if (sizingInformation.isDesktop) {
+          return Center(
+            child: ListView(
               children: [
                 const SizedBox(
                   height: 20,
@@ -157,19 +157,29 @@ class _SigninScreenState extends State<SigninScreen> {
                   height: 20,
                 ),
               ],
-            );
-          }
-          /* *!SECTION */
-          /* *SECTION - Mobile View */
-          else if (sizingInformation.isMobile) {
-            /* *SECTION - Dialog To Log In */
-            return Center(
+            ),
+          );
+        }
+        /* *!SECTION */
+        /* *SECTION - Mobile View */
+        else if (sizingInformation.isMobile || sizingInformation.isTablet) {
+          /* *SECTION - Dialog To Log In */
+          return Container(
+            width: width,
+            height: height,
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.fitHeight,
+                image: AssetImage('assets/images/spainCity.jpg'),
+              ),
+            ),
+            child: Center(
               child: Container(
                 alignment: Alignment.center,
                 width: width * 0.9,
                 height: 375,
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(20)),
                 child: Column(children: [
                   const SizedBox(
@@ -218,13 +228,13 @@ class _SigninScreenState extends State<SigninScreen> {
                   ),
                 ]),
               ),
-            );
-            /* *!SECTION */
-          }
-          return const SizedBox();
+            ),
+          );
           /* *!SECTION */
-        }),
-      ),
+        }
+        return const SizedBox();
+        /* *!SECTION */
+      }),
     );
   }
 

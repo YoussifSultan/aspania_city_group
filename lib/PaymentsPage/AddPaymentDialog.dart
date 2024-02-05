@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:aspania_city_group/Common_Used/button_tile.dart';
 import 'package:aspania_city_group/Common_Used/dialog_tile.dart';
@@ -202,6 +203,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
 
 /* *!SECTION */
   /* *!SECTION */
+
   @override
   Widget build(BuildContext context) {
     /* *SECTION - Mobile View */
@@ -337,7 +339,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
     /* *SECTION - Desktop View */
     if (GlobalClass.sizingInformation.deviceScreenType ==
         DeviceScreenType.desktop) {
-      return Container(
+      /*    return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
             color: Colors.white, borderRadius: BorderRadius.circular(20)),
@@ -469,6 +471,7 @@ class _AddPaymentDialogState extends State<AddPaymentDialog> {
           ],
         ),
       );
+     */
     }
     /* *!SECTION */
     return const SizedBox();

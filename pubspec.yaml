@@ -40,11 +40,14 @@ dependencies:
   google_fonts: ^5.1.0
   barcode_widget: ^2.0.4
   excel: ^2.1.0
+  printing: ^5.11.1
   selector_wheel: ^1.1.2
   animated_tree_view: ^2.1.0
+  number_to_word_arabic: ^0.0.8
   fluid_dialog: ^2.0.0
   http: ^1.1.0
   intl: ^0.18.1
+  pdf: ^3.10.7
   mouse_parallax: ^1.1.0
   flutter_zoom_drawer: ^3.1.1
   get: ^4.6.5

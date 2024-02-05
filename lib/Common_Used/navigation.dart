@@ -42,8 +42,8 @@ class NavigationProperties {
   static String addNewRealEstatePageRoute = 'AddNewApartement';
   static String dataTableOfApartements = 'showAllApartements';
   /* *!SECTION */
-  static List selectedTabNeededParamters = [];
-  static RxString selectedTabVaueNotifier = 'realEstateSummary'.obs;
+  static List selectedTabNeededParamters = ['PaymentsDuringMonth', ''];
+  static RxString selectedTabVaueNotifier = 'OverallPaymentPeriodPage'.obs;
 }
 
 /* *!SECTION */

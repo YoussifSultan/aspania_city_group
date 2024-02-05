@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:aspania_city_group/Common_Used/button_tile.dart';
+import 'package:aspania_city_group/Common_Used/dialog_tile.dart';
 import 'package:aspania_city_group/Common_Used/global_class.dart';
 import 'package:aspania_city_group/Common_Used/navigation.dart';
 import 'package:aspania_city_group/Common_Used/show_data_tile.dart';
@@ -18,10 +20,13 @@ import 'package:fluid_dialog/fluid_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:printing/printing.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-
+import 'package:number_to_word_arabic/number_to_word_arabic.dart';
 import '../Common_Used/text_tile.dart';
 import '../Dashboard/menu_card_button.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class OverallPaymentsThroughPeriod extends StatefulWidget {
   const OverallPaymentsThroughPeriod(
@@ -321,6 +326,133 @@ class _OverallPaymentsThroughPeriodState
 
 /* *!SECTION */
 /* *!SECTION */
+  /* *SECTION - Print Receit Of Payment */
+  /// This method takes a page format and generates the Pdf file data
+  Future<Uint8List> createPDFReceit(
+      PdfPageFormat format, PaymentData payment) async {
+    // Create the Pdf document
+    final pw.Document doc = pw.Document();
+    final arabicLabel = await PdfGoogleFonts.notoSansArabicLight();
+    final arabicData = await PdfGoogleFonts.notoSansArabicBold();
+    final arabicHeader = await PdfGoogleFonts.notoSansArabicExtraBold();
+    final englishData = await PdfGoogleFonts.notoSansAdlamBold();
+
+    // Add one page with centered text "Hello World"
+    doc.addPage(
+      pw.Page(
+        pageFormat: format,
+        textDirection: pw.TextDirection.rtl,
+        build: (pw.Context context) {
+          return pw.Column(children: [
+            /* *SECTION - Header */
+            pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Column(children: [
+                    pw.Container(
+                        width: 175,
+                        child: pw.Row(
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pw.Text('اتحاد ملاك كمبوند',
+                                  style: pw.TextStyle(font: arabicLabel)),
+                              pw.Text('/'),
+                              pw.Text('اسبانيا سيتي',
+                                  style: pw.TextStyle(font: arabicData)),
+                            ])),
+                    pw.Text('مشهر برقم 11-2013  العمرانية',
+                        style: pw.TextStyle(font: arabicLabel)),
+                  ]),
+                  pw.Container(
+                      width: 150,
+                      child: pw.Text(
+                          'لا يعتد بهذا الإيصال إلا إذا كان مختوماً بخاتم اتحاد الشاغلين',
+                          style: pw.TextStyle(font: arabicLabel)))
+                ]),
+            /* *!SECTION */
+            pw.SizedBox(height: 20),
+            /* *SECTION - Title & ApartementName */
+            pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                children: [
+                  pw.Text('إيصال تحصيل نقدية',
+                      style: pw.TextStyle(font: arabicHeader)),
+                  pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.center,
+                      children: [
+                        pw.Text('رقم الوحدة :   ',
+                            style: pw.TextStyle(font: arabicLabel)),
+                        pw.Text(payment.apartementName,
+                            style: pw.TextStyle(font: englishData))
+                      ])
+                ]),
+            /* *!SECTION */
+            pw.SizedBox(height: 20),
+            /* *SECTION - Date Of Report & Amount */
+            pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
+                children: [
+                  pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.center,
+                      children: [
+                        pw.Text('تحرير في :   ',
+                            style: pw.TextStyle(font: arabicLabel)),
+                        pw.Text(
+                            intl.DateFormat.yMMMMEEEEd('ar')
+                                .format(payment.paymentDate)
+                                .toString(),
+                            style: pw.TextStyle(font: arabicData))
+                      ]),
+                  pw.Column(children: [
+                    pw.Text('قيمة السداد',
+                        style: pw.TextStyle(font: arabicLabel)),
+                    pw.Text(
+                        UsefulFunctions.replaceArabicNumber(
+                            payment.paymentAmount.toStringAsFixed(2)),
+                        style: pw.TextStyle(font: arabicData)),
+                  ]),
+                ]),
+            /* *!SECTION */
+            pw.SizedBox(height: 20),
+            /* *SECTION - Owner Who Payed & Amount Written & The Reason */
+            pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Row(children: [
+                    pw.Text('استلمنا من :   استاذ ',
+                        style: pw.TextStyle(font: arabicLabel)),
+                    pw.Text(payment.ownerName,
+                        style: pw.TextStyle(font: arabicData))
+                  ]),
+                  pw.SizedBox(height: 20),
+                  pw.Row(children: [
+                    pw.Text('قيمة السداد مكتوبة :   ',
+                        style: pw.TextStyle(font: arabicLabel)),
+                    pw.Text(
+                        '${Tafqeet.convert(payment.paymentAmount.toString())}جنيهاً لا غير',
+                        style: pw.TextStyle(font: arabicData))
+                  ]),
+                  pw.SizedBox(height: 20),
+                  pw.Row(children: [
+                    pw.Text('وذلك قيمة :   ',
+                        style: pw.TextStyle(font: arabicLabel)),
+                    pw.Text(payment.paymentNote,
+                        style: pw.TextStyle(font: arabicData))
+                  ]),
+                ])
+            /* *!SECTION */
+          ]);
+        },
+      ),
+    );
+
+    // Build and return the final Pdf file data
+    return await doc.save();
+  }
+
+  /* *!SECTION */
+
   @override
   void initState() {
     initializeDateFormatting();
@@ -389,6 +521,7 @@ class _OverallPaymentsThroughPeriodState
       ];
 
       return Scaffold(
+        backgroundColor: Colors.white,
         body: ScrollConfiguration(
             behavior:
                 ScrollConfiguration.of(context).copyWith(scrollbars: false),
@@ -468,6 +601,17 @@ class _OverallPaymentsThroughPeriodState
                         onTapMoreButton: () {
                           selectedPaymentForDetails(index);
                         },
+                        onTapPrintButton: () {
+                          Printing.layoutPdf(
+                            // [onLayout] will be called multiple times
+                            // when the user changes the printer or printer settings
+                            onLayout: (PdfPageFormat format) {
+                              // Any valid Pdf document can be returned here as a list of int
+                              return createPDFReceit(
+                                  PdfPageFormat.a4, currentPayment);
+                            },
+                          );
+                        },
                       ),
                     );
                   },
@@ -488,7 +632,7 @@ class _OverallPaymentsThroughPeriodState
     /* *SECTION - Desktop View */
     else if (GlobalClass.sizingInformation.deviceScreenType ==
         DeviceScreenType.desktop) {
-      return Scaffold(
+      /*      return Scaffold(
           body: Container(
               padding: const EdgeInsets.fromLTRB(20, 15, 20, 10),
               color: Colors.white,
@@ -902,6 +1046,7 @@ class _OverallPaymentsThroughPeriodState
 
                 /* *!SECTION */
               ])));
+    */
     }
     /* *!SECTION */
     return const SizedBox();
@@ -916,7 +1061,8 @@ class PaymentMobileTile extends StatefulWidget {
       required this.selectedPaymentForDetails,
       required this.onTapMoreButton,
       required this.onTapDeleteButton,
-      required this.onTapEditButton});
+      required this.onTapEditButton,
+      required this.onTapPrintButton});
 
   final PaymentData currentPayment;
   final int selectedPaymentForDetails;
@@ -924,6 +1070,7 @@ class PaymentMobileTile extends StatefulWidget {
   final Function onTapMoreButton;
   final Function onTapDeleteButton;
   final Function onTapEditButton;
+  final Function onTapPrintButton;
   @override
   State<PaymentMobileTile> createState() => _PaymentMobileTileState();
 }
@@ -1032,10 +1179,36 @@ class _PaymentMobileTileState extends State<PaymentMobileTile> {
                             height: 10,
                           ),
                           MenuButtonCard(
+                              icon: Icons.print_outlined,
+                              title: 'طباعة ايصال',
+                              onTap: () {
+                                widget.onTapPrintButton();
+                              }),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          MenuButtonCard(
                             icon: Icons.delete_outline,
-                            title: 'حذف الفاتورة',
+                            title: 'حذف السداد',
                             onTap: () {
-                              widget.onTapDeleteButton();
+                              DialogTile.bottomSheetTile(
+                                  context: context,
+                                  width: GlobalClass
+                                      .sizingInformation.screenSize.width,
+                                  height: GlobalClass
+                                      .sizingInformation.screenSize.height,
+                                  onMenuButtonTap: (index) {
+                                    if (index == 0) {
+                                      widget.onTapDeleteButton();
+                                      Navigator.of(context).pop();
+                                    } else if (index == 1) {
+                                      Navigator.of(context).pop();
+                                    }
+                                  },
+                                  menuText: [
+                                    ' ${widget.currentPayment.paymentAmount} حذف السداد بقيمة',
+                                    'الغاء الحذف'
+                                  ]);
                             },
                           ),
                           const SizedBox(
@@ -1043,10 +1216,10 @@ class _PaymentMobileTileState extends State<PaymentMobileTile> {
                           ),
                           MenuButtonCard(
                               icon: Icons.edit_outlined,
-                              title: 'تعديل الفاتورة',
+                              title: 'تعديل السداد',
                               onTap: () {
                                 widget.onTapEditButton();
-                              })
+                              }),
                         ])))
           ]),
         ));

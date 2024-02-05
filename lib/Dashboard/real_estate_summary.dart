@@ -140,7 +140,7 @@ WHERE
     /* *SECTION - Desktop View */
     else if (GlobalClass.sizingInformation.deviceScreenType ==
         DeviceScreenType.desktop) {
-      return ListView(
+      /*  return ListView(
         shrinkWrap: true,
         children: [
           const SizedBox(
@@ -265,6 +265,7 @@ WHERE
           )
         ],
       );
+    */
     }
     /* *!SECTION */
     return const SizedBox();
